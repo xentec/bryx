@@ -2,4 +2,4 @@
 struct Game
 {
 	
-}
+};
