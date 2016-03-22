@@ -1,10 +1,11 @@
 #pragma once
 
 #include "global.h"
+#include "vector.h"
 
 #include <vector>
 
-enum class Cell : char
+enum class Cell : u8
 {
 	// standard fields
 	VOID = '-',
@@ -24,11 +25,24 @@ struct Map
 {
 	Map(u32 width, u32 height);
 
-	Cell at(u32 x, u32 y) const;
-	Cell& at(u32 x, u32 y);
+	void clear(Cell new_cell = Cell::EMPTY);
 
-	void clear(Cell cell = Cell::EMPTY);
-private:
+	struct Row
+	{
+		Cell& operator[](usz index);
+	private:
+		Row(Map& map, usz offset);
+		const usz offset;
+		Map& map;
+
+		friend class Map;
+	};
+	Row operator[](usz index);
+
+	string asString();
+
+
 	const u32 width, height;
+private:
 	std::vector<Cell> data;
 };
