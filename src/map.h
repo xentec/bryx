@@ -21,11 +21,30 @@ enum class Cell : u8
 	P1 = '1', P2, P3, P4, P5, P6, P7, P8,
 };
 
+enum class Direction : u8
+{
+	N, NE, E, SE, S, SW, W, NW
+};
+
+struct Location
+{
+	vec2 pos;
+	Direction dir;
+};
+
+struct Transistion
+{
+	Transistion(const Location& from, const Location& to);
+
+	const Location from, to;
+};
+
 struct Map
 {
 	Map(u32 width, u32 height);
 
 	void clear(Cell new_cell = Cell::EMPTY);
+	void add(const Transistion& trn);
 
 	struct Row
 	{
@@ -45,4 +64,5 @@ struct Map
 	const u32 width, height;
 private:
 	std::vector<Cell> data;
+	std::vector<Transistion> trans;
 };

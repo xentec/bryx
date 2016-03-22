@@ -12,6 +12,11 @@ void Map::clear(Cell new_cell)
 		cell = cell;
 }
 
+void Map::add(const Transistion &trn)
+{
+	trans.push_back(trn);
+}
+
 Map::Row Map::operator[](usz index)
 {
 	return Row(*this, index*height);
@@ -23,7 +28,7 @@ string Map::asString()
 	for(usz h = 0; h < height; h++)
 	{
 		for(usz w = 0; w < width; w++)
-			str << (char) (*this)[w][h] << " ";
+			str << (u8) (*this)[w][h] << " ";
 		str << std::endl;
 	}
 
