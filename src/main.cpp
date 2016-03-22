@@ -8,6 +8,8 @@ int main(int argc, char* argv[])
 	Map map(5,5);
 	std::cout << map.asString() << std::endl;
 
+	//Test Comment~
+
 #ifdef _WIN32
 	getchar();
 #endif
