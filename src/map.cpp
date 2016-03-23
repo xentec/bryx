@@ -20,6 +20,16 @@ void Map::add(const Transistion &trn)
 	trans.push_back(trn);
 }
 
+Cell Map::at(u32 x, u32 y) const
+{
+	return data[y*height+x];
+}
+
+Cell& Map::at(u32 x, u32 y)
+{
+	return data[y*height+x];
+}
+
 Map::Row Map::operator[](usz index)
 {
 	return Row(*this, index*height);
