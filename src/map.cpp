@@ -48,6 +48,28 @@ string Map::asString()
 	return str.str();
 }
 
+bool Map::isCell(u8 c)
+{
+	Cell cell = static_cast<Cell>(c);
+	switch(cell)
+	{
+	case Cell::BONUS:
+	case Cell::CHOICE:
+	case Cell::EMPTY:
+	case Cell::EXPANSION:
+	case Cell::INVERSION:
+	case Cell::VOID:
+		return true;
+	default:
+		break;
+	}
+
+	if((u8)Cell::P1 <= c && c <= (u8)Cell::P8)
+		return true;
+
+	return false;
+}
+
 // Row
 //########
 Map::Row::Row(Map &map, usz offset):

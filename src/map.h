@@ -63,6 +63,7 @@ struct Map
 
 	string asString();
 
+	static bool isCell(u8 c);
 
 	const u32 width, height;
 private:
