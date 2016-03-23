@@ -2,6 +2,9 @@
 
 #include <sstream>
 
+
+// Map
+//########
 Map::Map(u32 width, u32 height):
 	width(width), height(height), data(width*height, Cell::EMPTY)
 {}
@@ -35,10 +38,8 @@ string Map::asString()
 	return str.str();
 }
 
-
-
 // Row
-
+//########
 Map::Row::Row(Map &map, usz offset):
 	map(map), offset(offset)
 {}
