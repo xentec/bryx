@@ -22,17 +22,17 @@ void Map::add(const Transistion &trn)
 
 Cell Map::at(u32 x, u32 y) const
 {
-	return data[y*height+x];
+	return data[x*width+y];
 }
 
 Cell& Map::at(u32 x, u32 y)
 {
-	return data[y*height+x];
+	return data[x*width+y];
 }
 
 Map::Row Map::operator[](usz index)
 {
-	return Row(*this, index*height);
+	return Row(*this, index*width);
 }
 
 string Map::asString()
