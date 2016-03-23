@@ -5,12 +5,24 @@
 
 void Win32_Break();
 void PrintError(string message, string location);
+std::vector<string> splitString(string str, char at);
 bool parseMapByFile(string filename, Map* map_out, bool debug_text_out);
 
 int main(int argc, char* argv[])
 {
 // 	Map map(5,5);
 // 	std::cout << map.asString() << std::endl;
+
+	std::string str = "15 0 1 <-> 0 14 5";
+	std::string empty_str;
+	std::vector<string> poses = splitString(str, *(const char*)" ");
+
+ 	for (string& s : poses)
+ 	{
+ 		std::cout << s << std::endl;
+ 	}
+ 
+ 	std::cout << std::endl;
 
 
 	Map* debug_map = nullptr;
@@ -27,8 +39,7 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		//No output needed, information comes from function itself
-		//PrintError("Failed to parse the map !", "main => parseMapByFile(...) call");
+		//No output needed, information comes from function itself		
 	}
 
 	Win32_Break();
@@ -40,6 +51,42 @@ void Win32_Break()
 #ifdef _WIN32
 	getchar();
 #endif
+}
+
+std::vector<string> splitString(string str, char at)
+{
+	std::vector<u32> positions;
+	std::vector<string> retMe;
+	int count = 0;
+
+	if (str.empty())
+	{
+		PrintError("Split string failed during empty input !", "splitString => if (str.empty()) ..");
+		return retMe;
+	}		
+	
+	positions.push_back(0);	
+	for (char& c : str)
+	{
+		if (c == at)
+		{	
+			positions.push_back(count);
+		}
+	   
+		count++;
+	}	
+
+	for (int i = 0; i < positions.size() - 1; i++)	
+	{	
+		if (positions.at(i) == 0)
+			retMe.push_back(str.substr(positions.at(i), positions.at(i + 1)));		
+		else
+			retMe.push_back(str.substr(positions.at(i) + 1, positions.at(i + 1) - positions.at(i) - 1));
+	}
+
+	retMe.push_back(str.substr(positions.at(positions.size() - 1) + 1, str.length() - positions.size() - 1));
+
+	return retMe;
 }
 
 bool parseMapByFile(string filename, Map* map_out, bool debug_text_out)
@@ -87,8 +134,7 @@ bool parseMapByFile(string filename, Map* map_out, bool debug_text_out)
 		u32 tmp_overwritestones = 0;
 		u32 tmp_bombs = 0;
 		u32 tmp_bomb_strenght = 0;
-
-		u32 temp_transitions_from = 0;
+		u32 tmp_transitions_from = 0;
 
 		for (std::string& str : lines)
 		{
@@ -116,14 +162,14 @@ bool parseMapByFile(string filename, Map* map_out, bool debug_text_out)
 				map_out = new Map(map_width, map_height);
 							
 				//Debug				
-				std::cout << map_out->asString();
-				std::cout << "( Printed within the function parseMapByFile through map_out->asString()  )" << std::endl << std::endl;
+ 				std::cout << map_out->asString();
+ 				std::cout << "( Printed within the function parseMapByFile through map_out->asString()  )" << std::endl << std::endl;
 			}
 			else if (4 < line_count <= 4 + map_height)
 			{
 				for (char& c : str)
-				{
-					//map_out[map_x][map_y] = c;										
+				{						
+					//map_out->at(map_x, map_y) = (Cell)c;
 					map_x++;
 				}
 
@@ -132,14 +178,12 @@ bool parseMapByFile(string filename, Map* map_out, bool debug_text_out)
 			}
 			else if (line_count > 4 + map_height)
 			{
-				// Parse Transistion
+				// Parse Transistion    ex: 15 0 1 <-> 0 14 5
 			}
 
 
 			line_count++;
-		}
-
-		//Win32_Break();
+		}		
 		return true;		
 	}
 	else
