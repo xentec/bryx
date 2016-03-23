@@ -2,6 +2,9 @@
 
 #include <sstream>
 
+
+// Map
+//########
 Map::Map(u32 width, u32 height):
 	width(width), height(height), data(width*height, Cell::EMPTY)
 {}
@@ -17,9 +20,19 @@ void Map::add(const Transistion &trn)
 	trans.push_back(trn);
 }
 
+Cell Map::at(u32 x, u32 y) const
+{
+	return data[x*width+y];
+}
+
+Cell& Map::at(u32 x, u32 y)
+{
+	return data[x*width+y];
+}
+
 Map::Row Map::operator[](usz index)
 {
-	return Row(*this, index*height);
+	return Row(*this, index*width);
 }
 
 string Map::asString()
@@ -35,10 +48,8 @@ string Map::asString()
 	return str.str();
 }
 
-
-
 // Row
-
+//########
 Map::Row::Row(Map &map, usz offset):
 	map(map), offset(offset)
 {}

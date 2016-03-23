@@ -46,6 +46,9 @@ struct Map
 	void clear(Cell new_cell = Cell::EMPTY);
 	void add(const Transistion& trn);
 
+	Cell at(u32 x, u32 y) const;
+	Cell& at(u32 x, u32 y);
+
 	struct Row
 	{
 		Cell& operator[](usz index);
