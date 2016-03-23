@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 
 	Map* debug_map = nullptr;
 	if (parseMapByFile("Read.txt", debug_map, true))
-	{
+	{		
 		if (debug_map != nullptr)
 		{
 			std::cout << debug_map->asString() << std::endl;
@@ -67,71 +67,80 @@ bool parseMapByFile(string filename, Map* map_out, bool debug_text_out)
 	{
 		if (debug_text_out)
 		{
+			std::cout << "--- debug_text_out start ---" << std::endl;
 			for (std::string& str : lines)
 			{
 				std::cout << str << std::endl;
-			}
-			
-			//Win32_Break();
-			return true;
-		}
-		else
+			}			
+			std::cout << "--- debug_text_out end ---" << std::endl;
+			std::cout << std::endl << std::endl;
+		}		
+
+		u32 line_count = 1;
+		u32 map_width = 0;
+		u32 map_height = 0;
+		u32 map_x = 0;
+		u32 map_y = 0;
+
+		//Temporary Declarations
+		u32 tmp_players = 0;
+		u32 tmp_overwritestones = 0;
+		u32 tmp_bombs = 0;
+		u32 tmp_bomb_strenght = 0;
+
+		u32 temp_transitions_from = 0;
+
+		for (std::string& str : lines)
 		{
-			u32 line_count = 1;
-			u32 map_width = 0;
-			u32 map_height = 0;
-			u32 map_x = 0;
-			u32 map_y = 0;
-
-			//Temporary Declarations
-			u32 tmp_players = 0;
-			u32 tmp_overwritestones = 0;
-			u32 tmp_bombs = 0;
-			u32 tmp_bomb_strenght = 0;
-
-			u32 temp_transitions_from = 0;
-
-			for (std::string& str : lines)
+			if (line_count == 1)
 			{
-				if (line_count == 1)
+				tmp_players = atoi(str.c_str());
+			}
+			else if (line_count == 2)
+			{
+				tmp_overwritestones = atoi(str.c_str());
+			}
+			else if (line_count == 3)
+			{				
+				u32 temp = str.find(" ") + 1;
+				
+				tmp_bombs = std::stoi(str.substr(0, temp));
+				tmp_bomb_strenght = std::stoi(str.substr(temp, str.length()));
+			}
+			else if (line_count == 4)
+			{
+				u32 temp = str.find(" ") + 1;
+				
+				map_height = std::stoi(str.substr(0, temp));
+				map_width = std::stoi(str.substr(temp, str.length()));
+				map_out = new Map(map_width, map_height);
+							
+				//Debug				
+				std::cout << map_out->asString();
+				std::cout << "( Printed within the function parseMapByFile through map_out->asString()  )" << std::endl << std::endl;
+			}
+			else if (4 < line_count <= 4 + map_height)
+			{
+				for (char& c : str)
 				{
-					tmp_players = atoi(str.c_str());
+					//map_out[map_x][map_y] = c;										
+					map_x++;
 				}
-				else if (line_count == 2)
-				{
-					tmp_overwritestones = atoi(str.c_str());
-				}
-				else if (line_count == 3)
-				{					
-					// Split Bomb String and fill into tmp variables					
-				}
-				else if (line_count == 4)
-				{
-					// Split Size String and fill into tmp variables
-					map_out = new Map(map_width, map_height);
-				}
-				else if (4 < line_count <= 4 + map_height)
-				{
-					for (char& c : str)
-					{
-						//map_out[map_x][map_y] = c;										
-						map_x++;
-					}
 
-					map_y++;
-					map_x = 0;
-				}
-				else if (line_count > 4 + map_height)
-				{
-					// Parse Transistion
-				}
+				map_y++;
+				map_x = 0;
+			}
+			else if (line_count > 4 + map_height)
+			{
+				// Parse Transistion
 			}
 
-			//Win32_Break();
-			return true;
+
+			line_count++;
 		}
-		
-		return true;
+
+		//Win32_Break();
+		return true;		
 	}
 	else
 	{
