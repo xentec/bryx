@@ -128,6 +128,15 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 		}
 		else if (4 < line_count && line_count <= 4 + game.map->height)
 		{
+			usz lm = (line.length()+1)/2;
+			if(lm != game.map->width)
+			{
+				PrintError(string("Failed to parse map: line ")+std::to_string(line_count)
+						   +string(" length does not match map width: ")
+						   +std::to_string(lm)+string(" != ")+std::to_string(game.map->width), "parseMapByFile");
+				return false;
+			}
+
 			for(string::size_type i = 0; i < line.length(); i++)
 			{
 				char c = line[i];
