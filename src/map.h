@@ -28,13 +28,13 @@ enum class Direction : u8
 
 struct Location
 {
-	vec2 pos;
+	Vec2 pos;
 	Direction dir;
 
 	string asString() const
 	{
 		//static const char* dirs[] = {"⬆", "↗", "➡", "↘", "⬇", "↙", "⬅", "↖"};
-		static const char* dirs[] = {"N (0)", "NE (1)", "E (2)", "SE (3)", "S (4)", "SW (5)", "W (6)", "NW (7)"};
+		static const char* dirs[] = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
 		return pos.asString()+":"+dirs[static_cast<usz>(dir)];
 	}
 };
