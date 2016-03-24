@@ -148,7 +148,6 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 			// Parse Transistion
 		}
 	}
-	std::cout << game.map->height << std::endl;
 
 	if(!valid)
 	{
