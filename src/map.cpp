@@ -38,9 +38,9 @@ Map::Row Map::operator[](usz index)
 string Map::asString()
 {
 	std::stringstream str;
-	for(usz x = 0; x < width; x++)
+	for(usz y = 0; y < height; y++)
 	{
-		for(usz y = 0; y < height; y++)
+		for(usz x = 0; x < width; x++)
 			str << (u8) at(x,y) << " ";
 		str << std::endl;
 	}
