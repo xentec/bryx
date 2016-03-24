@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 {
 	Game game;
 
-	string mapFilePath = "Read.txt";
+	string mapFilePath = "dust.map";
 	if(argc >= 2) // TODO: better arg parsing with getopt
 	{
 		mapFilePath.assign(argv[1]);
@@ -146,6 +146,44 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 		{
 			valid = true;
 			// Parse Transistion
+			std::vector<std::string> transistion_parts = splitString(line, *(const char*)" ");
+
+			Location from, to;
+			vec2 v1, v2;
+
+			v1[0] = std::stoi(transistion_parts.at(0));
+			v1[1] = std::stoi(transistion_parts.at(1));
+
+			from.pos = v1;
+			from.dir = static_cast<Direction>(std::stoi(transistion_parts.at(2)));
+			
+
+			v2[0] = std::stoi(transistion_parts.at(4));
+			v2[1] = std::stoi(transistion_parts.at(5));
+
+			to.pos = v2;
+			to.dir = static_cast<Direction>(std::stoi(transistion_parts.at(6)));
+
+			/*
+			std::cout << "####################################" << std::endl;
+			std::cout << "Base Line:" << std::endl;
+			std::cout << line << std::endl;
+			std::cout << "Split Line:" << std::endl;
+			std::cout << " 0: " << transistion_parts.at(0)
+					  << " 1: " << transistion_parts.at(1)
+					  << " 2: " << transistion_parts.at(2)
+					  << " 4: " << transistion_parts.at(4)
+					  << " 5: " << transistion_parts.at(5)
+					  << " 6: " << transistion_parts.at(6)
+					  << std::endl;
+			std::cout << "####################################" << std::endl;
+			*/
+
+
+			/*
+			Error	3	error LNK2019: unresolved external symbol "public: __thiscall Transistion::Transistion(struct Location const &,struct Location const &)" (??0Transistion@@QAE@ABULocation@@0@Z) referenced in function "bool __cdecl parseMapByFile(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &,struct Game &,bool)" (?parseMapByFile@@YA_NABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AAUGame@@_N@Z)	E:\CodingProjects\VS13\Projects\_c++\_GitRepos\RevXT-SS16-g01\bryx\bryx\main.obj
+			*/
+			//game.map->add(Transistion(from, to));
 		}
 	}
 
