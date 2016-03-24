@@ -179,6 +179,22 @@ bool parseMapByFile(string filename, Map* map_out, bool debug_text_out)
 			else if (line_count > 4 + map_height)
 			{
 				// Parse Transistion    ex: 15 0 1 <-> 0 14 5
+				std::vector<string> parts = splitString(str, *(const char*)" ");
+
+				Location from, to;				
+								
+				vec2 v1;
+				v1[0] = std::stoi(parts.at(0));
+				v1[1] = std::stoi(parts.at(1));
+				from.pos = v1;
+				from.dir = (Direction)std::stoi(parts.at(2));
+
+				vec2 v2;
+				v1[0] = std::stoi(parts.at(4));
+				v1[1] = std::stoi(parts.at(5));				
+				to.dir = (Direction)std::stoi(parts.at(6));
+
+				//map_out->add(Transistion(from, to));
 			}
 
 
