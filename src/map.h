@@ -30,6 +30,12 @@ struct Location
 {
 	vec2 pos;
 	Direction dir;
+
+	string asString() const
+	{
+		static const char* dirs[] = {"⬆", "↗", "➡", "↘", "⬇", "↙", "⬅", "↖"};
+		return pos.asString()+":"+dirs[static_cast<usz>(dir)];
+	}
 };
 
 struct Transistion

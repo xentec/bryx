@@ -45,6 +45,9 @@ string Map::asString()
 		str << std::endl;
 	}
 
+	for(const Transistion& tr: trans)
+		str << tr.from.asString() << " >-< " << tr.to.asString() << std::endl;
+
 	return str.str();
 }
 

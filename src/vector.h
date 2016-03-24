@@ -2,7 +2,7 @@
 
 #include "global.h"
 
-#include <vector>
+#include <sstream>
 
 template<usz N, class T>
 struct Vector
@@ -61,6 +61,18 @@ struct Vector
 			res += data[i] * other[i];
 
 		return res;
+	}
+
+	string asString() const
+	{
+		std::stringstream str;
+		str << "[" << data[0];
+
+		for(usz i = 1; i < N; i++)
+			str << ", " << data[i];
+
+		str << "]";
+		return str.str();
 	}
 
 private:
