@@ -113,7 +113,7 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 			}
 
 			game.bombs = std::stoi(line.substr(0, temp));
-			game.bombsStrength = std::stoi(line.substr(temp+1, line.length()));
+			game.bombsStrength = std::stoi(line.substr(temp+1));
 		}
 		else if (line_count == 4)
 		{
@@ -124,7 +124,7 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 				return false;
 			}
 
-			game.map = new Map(std::stoi(line.substr(temp, line.length())), std::stoi(line.substr(0, temp)));
+			game.map = new Map(std::stoi(line.substr(temp+1)), std::stoi(line.substr(0, temp)));
 		}
 		else if (4 < line_count && line_count <= 4 + game.map->height)
 		{
@@ -139,7 +139,7 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 
 			for(string::size_type i = 0; i < line.length(); i++)
 			{
-				char c = line[i];
+				volatile char c = line[i];
 
 				if(c == ' ') continue;
 				if(!Map::isCell(c))
@@ -155,25 +155,17 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 		{
 			valid = true;
 			// Parse Transistion
-			std::vector<std::string> transistion_parts = splitString(line, *(const char*)" ");
+			std::vector<string> transistion_parts = splitString(line, ' ');
 
 			Location from, to;
-			vec2 v1, v2;
 
-			v1[0] = std::stoi(transistion_parts.at(0));
-			v1[1] = std::stoi(transistion_parts.at(1));
-
-			from.pos = v1;
+			from.pos = { std::stoi(transistion_parts.at(0)), std::stoi(transistion_parts.at(1)) };
 			from.dir = static_cast<Direction>(std::stoi(transistion_parts.at(2)));
-			
 
-			v2[0] = std::stoi(transistion_parts.at(4));
-			v2[1] = std::stoi(transistion_parts.at(5));
-
-			to.pos = v2;
+			to.pos = { std::stoi(transistion_parts.at(4)), std::stoi(transistion_parts.at(5)) };
 			to.dir = static_cast<Direction>(std::stoi(transistion_parts.at(6)));
 
-			/*
+#if DEBUG
 			std::cout << "####################################" << std::endl;
 			std::cout << "Base Line:" << std::endl;
 			std::cout << line << std::endl;
@@ -186,13 +178,9 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 					  << " 6: " << transistion_parts.at(6)
 					  << std::endl;
 			std::cout << "####################################" << std::endl;
-			*/
+#endif
 
-
-			/*
-			Error	3	error LNK2019: unresolved external symbol "public: __thiscall Transistion::Transistion(struct Location const &,struct Location const &)" (??0Transistion@@QAE@ABULocation@@0@Z) referenced in function "bool __cdecl parseMapByFile(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &,struct Game &,bool)" (?parseMapByFile@@YA_NABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AAUGame@@_N@Z)	E:\CodingProjects\VS13\Projects\_c++\_GitRepos\RevXT-SS16-g01\bryx\bryx\main.obj
-			*/
-			//game.map->add(Transistion(from, to));
+			game.map->add(Transistion(from, to));
 		}
 	}
 
