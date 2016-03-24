@@ -81,3 +81,8 @@ Cell& Map::Row::operator[](usz index)
 	return map.data[offset+index];
 }
 
+// Transistion
+//##############
+Transistion::Transistion(const Location& from, const Location& to):
+	from(from), to(to)
+{}
