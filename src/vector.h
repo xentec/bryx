@@ -3,6 +3,7 @@
 #include "global.h"
 
 #include <sstream>
+#include <initializer_list>
 
 template<usz N, class T>
 struct Vector
@@ -17,6 +18,16 @@ struct Vector
 	{
 		for(u32 i = 0; i < N; i++)
 			data[i] = other[i];
+	}
+
+	Vector(std::initializer_list<T> list)
+	{
+		if(list.size() != N)
+			throw std::logic_error("element number != vector size");
+
+		usz i = 0;
+		for(T e : list)
+			data[i++] = e;
 	}
 
 	T operator[](usz index) const
@@ -43,6 +54,11 @@ struct Vector
 			res[i] = data[i] + other[i];
 
 		return res;
+	}
+
+	Vector<N,T> operator -(const Vector<N,T>& other) const
+	{
+		return *this + -other;
 	}
 
 	Vector<N,T> operator *(T other) const
