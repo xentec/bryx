@@ -8,16 +8,28 @@
 void Win32_Break();
 void PrintError(string message, string location);
 std::vector<string> splitString(string str, char at);
+bool parseStartupArguments(int argc, char* argv[], std::string& map_name);
 bool parseMapByFile(const string& filename, Game& game, bool debug_text_out);
 
 int main(int argc, char* argv[])
 {
-	Game game;
+#ifdef _WIN32
+	system("title bryx");
+	system("color 0A");
+#endif
 
+	Game game;
 	string mapFilePath = "dust.map";
-	if(argc >= 2) // TODO: better arg parsing with getopt
+// 	if(argc >= 2) // TODO: better arg parsing with getopt
+// 	{
+// 		mapFilePath.assign(argv[1]);
+// 	}
+
+	if (!parseStartupArguments(argc, argv, mapFilePath))
 	{
-		mapFilePath.assign(argv[1]);
+#ifdef __linux__
+		PrintError("No map assigned ! Please check your arguments" , "parseStartupArguments");
+#endif
 	}
 
 	if (!parseMapByFile(mapFilePath, game, true))
@@ -81,6 +93,50 @@ std::vector<string> splitString(string str, char at)
 	return retMe;
 }
 
+bool parseStartupArguments(int argc, char* argv[], std::string& map_name)
+{
+	if (argc < 2)
+	{
+		PrintError("No StartUpArguments given !", "parseStartupArguments");
+		return false;
+	}
+
+	//std::cout << "argc: " << argc << std::endl;
+
+	for (int i = 1; i < argc - 1; i++)
+	{
+		std::string arg = argv[i];
+		std::string argn = argv[i + 1];
+
+		if (argn.empty())
+			break;
+
+		if (arg == "-h")
+		{
+			//Show Help 
+			std::cout << "Help ...." << std::endl;
+		}
+		else if (arg == "-m")
+		{
+			//Set Map
+			std::cout << "map: " << argn << std::endl;
+			map_name = argn;
+		}
+		else if (arg == "-ip")
+		{
+			//Set IP
+			std::cout << "ip: " << argn << std::endl;
+		}
+		else if (arg == "-port")
+		{
+			//Set Port
+			std::cout << "port: " << argn << std::endl;
+		}
+	}
+
+	return true;
+}
+
 bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 {
 	std::ifstream file(filename);
@@ -88,6 +144,7 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 	if (!file.good())
 	{
 		PrintError("File not found !", "parseMapByFile => if(file.good()) ..");
+		
 		return false;
 	}
 
