@@ -95,5 +95,5 @@ private:
 	T data[N];
 };
 
-using vec2 = Vector<2, i32>;
+using Vec2 = Vector<2, i32>;
 
