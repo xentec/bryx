@@ -36,3 +36,11 @@ std::vector<string> splitString(string str, char at)
 	return retMe;
 }
 
+std::basic_istream<char> & readline(std::basic_istream<char> &stream, string &str)
+{
+	std::basic_istream<char> &ret = std::getline(stream, str);
+	if(str[str.size()-1] == '\r')
+		str = str.substr(0, str.size()-1);
+
+	return ret;
+}

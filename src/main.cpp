@@ -1,5 +1,6 @@
 #include "map.h"
 #include "game.h"
+#include "util.h"
 
 #include <iostream>
 #include <fstream>
@@ -114,7 +115,7 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 
 	bool valid = false;
 	string line;
-	for (usz line_count = 1; std::getline(file, line); line_count++)
+	for (usz line_count = 1; readline(file, line); line_count++)
 	{
 		if (line_count == 1)
 		{
