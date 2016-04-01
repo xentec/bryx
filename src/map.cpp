@@ -12,7 +12,7 @@ Map::Map(u32 width, u32 height):
 void Map::clear(Cell new_cell)
 {
 	for(Cell &cell : data)
-		cell = cell;
+		cell = new_cell;
 }
 
 void Map::add(const Transistion &trn)
