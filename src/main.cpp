@@ -259,5 +259,5 @@ void PrintError(string message, string location)
 				<< location << std::endl
 				<< std::endl;
 
-	Win32_Break();
+//	Win32_Break();
 }
