@@ -177,13 +177,8 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 		// Parse Transistion
 		std::vector<string> transistion_parts = splitString(line, ' ');
 
-		Location from, to;
-
-		from.pos = { stoi(transistion_parts.at(0)), stoi(transistion_parts.at(1)) };
-		from.dir = static_cast<Direction>(stoi(transistion_parts.at(2)));
-
-		to.pos = { stoi(transistion_parts.at(4)), stoi(transistion_parts.at(5)) };
-		to.dir = static_cast<Direction>(stoi(transistion_parts.at(6)));
+		Location from({ stoi(transistion_parts.at(0)), stoi(transistion_parts.at(1)) }, static_cast<Direction>(stoi(transistion_parts.at(2)))),
+				 to  ({ stoi(transistion_parts.at(4)), stoi(transistion_parts.at(5)) }, static_cast<Direction>(stoi(transistion_parts.at(6))));
 
 #if DEBUG
 		std::cout << "####################################" << std::endl;

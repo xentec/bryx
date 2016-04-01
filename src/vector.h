@@ -95,5 +95,24 @@ private:
 	T data[N];
 };
 
-using Vec2 = Vector<2, i32>;
+template<usz N, class T>
+const Vector<N,T> Vector<N,T>::O;
 
+namespace std {
+	template<usz N, class T>
+	struct hash<Vector<N,T>>
+	{
+		typedef Vector<N,T> argument_type;
+		typedef std::size_t result_type;
+		result_type operator()(argument_type const& vec) const
+		{
+			result_type h = vec[0];
+			for(usz i = 1; i < N; i++)
+				h ^= (vec[i] << i);
+
+			return h;
+		}
+	};
+}
+
+using Vec2 = Vector<2, i32>;

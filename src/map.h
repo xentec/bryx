@@ -1,6 +1,7 @@
 #pragma once
 
 #include "global.h"
+#include "location.h"
 #include "vector.h"
 
 #include <vector>
@@ -19,24 +20,6 @@ enum class Cell : u8
 
 	// players
 	P1 = '1', P2, P3, P4, P5, P6, P7, P8,
-};
-
-enum class Direction : u8
-{
-	N, NE, E, SE, S, SW, W, NW
-};
-
-struct Location
-{
-	Vec2 pos;
-	Direction dir;
-
-	string asString() const
-	{
-		//static const char* dirs[] = {"⬆", "↗", "➡", "↘", "⬇", "↙", "⬅", "↖"};
-		static const char* dirs[] = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
-		return pos.asString()+":"+dirs[static_cast<usz>(dir)];
-	}
 };
 
 struct Transistion
