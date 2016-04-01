@@ -128,7 +128,7 @@ namespace std {
 using Vec2 = Vector<2, i32>;
 
 template<usz N, class T>
-bool inQuadRange(const Vector<N,T>& x, const Vector<N,T>& begin, const Vector<N,T>& end)
+bool inBox(const Vector<N,T>& x, const Vector<N,T>& begin, const Vector<N,T>& end)
 {
 	for(usz i = 0; i < N; i++)
 		if(x[i] < begin[i] || end[i] < x[i])
