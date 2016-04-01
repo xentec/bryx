@@ -27,6 +27,8 @@ struct Transistion
 	Transistion(const Location& from, const Location& to);
 
 	const Location from, to;
+
+	string asString() const;
 };
 
 struct Map
@@ -34,10 +36,14 @@ struct Map
 	Map(u32 width, u32 height);
 
 	void clear(Cell new_cell = Cell::EMPTY);
-	void add(const Transistion& trn);
 
 	Cell at(u32 x, u32 y) const;
 	Cell& at(u32 x, u32 y);
+
+	inline Cell at(Vec2 vec) const { return at(vec[0], vec[1]); }
+	inline Cell& at(Vec2 vec)      { return at(vec[0], vec[1]); }
+
+	void add(const Transistion& trn);
 
 	struct Row
 	{
@@ -57,6 +63,9 @@ struct Map
 
 	const u32 width, height;
 private:
+	bool isValid(const Location& loc) const;
+	bool checkXY(u32 x, u32 y) const;
+
 	std::vector<Cell> data;
 	std::vector<Transistion> trans;
 };

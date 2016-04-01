@@ -194,8 +194,21 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 				  << std::endl;
 		std::cout << "####################################" << std::endl;
 #endif
+		Transistion tr(from, to);
 
-		game.map->add(Transistion(from, to));
+		try {
+			game.map->add(tr);
+		}
+		catch(std::out_of_range& e)
+		{
+			std::cout << "Failed to set transistion [" << tr.asString() << "]: position is outside the map [" << e.what() << "]" << std::endl;
+			return false;
+		}
+		catch(std::exception& e)
+		{
+			std::cout << "Failed to set transistion [" << tr.asString() << "]: " << e.what() << std::endl;
+			return false;
+		}
 	}
 
 	//Win32_Break();

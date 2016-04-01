@@ -40,6 +40,15 @@ struct Vector
 		return data[index];
 	}
 
+	bool operator ==(const Vector<N,T>& other) const
+	{
+		for(u32 i = 0; i < N; i++)
+			if(data[i] != other[i])
+				return false;
+
+		return true;
+	}
+
 	Vector<N,T> operator -() const
 	{
 		Vector<N,T> res;
@@ -91,6 +100,7 @@ struct Vector
 		return str.str();
 	}
 
+	static const Vector<N,T> O;
 private:
 	T data[N];
 };
@@ -116,3 +126,13 @@ namespace std {
 }
 
 using Vec2 = Vector<2, i32>;
+
+template<usz N, class T>
+bool inQuadRange(const Vector<N,T>& x, const Vector<N,T>& begin, const Vector<N,T>& end)
+{
+	for(usz i = 0; i < N; i++)
+		if(x[i] < begin[i] || end[i] < x[i])
+			return false;
+
+	return true;
+}

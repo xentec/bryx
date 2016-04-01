@@ -2,7 +2,6 @@
 
 #include <sstream>
 
-
 // Map
 //########
 Map::Map(u32 width, u32 height):
@@ -17,16 +16,26 @@ void Map::clear(Cell new_cell)
 
 void Map::add(const Transistion &trn)
 {
+	if(!isValid(trn.from))
+		throw std::runtime_error("source location invalid");
+
+	if(!isValid(trn.to))
+		throw std::runtime_error("target location invalid");
+
 	trans.push_back(trn);
 }
 
 Cell Map::at(u32 x, u32 y) const
 {
+	if(!checkXY(x,y))
+		throw std::out_of_range(std::to_string(x)+":"+std::to_string(y));
 	return data[x*height+y];
 }
 
 Cell& Map::at(u32 x, u32 y)
 {
+	if(!checkXY(x,y))
+		throw std::out_of_range(std::to_string(x)+":"+std::to_string(y));
 	return data[x*height+y];
 }
 
@@ -46,7 +55,7 @@ string Map::asString()
 	}
 
 	for(const Transistion& tr: trans)
-		str << tr.from.asString() << " >-< " << tr.to.asString() << std::endl;
+		str << tr.asString() << std::endl;
 
 	return str.str();
 }
@@ -73,6 +82,20 @@ bool Map::isCell(u8 c)
 	return false;
 }
 
+bool Map::isValid(const Location& loc) const
+{
+	Vec2 dirPos = loc.pos + loc.dir;
+	// is position on a playable cell...
+	return at(loc.pos) != Cell::VOID
+	//  AND  is the portal on '-' cell or maybe even outside the map?
+		&& (!inBox(dirPos, Vec2::O, { (i32) width-1, (i32) height-1 }) || at(dirPos) == Cell::VOID);
+}
+
+bool Map::checkXY(u32 x, u32 y) const
+{
+	return x < width && y < height;
+}
+
 // Row
 //########
 Map::Row::Row(Map &map, usz offset):
@@ -89,3 +112,8 @@ Cell& Map::Row::operator[](usz index)
 Transistion::Transistion(const Location& from, const Location& to):
 	from(from), to(to)
 {}
+
+std::string Transistion::asString() const
+{
+	return from.asString() + " >-< " + to.asString();
+}
