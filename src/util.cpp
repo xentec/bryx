@@ -1,6 +1,5 @@
 #include "util.h"
 
-#include <stdexcept>
 #include <sstream>
 
 std::vector<string> splitString(string str, char at)
@@ -18,7 +17,7 @@ std::vector<string> splitString(string str, char at)
 std::basic_istream<char> & readline(std::basic_istream<char> &stream, string &str)
 {
 	std::basic_istream<char> &ret = std::getline(stream, str);
-	if(str[str.size()-1] == '\r')
+	if(str.size() && str[str.size()-1] == '\r')
 		str = str.substr(0, str.size()-1);
 
 	return ret;

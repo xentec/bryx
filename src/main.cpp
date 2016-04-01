@@ -20,10 +20,6 @@ int main(int argc, char* argv[])
 
 	Game game;
 	string mapFilePath = "dust.map";
-// 	if(argc >= 2) // TODO: better arg parsing with getopt
-// 	{
-// 		mapFilePath.assign(argv[1]);
-// 	}
 
 	if (!parseStartupArguments(argc, argv, mapFilePath))
 	{
@@ -114,8 +110,6 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 		return false;
 	}
 
-	bool valid = false;
-
 	game.players = stoi(readline(file));
 	game.overrides = stoi(readline(file));
 
@@ -129,7 +123,6 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 		game.bombs = stoi(s[0]);
 		game.bombsStrength = stoi(s[1]);
 	}
-
 	{
 		std::vector<string> s = splitString(readline(file), ' ');
 		if(s.size() < 2)
@@ -155,13 +148,12 @@ bool parseMapByFile(const string& filename, Game &game, bool debug_text_out)
 
 		for(usz x = 0; x < line.length(); x++)
 		{
-			volatile char c = line[x];
+			char c = line[x];
 
 			if(c == ' ') continue;
 			if(!Map::isCell(c))
 			{
-				char ch = c; // saved for output
-				PrintError("Failed to parse map: invalid cell character '" + string(&ch) + "' found at "+std::to_string(y+5)+":"+std::to_string(x), "parseMapByFile");
+				PrintError("Failed to parse map: invalid cell character '" + string(&c) + "' found at "+std::to_string(y+5)+":"+std::to_string(x), "parseMapByFile");
 				return false;
 			}
 
