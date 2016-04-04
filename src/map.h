@@ -44,6 +44,7 @@ struct Map
 	inline Cell& at(Vec2 vec)      { return at(vec[0], vec[1]); }
 
 	void add(const Transistion& trn);
+	std::vector<Transistion>& getTransitstions();
 
 	struct Row
 	{

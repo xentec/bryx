@@ -33,6 +33,27 @@ struct ConsoleFormat
 
 namespace color
 {
+#if _WIN32
+	static const ConsoleFormat RESET(7);
+
+	static const ConsoleFormat BLACK(0);
+	static const ConsoleFormat RED(4);
+	static const ConsoleFormat GREEN(2);
+	static const ConsoleFormat BLUE(1);
+	static const ConsoleFormat MAGENTA(5);
+	static const ConsoleFormat CYAN(3);
+	static const ConsoleFormat BROWN(6);
+	static const ConsoleFormat GRAY_LIGHT(7);
+
+	static const ConsoleFormat GRAY(8, ConsoleFormat::BOLD);
+	static const ConsoleFormat RED_LIGHT(12, ConsoleFormat::BOLD);
+	static const ConsoleFormat GREEN_LIGHT(10, ConsoleFormat::BOLD);
+	static const ConsoleFormat YELLOW(14, ConsoleFormat::BOLD);
+	static const ConsoleFormat BLUE_LIGHT(9, ConsoleFormat::BOLD);
+	static const ConsoleFormat MAGENTA_LIGHT(13, ConsoleFormat::BOLD);
+	static const ConsoleFormat CYAN_LIGHT(11, ConsoleFormat::BOLD);
+	static const ConsoleFormat WHITE(15, ConsoleFormat::BOLD);
+#else
 	static const ConsoleFormat RESET(0);
 
 	static const ConsoleFormat BLACK(30);
@@ -52,4 +73,8 @@ namespace color
 	static const ConsoleFormat MAGENTA_LIGHT(35, ConsoleFormat::BOLD);
 	static const ConsoleFormat CYAN_LIGHT(36, ConsoleFormat::BOLD);
 	static const ConsoleFormat WHITE(37, ConsoleFormat::BOLD);
+#endif
 }
+
+struct Map;
+void printMapColored(Map* map);

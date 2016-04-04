@@ -4,26 +4,6 @@
 
 #include <cppformat/format.h>
 
-static string colorCell(Cell c)
-{
-	ConsoleFormat color;
-	switch(c)
-	{
-	case Cell::BONUS:     color = color::GREEN_LIGHT;   break;
-	case Cell::CHOICE:    color = color::BLUE_LIGHT;    break;
-	case Cell::EMPTY:     color = color::GRAY_LIGHT;    break;
-	case Cell::EXPANSION: color = color::CYAN_LIGHT;    break;
-	case Cell::INVERSION: color = color::MAGENTA; break;
-	case Cell::VOID:      color = color::GRAY;          break;
-	default:
-		if(Cell::P1 <= c && c <= Cell::P8)
-			color = color::YELLOW;
-	}
-
-	return fmt::format("{}{}", color, (char) c);
-}
-
-
 // Map
 //########
 Map::Map(u32 width, u32 height):
@@ -45,6 +25,11 @@ void Map::add(const Transistion &trn)
 		throw std::runtime_error("target location invalid");
 
 	trans.push_back(trn);
+}
+
+std::vector<Transistion>& Map::getTransitstions()
+{
+	return trans;
 }
 
 Cell Map::at(u32 x, u32 y) const
@@ -72,19 +57,11 @@ string Map::asString(bool color)
 	for(usz y = 0; y < height; y++)
 	{
 		for(usz x = 0; x < width; x++)
-		{
-			if(color)
-				str << colorCell(at(x,y));
-			else
-				str << (u8) at(x,y);
-
-			str << ' ';
+		{			
+			str << (u8) at(x,y) << ' ';
 		}
 		str << fmt::format("{}\n", color::RESET) ;
 	}
-
-	for(const Transistion& tr: trans)
-		str << tr.asString() << '\n';
 
 	return str.str();
 }

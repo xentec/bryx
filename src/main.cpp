@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 {
 #ifdef _WIN32
 	system("title bryx");
-	system("color 0A");
+	//system("color 0A");
 #endif
 
 	Game game;
@@ -38,8 +38,9 @@ int main(int argc, char* argv[])
 	fmt::print("Players: {}\n", game.players);
 	fmt::print("Overrides: {}\n", game.overrides);
 	fmt::print("Bombs: {} ({})\n", game.bombs, game.bombsStrength);
-	fmt::print("Map: {}x{}\n", game.map->width, game.map->height);
-	fmt::print("{}\n", game.map->asString(true));
+	fmt::print("Map: {}x{}\n", game.map->width, game.map->height);	
+	
+	printMapColored(game.map);
 
 	Win32_Break();
 	return 0;
@@ -48,7 +49,7 @@ int main(int argc, char* argv[])
 void Win32_Break()
 {
 #ifdef _WIN32
-	getchar();
+	getchar();	
 #endif
 }
 
