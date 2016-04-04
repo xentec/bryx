@@ -18,4 +18,8 @@ struct Location
 	Vec2 dir;
 
 	string asString() const;
+	friend std::ostream &operator<<(std::ostream &os, const Location &o)
+	{
+		return os << o.asString();
+	}
 };

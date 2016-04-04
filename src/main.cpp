@@ -2,6 +2,8 @@
 #include "game.h"
 #include "util.h"
 
+#include <cppformat/format.h>
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -23,24 +25,21 @@ int main(int argc, char* argv[])
 
 	if (!parseStartupArguments(argc, argv, mapFilePath))
 	{
-#ifdef __linux__
 		PrintError("No map assigned ! Please check your arguments" , "parseStartupArguments");
-#endif
+		return 0;
 	}
 
 	if (!parseMapByFile(mapFilePath, game, true))
 	{
-
 		PrintError("Failed to create the game !", "main => parseMapByFile(...) => if(line_count == 4) ..");
 		return 0;
 	}
 
-	std::cout << "Players: " << game.players << std::endl;
-	std::cout << "Overrides: " << game.overrides << std::endl;
-	std::cout << "Bombs: " << game.bombs << " (" << game.bombsStrength << ")" << std::endl;
-	std::cout << "Map: " << game.map->width << "x" << game.map->height << std::endl;
-	std::cout << game.map->asString() << std::endl;
-
+	fmt::print("Players: {}\n", game.players);
+	fmt::print("Overrides: {}\n", game.overrides);
+	fmt::print("Bombs: {} ({})\n", game.bombs, game.bombsStrength);
+	fmt::print("Map: {}x{}\n", game.map->width, game.map->height);
+	fmt::print("{}\n", game.map->asString(true));
 
 	Win32_Break();
 	return 0;

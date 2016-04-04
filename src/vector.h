@@ -2,7 +2,7 @@
 
 #include "global.h"
 
-#include <sstream>
+#include <cppformat/format.h>
 #include <initializer_list>
 
 template<usz N, class T>
@@ -90,7 +90,7 @@ struct Vector
 
 	string asString() const
 	{
-		std::stringstream str;
+		fmt::MemoryWriter str;
 		str << "[" << data[0];
 
 		for(usz i = 1; i < N; i++)
@@ -98,6 +98,11 @@ struct Vector
 
 		str << "]";
 		return str.str();
+	}
+
+	friend std::ostream &operator<<(std::ostream &os, const Vector<N,T> &vec)
+	{
+		return os << vec.asString();
 	}
 
 	static const Vector<N,T> O;
