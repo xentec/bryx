@@ -1,6 +1,28 @@
 #include "map.h"
 
-#include <sstream>
+#include "util.h"
+
+#include <cppformat/format.h>
+
+static string colorCell(Cell c)
+{
+	ConsoleFormat color;
+	switch(c)
+	{
+	case Cell::BONUS:     color = color::GREEN_LIGHT;   break;
+	case Cell::CHOICE:    color = color::BLUE_LIGHT;    break;
+	case Cell::EMPTY:     color = color::GRAY_LIGHT;    break;
+	case Cell::EXPANSION: color = color::CYAN_LIGHT;    break;
+	case Cell::INVERSION: color = color::MAGENTA; break;
+	case Cell::VOID:      color = color::GRAY;          break;
+	default:
+		if(Cell::P1 <= c && c <= Cell::P8)
+			color = color::YELLOW;
+	}
+
+	return fmt::format("{}{}", color, (char) c);
+}
+
 
 // Map
 //########
@@ -44,21 +66,30 @@ Map::Row Map::operator[](usz index)
 	return Row(*this, index*height);
 }
 
-string Map::asString()
+string Map::asString(bool color)
 {
-	std::stringstream str;
+	fmt::MemoryWriter str;
 	for(usz y = 0; y < height; y++)
 	{
 		for(usz x = 0; x < width; x++)
-			str << (u8) at(x,y) << " ";
-		str << std::endl;
+		{
+			if(color)
+				str << colorCell(at(x,y));
+			else
+				str << (u8) at(x,y);
+
+			str << ' ';
+		}
+		str << fmt::format("{}\n", color::RESET) ;
 	}
 
 	for(const Transistion& tr: trans)
-		str << tr.asString() << std::endl;
+		str << tr.asString() << '\n';
 
 	return str.str();
 }
+
+
 
 bool Map::isCell(u8 c)
 {
@@ -73,13 +104,8 @@ bool Map::isCell(u8 c)
 	case Cell::VOID:
 		return true;
 	default:
-		break;
+		return Cell::P1 <= cell && cell <= Cell::P8;
 	}
-
-	if((u8)Cell::P1 <= c && c <= (u8)Cell::P8)
-		return true;
-
-	return false;
 }
 
 bool Map::isValid(const Location& loc) const

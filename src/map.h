@@ -57,7 +57,7 @@ struct Map
 	};
 	Row operator[](usz index);
 
-	string asString();
+	string asString(bool color = false);
 
 	static bool isCell(u8 c);
 

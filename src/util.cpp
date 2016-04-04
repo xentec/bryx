@@ -1,5 +1,6 @@
 #include "util.h"
 
+#include <cppformat/format.h>
 #include <sstream>
 
 std::vector<string> splitString(string str, char at)
@@ -28,4 +29,19 @@ std::string readline(std::basic_istream<char> &stream)
 	string str;
 	readline(stream, str);
 	return str;
+}
+
+
+ConsoleFormat::ConsoleFormat(u8 color, ConsoleFormat::Attribute attr):
+	color(color), attr(attr)
+{}
+
+
+std::string ConsoleFormat::asString() const
+{
+#if _WIN32
+	return "";
+#else
+	return fmt::format("\e[{:d};{:d}m", attr, color);
+#endif
 }
