@@ -4,61 +4,163 @@
 
 #include <cppformat/format.h>
 
+static Vec2 dir2vec(Direction dir)
+{
+	switch(dir)
+	{
+	case Direction::N:  return {0,-1};
+	case Direction::NE: return {1,-1};
+	case Direction::E:  return {1, 0};
+	case Direction::SE: return {1, 1};
+	case Direction::S:  return {0, 1};
+	case Direction::SW: return {-1,1};
+	case Direction::W:  return {-1,0};
+	case Direction::NW: return {-1,-1};
+	default:
+		return {0,0};
+	}
+}
+
+static string dir2str(Direction dir)
+{
+	switch(dir)
+	{
+	case Direction::N:  return "N";
+	case Direction::NE: return "NE";
+	case Direction::E:  return "E";
+	case Direction::SE: return "SE";
+	case Direction::S:  return "S";
+	case Direction::SW: return "SW";
+	case Direction::W:  return "W";
+	case Direction::NW: return "NW";
+	default:
+		return "!";
+	}
+}
+
+// Cell
+//#######
+Cell::Cell(Map& map, Vec2 pos, Type type):
+	pos(pos), type(type), map(map)
+{
+	transistions.fill(nullptr);
+}
+
+Cell::Cell(const Cell &other):
+	pos(other.pos), type(other.type), map(other.map)
+{}
+
+Cell &Cell::operator=(const Cell &other) // copy assignment
+{
+	type = other.type;
+	std::copy(other.transistions.begin(), other.transistions.end(), transistions.data());
+
+	return *this;
+}
+
+Cell &Cell::getNeighbor(Direction dir) const
+{
+	Cell* c = transistions[(usz)dir];
+	return c ? *c : map.at(pos+dir2vec(dir));
+}
+
+void Cell::addTransistion(Direction dir, Cell* target)
+{
+	if(type == Cell::Type::VOID)
+		throw std::runtime_error(fmt::format("adding transistion to void cell ({})", pos));
+
+	if(map.checkPos(pos+dir2vec(dir)) && getNeighbor(dir).type != Cell::Type::VOID)
+		throw std::runtime_error(fmt::format("transistion exit is not void ({}:{})", pos, dir2str(dir)));
+
+	transistions[(usz) dir] = target;
+}
+
+std::string Cell::asString() const
+{
+	return fmt::format("{}:'{}'", pos, (char) type);
+}
+
+bool Cell::isValid(char ch)
+{
+	Cell::Type ct = static_cast<Cell::Type>(ch);
+	switch(ct)
+	{
+	case Cell::Type::BONUS:
+	case Cell::Type::CHOICE:
+	case Cell::Type::EMPTY:
+	case Cell::Type::EXPANSION:
+	case Cell::Type::INVERSION:
+	case Cell::Type::VOID:
+		return true;
+	default:
+		return Cell::Type::P1 <= ct && ct <= Cell::Type::P8;
+	}
+}
+
 // Map
 //########
 Map::Map(u32 width, u32 height):
-	width(width), height(height), data(width*height, Cell::VOID)
-{}
-
-void Map::clear(Cell new_cell)
+	width(width), height(height), data(width*height, Cell(*this, {-1, -1}, Cell::Type::VOID))
 {
-	for(Cell &cell : data)
-		cell = new_cell;
+	Vec2 pos;
+	for(i32 x = 0; x < width; x++)
+	for(i32 y = 0; y < height; y++)
+	{
+		pos = { x, y };
+		// dirty, but necessary const hack to set right position
+		*const_cast<Vec2*>(&at(pos).pos) = pos;
+	}
+
 }
 
-void Map::add(const Transistion &trn)
+Map::~Map()
 {
-	if(!isValid(trn.from))
-		throw std::runtime_error("source location invalid");
-
-	if(!isValid(trn.to))
-		throw std::runtime_error("target location invalid");
-
-	trans.push_back(trn);
+	clear();
 }
 
-std::vector<Transistion>& Map::getTransitstions()
+void Map::clear(Cell::Type type)
 {
-	return trans;
+	for(Cell& c: data)
+		c.type = Cell::Type::VOID;
 }
 
-Cell Map::at(u32 x, u32 y) const
+Cell& Map::at(const Vec2 &pos)
 {
-	if(!checkXY(x,y))
-		throw std::out_of_range(std::to_string(x)+":"+std::to_string(y));
-	return data[x*height+y];
+	if(!checkPos(pos))
+		throw std::out_of_range(pos.asString());
+	return data[pos.x * height + pos.y];
 }
 
-Cell& Map::at(u32 x, u32 y)
+const Cell& Map::at(const Vec2 &pos) const
 {
-	if(!checkXY(x,y))
-		throw std::out_of_range(std::to_string(x)+":"+std::to_string(y));
-	return data[x*height+y];
+	if(!checkPos(pos))
+		throw std::out_of_range(pos.asString());
+	return data[pos.x * height + pos.y];
 }
-
-Map::Row Map::operator[](usz index)
+/*
+std::unordered_multimap<Vec2, Vec2> Map::getTransitstions()
 {
-	return Row(*this, index*height);
+	std::unordered_multimap<Vec2, Vec2> res;
+	for(auto& p: trans)
+	{
+		if(set.find(p.second) == set.end())
+		{
+			set.emplace(p.second, true);
+			res.push_back(p.second);
+		}
+	}
+	return res;
 }
+*/
 
-string Map::asString(bool color)
+string Map::asString()
 {
 	fmt::MemoryWriter str;
 	for(usz y = 0; y < height; y++)
 	{
 		for(usz x = 0; x < width; x++)
-		{			
-			str << (u8) at(x,y) << ' ';
+		{
+			str << (char) at(x,y).type << ' ';
 		}
 		str << fmt::format("{}\n", color::RESET) ;
 	}
@@ -66,57 +168,8 @@ string Map::asString(bool color)
 	return str.str();
 }
 
-
-
-bool Map::isCell(u8 c)
+bool Map::checkPos(const Vec2& pos) const
 {
-	Cell cell = static_cast<Cell>(c);
-	switch(cell)
-	{
-	case Cell::BONUS:
-	case Cell::CHOICE:
-	case Cell::EMPTY:
-	case Cell::EXPANSION:
-	case Cell::INVERSION:
-	case Cell::VOID:
-		return true;
-	default:
-		return Cell::P1 <= cell && cell <= Cell::P8;
-	}
+	return inBox(pos, Vec2::O, {(i32)width-1, (i32)height-1});
 }
 
-bool Map::isValid(const Location& loc) const
-{
-	Vec2 dirPos = loc.pos + loc.dir;
-	// is position on a playable cell...
-	return at(loc.pos) != Cell::VOID
-	//  AND  is the portal on '-' cell or maybe even outside the map?
-		&& (!inBox(dirPos, Vec2::O, { (i32) width-1, (i32) height-1 }) || at(dirPos) == Cell::VOID);
-}
-
-bool Map::checkXY(u32 x, u32 y) const
-{
-	return x < width && y < height;
-}
-
-// Row
-//########
-Map::Row::Row(Map &map, usz offset):
-	map(map), offset(offset)
-{}
-
-Cell& Map::Row::operator[](usz index)
-{
-	return map.data[offset+index];
-}
-
-// Transistion
-//##############
-Transistion::Transistion(const Location& from, const Location& to):
-	from(from), to(to)
-{}
-
-std::string Transistion::asString() const
-{
-	return from.asString() + " >-< " + to.asString();
-}

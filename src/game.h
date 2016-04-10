@@ -1,8 +1,12 @@
 #pragma once
 
 #include "global.h"
+#include "map.h"
 
-struct Map;
+struct Move
+{
+	Cell& from, to;
+};
 
 struct Game
 {
@@ -12,4 +16,10 @@ struct Game
 	u32 bombsStrength;
 
 	Map* map;
+
+	~Game();
+	bool isValidMove(Move& move);
+
+	static Game load(string filename);
 };
+

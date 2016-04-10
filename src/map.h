@@ -1,72 +1,73 @@
 #pragma once
 
 #include "global.h"
-#include "location.h"
 #include "vector.h"
 
+#include <array>
 #include <vector>
+#include <unordered_map>
 
-enum class Cell : u8
+
+enum class Direction : u8
 {
-	// standard fields
-	VOID = '-',
-	EMPTY = '0',
-
-	// special
-	BONUS = 'b',
-	CHOICE = 'c',
-	INVERSION = 'i',
-	EXPANSION = 'x',
-
-	// players
-	P1 = '1', P2, P3, P4, P5, P6, P7, P8,
+	N, NE, E, SE, S, SW, W, NW, LAST
 };
 
-struct Transistion
+struct Map;
+struct Cell
 {
-	Transistion(const Location& from, const Location& to);
+	enum class Type : u8
+	{
+		// standard fields
+		VOID = '-',
+		EMPTY = '0',
 
-	const Location from, to;
+		// special
+		BONUS = 'b',
+		CHOICE = 'c',
+		INVERSION = 'i',
+		EXPANSION = 'x',
+
+		// players
+		P1 = '1', P2, P3, P4, P5, P6, P7, P8,
+	};
+
+	Cell(Map &map, Vec2 pos, Type type);
+	Cell(const Cell& other);
+	Cell& operator=(const Cell& other);
+
+	Cell& getNeighbor(Direction dir) const;
+	void addTransistion(Direction dir, Cell* target);
 
 	string asString() const;
+
+	static bool isValid(char ch);
+
+	const Vec2 pos;
+	Cell::Type type;
+	std::array<Cell*, 8> transistions;
+	Map& map;
 };
 
 struct Map
 {
 	Map(u32 width, u32 height);
+	~Map();
 
-	void clear(Cell new_cell = Cell::EMPTY);
+	void clear(Cell::Type type = Cell::Type::VOID);
 
-	Cell at(u32 x, u32 y) const;
-	Cell& at(u32 x, u32 y);
+	inline Cell& at(i32 x, i32 y) { return at({x, y}); }
+	inline const Cell& at(i32 x, i32 y) const  { return at({x, y}); }
 
-	inline Cell at(Vec2 vec) const { return at(vec[0], vec[1]); }
-	inline Cell& at(Vec2 vec)      { return at(vec[0], vec[1]); }
+	Cell& at(const Vec2& pos);
+	const Cell& at(const Vec2& pos) const;
 
-	void add(const Transistion& trn);
-	std::vector<Transistion>& getTransitstions();
-
-	struct Row
-	{
-		Cell& operator[](usz index);
-	private:
-		Row(Map& map, usz offset);
-		const usz offset;
-		Map& map;
-
-		friend class Map;
-	};
-	Row operator[](usz index);
-
-	string asString(bool color = false);
-
-	static bool isCell(u8 c);
+	string asString();
 
 	const u32 width, height;
 private:
-	bool isValid(const Location& loc) const;
-	bool checkXY(u32 x, u32 y) const;
+	friend struct Cell;
+	bool checkPos(const Vec2& pos) const;
 
 	std::vector<Cell> data;
-	std::vector<Transistion> trans;
 };
