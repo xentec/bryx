@@ -8,13 +8,15 @@
 template<usz N, class T>
 struct Vector
 {
-	Vector(T init = 0)
+    using vec = Vector<N,T>;
+
+    Vector(T init = 0)
 	{
 		for(T& e : data)
 			e = init;
 	}
 
-	Vector(const Vector<N,T>& other)
+	Vector(const vec& other)
 	{
 		for(u32 i = 0; i < N; i++)
 			data[i] = other[i];
@@ -40,7 +42,7 @@ struct Vector
 		return data[index];
 	}
 
-	bool operator ==(const Vector<N,T>& other) const
+	bool operator ==(const vec& other) const
 	{
 		for(u32 i = 0; i < N; i++)
 			if(data[i] != other[i])
@@ -49,37 +51,37 @@ struct Vector
 		return true;
 	}
 
-	Vector<N,T> operator -() const
+	vec operator -() const
 	{
-		Vector<N,T> res;
+		vec res;
 		for(u32 i = 0; i < N; i++)
 			res[i] = -data[i];
 	}
 
-	Vector<N,T> operator +(const Vector<N,T>& other) const
+	vec operator +(const vec& other) const
 	{
-		Vector<N,T> res;
+		vec res;
 		for(u32 i = 0; i < N; i++)
 			res[i] = data[i] + other[i];
 
 		return res;
 	}
 
-	Vector<N,T> operator -(const Vector<N,T>& other) const
+	vec operator -(const vec& other) const
 	{
 		return *this + -other;
 	}
 
-	Vector<N,T> operator *(T other) const
+	vec operator *(T other) const
 	{
-		Vector<N,T> res;
+		vec res;
 		for(u32 i = 0; i < N; i++)
 			res[i] = data[i] * other;
 
 		return res;
 	}
 
-	T operator *(const Vector<N,T>& other) const
+	T operator *(const vec& other) const
 	{
 		T res;
 		for(u32 i = 0; i < N; i++)
@@ -100,7 +102,7 @@ struct Vector
 		return str.str();
 	}
 
-	friend std::ostream &operator<<(std::ostream &os, const Vector<N,T> &vec)
+	friend std::ostream &operator<<(std::ostream &os, const vec &vec)
 	{
 		return os << vec.asString();
 	}
