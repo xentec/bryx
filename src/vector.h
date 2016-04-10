@@ -8,9 +8,9 @@
 template<usz N, class T>
 struct Vector
 {
-    using vec = Vector<N,T>;
+	using vec = Vector<N,T>;
 
-    Vector(T init = 0)
+	Vector(T init = 0)
 	{
 		for(T& e : data)
 			e = init;
@@ -107,9 +107,15 @@ struct Vector
 		return os << vec.asString();
 	}
 
-	static const Vector<N,T> O;
-private:
-	T data[N];
+	static const vec O;
+
+	union
+	{
+		T data[N];
+		struct {
+			T x, y, z, w;
+		};
+	};
 };
 
 template<usz N, class T>
@@ -121,11 +127,11 @@ namespace std {
 	{
 		typedef Vector<N,T> argument_type;
 		typedef std::size_t result_type;
-		result_type operator()(argument_type const& vec) const
+		result_type operator()(argument_type const& o) const
 		{
-			result_type h = vec[0];
+			result_type h = o[0];
 			for(usz i = 1; i < N; i++)
-				h ^= (vec[i] << i);
+				h ^= (o[i] << i);
 
 			return h;
 		}
