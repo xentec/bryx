@@ -40,10 +40,10 @@ static string dir2str(Direction dir)
 
 // Cell
 //#######
-Cell::Cell(Map& map, Vec2 pos, Type type):
-	pos(pos), type(type), map(map)
+Cell::Cell(Map& map, Type type):
+	type(type), map(map)
 {
-	transistions.fill(nullptr);
+	transistions.fill({nullptr, Direction::N});
 }
 
 Cell::Cell(const Cell &other):
@@ -58,21 +58,28 @@ Cell &Cell::operator=(const Cell &other) // copy assignment
 	return *this;
 }
 
-Cell &Cell::getNeighbor(Direction dir) const
+Cell* Cell::getNeighbor(Direction dir, bool with_trans) const
 {
-	Cell* c = transistions[(usz)dir];
-	return c ? *c : map.at(pos+dir2vec(dir));
+	Transistion t = transistions[(usz)dir];
+	if(with_trans && t.target) return t.target;
+
+	Vec2 dirPos = pos + dir2vec(dir);
+	return map.checkPos(dirPos) ? &map.at(dirPos) : nullptr;
 }
 
-void Cell::addTransistion(Direction dir, Cell* target)
+void Cell::addTransistion(Direction in, Direction out, Cell* target)
 {
 	if(type == Cell::Type::VOID)
 		throw std::runtime_error(fmt::format("adding transistion to void cell ({})", pos));
 
-	if(map.checkPos(pos+dir2vec(dir)) && getNeighbor(dir).type != Cell::Type::VOID)
-		throw std::runtime_error(fmt::format("transistion exit is not void ({}:{})", pos, dir2str(dir)));
+	Cell* wall = getNeighbor(in, false);
+	if(wall && wall->type != Cell::Type::VOID)
+		throw std::runtime_error(fmt::format("transistion exit is not void ({}:{})", pos, dir2str(in)));
 
-	transistions[(usz) dir] = target;
+	if(!target || target->type == Cell::Type::VOID)
+		throw std::runtime_error(fmt::format("transistion points to void cell ({})", target ? target->asString() : ""));
+
+	transistions[(usz) in] = { target, out };
 }
 
 std::string Cell::asString() const
@@ -100,7 +107,7 @@ bool Cell::isValid(char ch)
 // Map
 //########
 Map::Map(u32 width, u32 height):
-	width(width), height(height), data(width*height, Cell(*this, {-1, -1}, Cell::Type::VOID))
+	width(width), height(height), data(width*height, Cell(*this, Cell::Type::VOID))
 {
 	Vec2 pos;
 	for(i32 x = 0; x < width; x++)
@@ -111,11 +118,6 @@ Map::Map(u32 width, u32 height):
 		*const_cast<Vec2*>(&at(pos).pos) = pos;
 	}
 
-}
-
-Map::~Map()
-{
-	clear();
 }
 
 void Map::clear(Cell::Type type)

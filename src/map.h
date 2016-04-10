@@ -31,13 +31,19 @@ struct Cell
 		// players
 		P1 = '1', P2, P3, P4, P5, P6, P7, P8,
 	};
+	struct Transistion
+	{
+		Cell* target;
+		Direction out;
+	};
 
-	Cell(Map &map, Vec2 pos, Type type);
+
+	Cell(Map &map, Type type);
 	Cell(const Cell& other);
 	Cell& operator=(const Cell& other);
 
-	Cell& getNeighbor(Direction dir) const;
-	void addTransistion(Direction dir, Cell* target);
+	Cell* getNeighbor(Direction dir, bool with_trans = true) const;
+	void addTransistion(Direction in, Direction out, Cell* target);
 
 	string asString() const;
 
@@ -45,14 +51,13 @@ struct Cell
 
 	const Vec2 pos;
 	Cell::Type type;
-	std::array<Cell*, 8> transistions;
+	std::array<Transistion, 8> transistions;
 	Map& map;
 };
 
 struct Map
 {
 	Map(u32 width, u32 height);
-	~Map();
 
 	void clear(Cell::Type type = Cell::Type::VOID);
 
