@@ -5,14 +5,75 @@
 #include <cppformat/format.h>
 #include <fstream>
 
+static bool vec2dir(const Vec2& v, Direction& dir)
+{
+	if(v.x != 0 && v.y != 0 && v.x != v.y)
+		return false;
+
+	Direction dirH;
+	switch(v.x / std::abs(v.x))
+	{
+	case -1: dirH = Direction::W; break;
+	case 0: break;
+	case 1: dirH = Direction::E; break;
+	}
+
+	Direction dirV;
+	switch(v.y / std::abs(v.y))
+	{
+	case -1: dirV = Direction::N; break;
+	case 0: break;
+	case 1: dirV = Direction::S; break;
+	}
+
+	return true;
+}
+
+Cell* Game::test = nullptr;
+
+Game::Game()
+{}
+
 Game::~Game()
 {
 	delete map;
 }
 
-bool Game::isValidMove(Move& move)
+Move::Error Game::testMove(Move& move)
 {
-	return true;
+	move.stones.clear();
+
+	if(move.from.type != me)
+		return Move::Error::WRONG_START;
+
+	Direction moveDir = move.dir;
+
+	Cell* cur = move.from.getNeighbor(moveDir);
+	while(cur && cur->isCaptureable())
+	{
+		if(cur->type == me)
+			return Move::Error::WRONG_PATH;
+
+
+
+		move.stones.push_back(cur);
+//#if DEBUG
+		fmt::print("\nNEW STONE: {}\n", cur->asString());
+		map->print(&cur->pos);
+//#endif
+
+		Cell::Transition tr = cur->transitions[(usz) moveDir];
+		if(tr.target)
+		{
+			cur = tr.target;
+			moveDir = tr.out;
+		} else
+			cur = cur->getNeighbor(moveDir);
+	}
+	if(move.stones.empty())
+		return Move::Error::NO_STONES_CAPTURED;
+
+	return Move::Error::NONE;
 }
 
 Game Game::load(std::string filename)
@@ -20,7 +81,7 @@ Game Game::load(std::string filename)
 	using std::stoi;
 
 	std::ifstream file(filename);
-	if (!file.good())
+	if (!file)
 		throw std::runtime_error(fmt::format("File '{}' cannot be read", filename));
 
 	Game game;
@@ -70,12 +131,17 @@ Game Game::load(std::string filename)
 		// Parse Transistion
 		s = splitString(line, ' ');
 
-		Cell& from = game.map->at({ stoi(s.at(0)), stoi(s.at(1)) }),
-				to = game.map->at({ stoi(s.at(4)), stoi(s.at(5)) });
+		Cell &from = game.map->at(stoi(s.at(0)), stoi(s.at(1))),
+			   &to = game.map->at(stoi(s.at(4)), stoi(s.at(5)));
+
+		Direction in = static_cast<Direction>(stoi(s.at(2))),
+				 out = static_cast<Direction>(stoi(s.at(6)));
 
 		try {
-			from.addTransistion(static_cast<Direction>(stoi(s.at(2))), &to);
-			to.addTransistion(static_cast<Direction>(stoi(s.at(6))), &from);
+			from.addTransistion(in, out, &to);
+			to.addTransistion(out, in, &from);
+
+			Game::test = &from;
 		}
 		catch(std::out_of_range& e)
 		{
@@ -87,4 +153,18 @@ Game Game::load(std::string filename)
 		}
 	}
 	return game;
+}
+
+
+std::string Move::err2str(Move::Error err)
+{
+	switch(err)
+	{
+	case Error::NO_STONES_CAPTURED: return "no stones to capture";
+	case Error::TARGET_OCCUPIED: return "target field is occupied";
+	case Error::WRONG_PATH: return "path is not correct";
+	case Error::WRONG_START: return "start field is not in possesion";
+	default:
+		return "none";
+	}
 }

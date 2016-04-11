@@ -4,7 +4,9 @@
 
 #include <cppformat/format.h>
 
-static Vec2 dir2vec(Direction dir)
+// Direction
+//############
+Vec2 dir2vec(Direction dir)
 {
 	switch(dir)
 	{
@@ -21,7 +23,7 @@ static Vec2 dir2vec(Direction dir)
 	}
 }
 
-static string dir2str(Direction dir)
+string dir2str(Direction dir)
 {
 	switch(dir)
 	{
@@ -38,33 +40,69 @@ static string dir2str(Direction dir)
 	}
 }
 
+Direction str2dir(std::string input)
+{
+	static std::unordered_map<string, Direction> tbl =
+	{
+		{"N", Direction::N},
+		{"NE", Direction::NE},
+		{"E", Direction::E},
+		{"SE", Direction::SE},
+		{"S", Direction::S},
+		{"SW", Direction::SW},
+		{"W", Direction::W},
+		{"NW", Direction::NW},
+	};
+
+	auto dir = tbl.find(input);
+	if(dir == tbl.end())
+		throw std::out_of_range(fmt::format("Direction {} invalid", input));
+	return dir->second;
+}
+
+
 // Cell
 //#######
 Cell::Cell(Map& map, Type type):
-	type(type), map(map)
+	pos{-1,-1}, type(type), map(map), transitions()
 {
-	transistions.fill({nullptr, Direction::N});
+	transitions.fill({nullptr, Direction::N});
 }
 
 Cell::Cell(const Cell &other):
-	pos(other.pos), type(other.type), map(other.map)
+	pos(other.pos), type(other.type), map(other.map), transitions(other.transitions)
 {}
 
-Cell &Cell::operator=(const Cell &other) // copy assignment
+Cell::~Cell()
+{
+	// for break points
+}
+
+Cell &Cell::operator=(const Cell &other)
 {
 	type = other.type;
-	std::copy(other.transistions.begin(), other.transistions.end(), transistions.data());
-
+	transitions = other.transitions;
 	return *this;
+}
+
+bool Cell::operator ==(const Cell& other) const
+{
+	return pos == other.pos; //NOTE: maybe also type check
+}
+
+bool Cell::operator !=(const Cell& other) const
+{
+	return !(*this == other);
 }
 
 Cell* Cell::getNeighbor(Direction dir, bool with_trans) const
 {
-	Transistion t = transistions[(usz)dir];
+	const Transition& t = transitions[(usz)dir];
 	if(with_trans && t.target) return t.target;
 
 	Vec2 dirPos = pos + dir2vec(dir);
-	return map.checkPos(dirPos) ? &map.at(dirPos) : nullptr;
+	Cell* res = map.checkPos(dirPos) ? &map.at(dirPos) : nullptr;
+	return res;
 }
 
 void Cell::addTransistion(Direction in, Direction out, Cell* target)
@@ -79,7 +117,30 @@ void Cell::addTransistion(Direction in, Direction out, Cell* target)
 	if(!target || target->type == Cell::Type::VOID)
 		throw std::runtime_error(fmt::format("transistion points to void cell ({})", target ? target->asString() : ""));
 
-	transistions[(usz) in] = { target, out };
+	transitions[(usz) in] = { target, (Direction)(((u32)out + 4) % 8) }; // reverse out direction
+}
+
+bool Cell::isFree() const
+{
+	switch(type)
+	{
+	case Type::EXPANSION:
+	case Type::VOID:
+		return false;
+	default:
+		return !isPlayer();
+	}
+	return true;
+}
+
+bool Cell::isPlayer() const
+{
+	return Cell::Type::P1 <= type && type <= Cell::Type::P8;
+}
+
+bool Cell::isCaptureable() const
+{
+	return type == Type::EXPANSION || isPlayer();
 }
 
 std::string Cell::asString() const
@@ -139,21 +200,6 @@ const Cell& Map::at(const Vec2 &pos) const
 		throw std::out_of_range(pos.asString());
 	return data[pos.x * height + pos.y];
 }
-/*
-std::unordered_multimap<Vec2, Vec2> Map::getTransitstions()
-{
-	std::unordered_multimap<Vec2, Vec2> res;
-	for(auto& p: trans)
-	{
-		if(set.find(p.second) == set.end())
-		{
-			set.emplace(p.second, true);
-			res.push_back(p.second);
-		}
-	}
-	return res;
-}
-*/
 
 string Map::asString()
 {

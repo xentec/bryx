@@ -12,11 +12,14 @@ enum class Direction : u8
 {
 	N, NE, E, SE, S, SW, W, NW, LAST
 };
+Vec2 dir2vec(Direction dir);
+string dir2str(Direction dir);
+Direction str2dir(string input);
 
 struct Map;
 struct Cell
 {
-	enum class Type : u8
+	enum class Type : char
 	{
 		// standard fields
 		VOID = '-',
@@ -31,7 +34,7 @@ struct Cell
 		// players
 		P1 = '1', P2, P3, P4, P5, P6, P7, P8,
 	};
-	struct Transistion
+	struct Transition
 	{
 		Cell* target;
 		Direction out;
@@ -40,10 +43,18 @@ struct Cell
 
 	Cell(Map &map, Type type);
 	Cell(const Cell& other);
+	~Cell();
 	Cell& operator=(const Cell& other);
+
+	bool operator ==(const Cell& other) const;
+	bool operator !=(const Cell& other) const;
 
 	Cell* getNeighbor(Direction dir, bool with_trans = true) const;
 	void addTransistion(Direction in, Direction out, Cell* target);
+
+	bool isFree() const;
+	bool isPlayer() const;
+	bool isCaptureable() const;
 
 	string asString() const;
 
@@ -51,7 +62,7 @@ struct Cell
 
 	const Vec2 pos;
 	Cell::Type type;
-	std::array<Transistion, 8> transistions;
+	std::array<Transition, 8> transitions;
 	Map& map;
 };
 
