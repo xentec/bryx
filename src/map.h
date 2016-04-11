@@ -68,6 +68,7 @@ struct Map
 	const Cell& at(const Vec2& pos) const;
 
 	string asString();
+	void print(const Vec2 *highlight = nullptr, bool colored = true, bool ansi = true) const;
 
 	const u32 width, height;
 private:

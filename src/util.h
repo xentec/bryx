@@ -75,6 +75,3 @@ namespace color
 	static const ConsoleFormat WHITE(37, ConsoleFormat::BOLD);
 #endif
 }
-
-struct Map;
-void printMapColored(Map* map);

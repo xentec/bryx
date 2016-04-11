@@ -170,8 +170,57 @@ string Map::asString()
 	return str.str();
 }
 
+void Map::print(const Vec2* highlight, bool colored, bool ansi) const
+{
+	fmt::print("   ");
+	for (usz x = 0; x < width; x++)
+	{
+		if(x%2 == 0)
+			fmt::print("{:^2}", x);
+		else
+			fmt::print("- ");
+	}
+
+	fmt::print("\n");
+
+	for (usz y = 0; y < height; y++)
+	{
+		fmt::print("{}", color::RESET);
+		if(y%2 == 0)
+			fmt::print("{:2} ", y);
+		else
+			fmt::print(" | ");
+		for (usz x = 0; x < width; x++)
+		{
+			ConsoleFormat color;
+			const Cell& c = at(x, y);
+			switch (c.type)
+			{
+			case Cell::Type::BONUS:     color = color::GREEN_LIGHT; break;
+			case Cell::Type::CHOICE:    color = color::BLUE_LIGHT;  break;
+			case Cell::Type::EMPTY:     color = color::GRAY_LIGHT;  break;
+			case Cell::Type::EXPANSION: color = color::CYAN_LIGHT;  break;
+			case Cell::Type::INVERSION: color = color::YELLOW;	    break;
+			case Cell::Type::VOID:      color = color::GRAY;        break;
+			default:
+				if (Cell::Type::P1 <= c.type && c.type <= Cell::Type::P8)
+					color = color::YELLOW;
+			}
+
+			if(highlight && c.pos == *highlight) {
+				color.color += 10;
+				color.attr = ConsoleFormat::BLINK;
+			}
+
+			fmt::print("{}{}{} ", color, (char)c.type, color::RESET);
+		}
+		fmt::print("\n");
+	}
+	fmt::print("{}", color::RESET);
+}
+
+
 bool Map::checkPos(const Vec2& pos) const
 {
 	return inBox(pos, Vec2::O, {(i32)width-1, (i32)height-1});
 }
-

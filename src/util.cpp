@@ -37,52 +37,7 @@ std::string readline(std::basic_istream<char> &stream)
 	return str;
 }
 
-void printMapColored(Map* map)
-{
-	fmt::print("   ");
-	for (usz x = 0; x < map->width; x++)
-	{
-		if(x%2 == 0)
-			fmt::print("{:^2}", x);
-		else
-			fmt::print("- ");
-	}
 
-	fmt::print("\n");
-
-	for (usz y = 0; y < map->height; y++)
-	{
-		fmt::print("{}", color::RESET);
-		if(y%2 == 0)
-			fmt::print("{:2} ", y);
-		else
-			fmt::print(" | ");
-		for (usz x = 0; x < map->width; x++)
-		{
-			ConsoleFormat color;
-			Cell& c = map->at(x, y);
-			switch (c.type)
-			{
-			case Cell::Type::BONUS:     color = color::GREEN_LIGHT; break;
-			case Cell::Type::CHOICE:    color = color::BLUE_LIGHT;  break;
-			case Cell::Type::EMPTY:     color = color::GRAY_LIGHT;  break;
-			case Cell::Type::EXPANSION: color = color::CYAN_LIGHT;  break;
-			case Cell::Type::INVERSION: color = color::MAGENTA;	    break;
-			case Cell::Type::VOID:      color = color::GRAY;        break;
-			default:
-				if (Cell::Type::P1 <= c.type && c.type <= Cell::Type::P8)
-					color = color::YELLOW;
-			}
-
-			fmt::print("{}{} ", color, (char)c.type);
-		}
-		fmt::print("\n");
-	}
-/*
-	for (const Transistion& t : map->getTransitstions())
-		fmt::print("{}\n", t.asString());
-*/
-}
 
 
 ConsoleFormat::ConsoleFormat(u8 color, ConsoleFormat::Attribute attr):
