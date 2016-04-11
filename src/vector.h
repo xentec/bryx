@@ -45,8 +45,10 @@ struct Vector
 	bool operator ==(const vec& other) const
 	{
 		for(u32 i = 0; i < N; i++)
+		{
 			if(data[i] != other[i])
 				return false;
+		}
 
 		return true;
 	}
@@ -56,6 +58,8 @@ struct Vector
 		vec res;
 		for(u32 i = 0; i < N; i++)
 			res[i] = -data[i];
+
+		return res;
 	}
 
 	vec operator +(const vec& other) const
