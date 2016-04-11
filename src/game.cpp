@@ -5,31 +5,6 @@
 #include <cppformat/format.h>
 #include <fstream>
 
-static bool vec2dir(const Vec2& v, Direction& dir)
-{
-	if(v.x != 0 && v.y != 0 && v.x != v.y)
-		return false;
-
-	Direction dirH;
-	switch(v.x / std::abs(v.x))
-	{
-	case -1: dirH = Direction::W; break;
-	case 0: break;
-	case 1: dirH = Direction::E; break;
-	}
-
-	Direction dirV;
-	switch(v.y / std::abs(v.y))
-	{
-	case -1: dirV = Direction::N; break;
-	case 0: break;
-	case 1: dirV = Direction::S; break;
-	}
-
-	return true;
-}
-
-Cell* Game::test = nullptr;
 
 Game::Game()
 {}
@@ -54,13 +29,12 @@ Move::Error Game::testMove(Move& move)
 		if(cur->type == me)
 			return Move::Error::WRONG_PATH;
 
-
-
 		move.stones.push_back(cur);
-//#if DEBUG
+
+#if DEBUG
 		fmt::print("\nNEW STONE: {}\n", cur->asString());
 		map->print(&cur->pos);
-//#endif
+#endif
 
 		Cell::Transition tr = cur->transitions[(usz) moveDir];
 		if(tr.target)
@@ -140,8 +114,6 @@ Game Game::load(std::string filename)
 		try {
 			from.addTransistion(in, out, &to);
 			to.addTransistion(out, in, &from);
-
-			Game::test = &from;
 		}
 		catch(std::out_of_range& e)
 		{

@@ -216,6 +216,8 @@ string Map::asString()
 	return str.str();
 }
 
+
+// TODO: color und ansi flags
 void Map::print(const Vec2* highlight, bool colored, bool ansi) const
 {
 	fmt::print("   ");

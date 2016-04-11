@@ -39,8 +39,6 @@ struct Game
 	Move::Error testMove(Move& move);
 
 	static Game load(string filename);
-	static Cell* test;
-
 private:
 	Game();
 };

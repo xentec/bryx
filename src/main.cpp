@@ -42,29 +42,25 @@ int main(int argc, char* argv[])
 		Vec2 from;
 		string dirStr;
 
-		from = input<Vec2>(game.me, "Start [Vec2]");
+		from = input<Vec2>(game.me, "Start [Vec2]"); fmt::print("\n");
+		from = { 8, 2 };
+
 		game.map->print(&from);
 
-		dirStr = input<string>(game.me, "Direction [Dir]");
-		fmt::print("\n");
-
-		from = { 8, 2 };
+		dirStr = input<string>(game.me, "Direction [Dir]");	fmt::print("\n");
 		dirStr = "W";
+
 
 		Direction dir = str2dir(dirStr);
 		Move move { game.map->at(from), dir };
 
 		Move::Error res = game.testMove(move);
-		fmt::print("Valid: {}\n", Move::err2str(res));
+		fmt::print("Errors? {}\n", Move::err2str(res));
 
 		if(res != Move::Error::NONE) return 0;
 
 		for(Cell* c: move.stones)
-		{
-			fmt::print("SET STONE: {} --> ", c->asString());
 			c->type = game.me;
-			fmt::print("{}\n", c->asString());
-		}
 
 		game.me = (Cell::Type)((u32)Cell::Type::P1 + ++ply % game.players);
 
