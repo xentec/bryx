@@ -13,7 +13,7 @@ struct ConsoleFormat
 {
 	enum Attribute
 	{
-		NORMAL = 0, BOLD = 1, UNDERLINE = 4, BLINK, REVERSE = 7, INVISIBLE
+		NORMAL = 0, BOLD = 1, UNDERLINE = 4, BLINK = 5, REVERSE = 7, INVISIBLE = 8
 	};
 
 	ConsoleFormat(u8 color = 0, Attribute attr = NORMAL);
