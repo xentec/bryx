@@ -3,6 +3,7 @@
 #include "global.h"
 
 #include <cppformat/format.h>
+#include <istream>
 #include <initializer_list>
 
 template<usz N, class T>
@@ -143,6 +144,14 @@ namespace std {
 }
 
 using Vec2 = Vector<2, i32>;
+
+template<class CharT, class Traits, usz N, class T>
+std::basic_istream<CharT,Traits>& operator>>(std::basic_istream<CharT,Traits>& stream, Vector<N,T>& o)
+{
+	for(u32 i = 0; i < N; i++)
+		stream >> o[i];
+	return stream;
+}
 
 template<usz N, class T>
 bool inBox(const Vector<N,T>& x, const Vector<N,T>& begin, const Vector<N,T>& end)
