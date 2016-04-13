@@ -34,18 +34,36 @@ int main(int argc, char* argv[])
 	fmt::print("Overrides: {}\n", game.overrides);
 	fmt::print("Bombs: {} ({})\n", game.bombs, game.bombsStrength);
 	fmt::print("Map: {}x{}\n", game.map->width, game.map->height);
+	game.map->print();
 
 	u32 ply = 0;
-//	do
+	do
 	{
-		game.map->print();
-		Vec2 from;
+		fmt::print("\n");
+		fmt::print("Player {}\n", (char) game.me);
+		fmt::print("################\n\n");
+
+		std::vector<Move> moves = game.possibleMoves();
+		for(Move& move: moves)
+		{
+			fmt::print("{} --> {}\n", move.start.asString(), move.end->asString());
+			std::unordered_set<Vec2> hl;
+			hl.insert(move.start.pos);
+			hl.insert(move.end->pos);
+			for(Cell* c: move.stones)
+				hl.insert(c->pos);
+
+			game.map->print(hl);
+		}
+
+
+/*		Vec2 from;
 		string dirStr;
 
 		from = input<Vec2>(game.me, "Start [Vec2]"); fmt::print("\n");
 		from = { 8, 2 };
 
-		game.map->print(&from);
+		game.map->print({from});
 
 		dirStr = input<string>(game.me, "Direction [Dir]");	fmt::print("\n");
 		dirStr = "W";
@@ -61,12 +79,16 @@ int main(int argc, char* argv[])
 
 		for(Cell* c: move.stones)
 			c->type = game.me;
-
+*/
 		game.me = (Cell::Type)((u32)Cell::Type::P1 + ++ply % game.players);
-
+		if(ply == game.players)
+			break;
 	}
-//	while(true);
+	while(true);
 
+	fmt::print("\n################\n");
+	fmt::print("GAME SET\n");
+	fmt::print("################\n\n");
 	game.map->print();
 
 	return 0;

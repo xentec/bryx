@@ -14,8 +14,13 @@ struct Move
 		NO_STONES_CAPTURED,
 	};
 
-	Cell &from;
+	Move(Cell& start, Direction dir);
+	Move(const Move& other);
+	Move& operator =(const Move& other);
+
+	Cell &start, *end;
 	Direction dir;
+	Error err;
 
 	std::vector<Cell*> stones;
 	bool override;
@@ -36,7 +41,10 @@ struct Game
 	Map* map;
 
 	~Game();
-	Move::Error testMove(Move& move);
+
+	std::vector<Move> possibleMoves() const;
+	std::vector<Move> possibleMovesOn(Cell& cell) const;
+	Move::Error testMove(Move& move) const;
 
 	static Game load(string filename);
 private:

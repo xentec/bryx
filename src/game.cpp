@@ -14,16 +14,47 @@ Game::~Game()
 	delete map;
 }
 
-Move::Error Game::testMove(Move& move)
+std::vector<Move> Game::possibleMoves() const
+{
+	std::vector<Move> moves;
+
+	for(i32 x = 0; x < map->width; x++)
+	for(i32 y = 0; y < map->height; y++)
+	{
+		auto cellMoves = possibleMovesOn(map->at(x, y));
+		moves.insert(moves.end(), cellMoves.begin(), cellMoves.end());
+	}
+
+	return moves;
+}
+
+std::vector<Move> Game::possibleMovesOn(Cell& cell) const
+{
+	std::vector<Move> moves;
+
+	for(u8 dir = Direction::N; dir < Direction::LAST; dir++)
+	{
+		Move move { cell, (Direction) dir };
+		if(testMove(move) == Move::Error::NONE)
+		{
+			moves.push_back(move);
+			continue;
+		}
+	}
+
+	return moves;
+}
+
+Move::Error Game::testMove(Move& move) const
 {
 	move.stones.clear();
 
-	if(move.from.type != me)
+	if(move.start.type != me)
 		return Move::Error::WRONG_START;
 
 	Direction moveDir = move.dir;
 
-	Cell* cur = move.from.getNeighbor(moveDir);
+	Cell* cur = move.start.getNeighbor(moveDir);
 	while(cur && cur->isCaptureable())
 	{
 		if(cur->type == me)
@@ -33,7 +64,7 @@ Move::Error Game::testMove(Move& move)
 
 #if DEBUG
 		fmt::print("\nNEW STONE: {}\n", cur->asString());
-		map->print(&cur->pos);
+		map->print({cur->pos});
 #endif
 
 		Cell::Transition tr = cur->transitions[(usz) moveDir];
@@ -44,8 +75,10 @@ Move::Error Game::testMove(Move& move)
 		} else
 			cur = cur->getNeighbor(moveDir);
 	}
-	if(move.stones.empty())
+	if(move.stones.empty() || !cur)
 		return Move::Error::NO_STONES_CAPTURED;
+
+	move.end = cur;
 
 	return Move::Error::NONE;
 }
@@ -127,6 +160,26 @@ Game Game::load(std::string filename)
 	return game;
 }
 
+
+Move::Move(Cell& start, Direction dir):
+	start(start), end(nullptr), dir(dir)
+{}
+
+Move::Move(const Move& other):
+	start(other.start), end(other.end), dir(other.dir),
+	err(other.err),
+	stones(other.stones)
+{}
+
+Move&Move::operator =(const Move& other)
+{
+	start = other.start;
+	dir = other.dir;
+	end = other.end;
+	err = other.err;
+	stones = other.stones;
+	return *this;
+}
 
 std::string Move::err2str(Move::Error err)
 {
