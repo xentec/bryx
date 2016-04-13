@@ -5,10 +5,11 @@
 
 #include <array>
 #include <vector>
+#include <unordered_set>
 #include <unordered_map>
 
 
-enum class Direction : u8
+enum Direction : u8
 {
 	N, NE, E, SE, S, SW, W, NW, LAST
 };
