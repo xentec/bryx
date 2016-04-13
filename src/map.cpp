@@ -218,7 +218,7 @@ string Map::asString()
 
 
 // TODO: color und ansi flags
-void Map::print(const Vec2* highlight, bool colored, bool ansi) const
+void Map::print(std::unordered_set<Vec2> highlight, bool colored, bool ansi) const
 {
 	fmt::print("   ");
 	for (usz x = 0; x < width; x++)
@@ -255,7 +255,7 @@ void Map::print(const Vec2* highlight, bool colored, bool ansi) const
 					color = color::YELLOW;
 			}
 
-			if(highlight && c.pos == *highlight) {
+			if(highlight.size() && highlight.find(c.pos) != highlight.end()) {
 				color.color += 10;
 				color.attr = ConsoleFormat::BLINK;
 			}
