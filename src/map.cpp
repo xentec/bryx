@@ -95,30 +95,11 @@ bool Cell::operator !=(const Cell& other) const
 	return !(*this == other);
 }
 
-Cell* Cell::getNeighbor(Direction dir, bool with_trans) const
+string Cell::asString() const
 {
-	const Transition& t = transitions[(usz)dir];
-	if(with_trans && t.target) return t.target;
-
-	Vec2 dirPos = pos + dir2vec(dir);
-	Cell* res = map.checkPos(dirPos) ? &map.at(dirPos) : nullptr;
-	return res;
+	return fmt::format("{}:'{}'", pos, (char) type);
 }
 
-void Cell::addTransistion(Direction in, Direction out, Cell* target)
-{
-	if(type == Cell::Type::VOID)
-		throw std::runtime_error(fmt::format("adding transistion to void cell ({})", pos));
-
-	Cell* wall = getNeighbor(in, false);
-	if(wall && wall->type != Cell::Type::VOID)
-		throw std::runtime_error(fmt::format("transistion exit is not void ({}:{})", pos, dir2str(in)));
-
-	if(!target || target->type == Cell::Type::VOID)
-		throw std::runtime_error(fmt::format("transistion points to void cell ({})", target ? target->asString() : ""));
-
-	transitions[(usz) in] = { target, (Direction)(((u32)out + 4) % 8) }; // reverse out direction
-}
 
 bool Cell::isFree() const
 {
@@ -143,10 +124,31 @@ bool Cell::isCaptureable() const
 	return type == Type::EXPANSION || isPlayer();
 }
 
-std::string Cell::asString() const
+
+Cell* Cell::getNeighbor(Direction dir, bool with_trans) const
 {
-	return fmt::format("{}:'{}'", pos, (char) type);
+	const Transition& t = transitions[(usz)dir];
+	if(with_trans && t.target) return t.target;
+
+	Vec2 dirPos = pos + dir2vec(dir);
+	return map.checkPos(dirPos) ? &map.at(dirPos) : nullptr;
 }
+
+void Cell::addTransistion(Direction in, Direction out, Cell* target)
+{
+	if(type == Cell::Type::VOID)
+		throw std::runtime_error(fmt::format("adding transistion to void cell ({})", pos));
+
+	Cell* wall = getNeighbor(in, false);
+	if(wall && wall->type != Cell::Type::VOID)
+		throw std::runtime_error(fmt::format("transistion exit is not void ({}:{})", pos, dir2str(in)));
+
+	if(!target || target->type == Cell::Type::VOID)
+		throw std::runtime_error(fmt::format("transistion points to void cell ({})", target ? target->asString() : ""));
+
+	transitions[(usz) in] = { target, (Direction)(((u32)out + 4) % 8) }; // reverse out direction
+}
+
 
 bool Cell::isValid(char ch)
 {
@@ -244,20 +246,20 @@ void Map::print(std::unordered_set<Vec2> highlight, bool colored, bool ansi) con
 			const Cell& c = at(x, y);
 			switch (c.type)
 			{
-			case Cell::Type::BONUS:     color = color::GREEN_LIGHT; break;
-			case Cell::Type::CHOICE:    color = color::BLUE_LIGHT;  break;
+			case Cell::Type::BONUS:     color = color::CYAN_LIGHT; break;
+			case Cell::Type::CHOICE:    color = color::RED_LIGHT;  break;
 			case Cell::Type::EMPTY:     color = color::GRAY_LIGHT;  break;
 			case Cell::Type::EXPANSION: color = color::CYAN_LIGHT;  break;
 			case Cell::Type::INVERSION: color = color::YELLOW;	    break;
 			case Cell::Type::VOID:      color = color::GRAY;        break;
 			default:
-				if (Cell::Type::P1 <= c.type && c.type <= Cell::Type::P8)
+				if (c.isPlayer())
 					color = color::YELLOW;
 			}
 
 			if(highlight.size() && highlight.find(c.pos) != highlight.end()) {
 				color.color += 10;
-				color.attr = ConsoleFormat::BLINK;
+				//color.attr = ConsoleFormat::BLINK;
 			}
 
 			fmt::print("{}{}{} ", color, (char)c.type, color::RESET);

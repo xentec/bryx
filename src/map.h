@@ -45,19 +45,19 @@ struct Cell
 	Cell(Map &map, Type type);
 	Cell(const Cell& other);
 	~Cell();
-	Cell& operator=(const Cell& other);
 
+	Cell& operator =(const Cell& other);
 	bool operator ==(const Cell& other) const;
 	bool operator !=(const Cell& other) const;
 
-	Cell* getNeighbor(Direction dir, bool with_trans = true) const;
-	void addTransistion(Direction in, Direction out, Cell* target);
+	string asString() const;
 
 	bool isFree() const;
 	bool isPlayer() const;
 	bool isCaptureable() const;
 
-	string asString() const;
+	Cell* getNeighbor(Direction dir, bool with_trans = true) const;
+	void addTransistion(Direction in, Direction out, Cell* target);
 
 	static bool isValid(char ch);
 
