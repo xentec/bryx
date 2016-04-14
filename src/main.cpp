@@ -41,23 +41,54 @@ int main(int argc, char* argv[])
 	{
 		fmt::print("\n");
 		fmt::print("Player {}\n", (char) game.me);
-		fmt::print("################\n\n");
+		fmt::print("################\n");
 
 		std::vector<Move> moves = game.possibleMoves();
-		for(Move& move: moves)
-		{
-			fmt::print("{} --> {}\n", move.start.asString(), move.end->asString());
-			std::unordered_set<Vec2> hl;
-			hl.insert(move.start.pos);
-			hl.insert(move.end->pos);
-			for(Cell* c: move.stones)
-				hl.insert(c->pos);
 
-			game.map->print(hl);
+		u32 stoneSum = 0;
+		u32 stoneMax = 0;
+		std::vector<Move*> bestMoves;
+		for(Move& m: moves)
+		{
+			int stones = m.stones.size();
+			stoneSum += stones;
+			if(stones > stoneMax)
+			{
+				bestMoves.clear();
+				stoneMax = stones;
+				bestMoves.push_back(&m);
+				continue;
+			}
+			if(stones == stoneMax)
+				bestMoves.push_back(&m);
 		}
 
+		if(moves.size())
+		{
+			fmt::print("{} moves with {} possible captures\n", (char)game.me, moves.size(), stoneMax);
 
-/*		Vec2 from;
+			for(Move& move: moves)
+			{
+				fmt::print("{}>{} --> {}\n\n", move.start.pos, dir2str(move.dir), move.end->pos);
+				std::unordered_set<Vec2> hl;
+				hl.insert(move.start.pos);
+				hl.insert(move.end->pos);
+
+				for(Cell* c: move.stones)
+					hl.insert(c->pos);
+
+				game.map->print(hl);
+			}
+
+			fmt::print("Best moves being:\n");
+			for(Move* bm: bestMoves)
+				fmt::print("\t{}>{} --> {}\n", bm->start.pos, dir2str(bm->dir), bm->end->pos);
+		} else
+		{
+			fmt::print("Cannot move", (char) game.me);
+		}
+/*
+		Vec2 from;
 		string dirStr;
 
 		from = input<Vec2>(game.me, "Start [Vec2]"); fmt::print("\n");
