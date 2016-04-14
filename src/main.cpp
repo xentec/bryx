@@ -28,7 +28,18 @@ int main(int argc, char* argv[])
 
 	mapFilePath = argv[1];
 
-	Game game = Game::load(mapFilePath);
+	fmt::print("Loading {} ...", mapFilePath);
+
+	std::ifstream file(mapFilePath);
+	if (!file)
+	{
+		fmt::print("File '{}' cannot be read", mapFilePath);
+		return 0;
+	}
+
+	Game game = Game::load(file);
+
+	fmt::print(" Done!\n");
 
 	fmt::print("Players: {}\n", game.players);
 	fmt::print("Overrides: {}\n", game.overrides);

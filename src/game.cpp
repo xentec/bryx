@@ -83,13 +83,9 @@ Move::Error Game::testMove(Move& move) const
 	return Move::Error::NONE;
 }
 
-Game Game::load(std::string filename)
+Game Game::load(std::istream& file)
 {
 	using std::stoi;
-
-	std::ifstream file(filename);
-	if (!file)
-		throw std::runtime_error(fmt::format("File '{}' cannot be read", filename));
 
 	Game game;
 	game.players = stoi(readline(file));

@@ -46,7 +46,7 @@ struct Game
 	std::vector<Move> possibleMovesOn(Cell& cell) const;
 	Move::Error testMove(Move& move) const;
 
-	static Game load(string filename);
+	static Game load(std::istream& file);
 private:
 	Game();
 };
