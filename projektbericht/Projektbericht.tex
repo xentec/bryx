@@ -1,0 +1,343 @@
+\documentclass[12pt,a4paper]{article}
+%\documentclass[12pt,a4paper,bibliography=totocnumbered,listof=totocnumbered]{scrartcl}
+\input{includes}
+
+\begin{document}
+
+\input{commands}
+% ----------------------------------------------------------------------------------------------------------
+% Titelseite
+% ----------------------------------------------------------------------------------------------------------
+\MyTitlepage[pics/gamefield02]{G01}{
+\texttt{andrej.utz@st.oth-regensburg.de}}
+{??.06.\the\year} % FIXME optional: Gruppenlogo als PNG, Pflichtfelder: Gruppe, Authoren durch "\\" getrennt und Abgabedatum eingeben
+
+\setcounter{page}{1} 
+% ----------------------------------------------------------------------------------------------------------
+% Inhaltsverzeichnis
+% ----------------------------------------------------------------------------------------------------------
+\tableofcontents
+\pagebreak
+
+
+% ----------------------------------------------------------------------------------------------------------
+% Inhalt
+% ----------------------------------------------------------------------------------------------------------
+% Abstände Überschrift
+\titlespacing{\section}{0pt}{12pt plus 4pt minus 2pt}{-6pt plus 2pt minus 2pt}
+\titlespacing{\subsection}{0pt}{12pt plus 4pt minus 2pt}{-6pt plus 2pt minus 2pt}
+\titlespacing{\subsubsection}{0pt}{12pt plus 4pt minus 2pt}{-6pt plus 2pt minus 2pt}
+
+% Kopfzeile
+\renewcommand{\sectionmark}[1]{\markright{#1}}
+\renewcommand{\subsectionmark}[1]{}
+\renewcommand{\subsubsectionmark}[1]{}
+\lhead{Kapitel \thesection}
+\rhead{\rightmark}
+
+\onehalfspacing
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\theHsection}{\arabic{section}}
+\setcounter{section}{0}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% ----------------------------------------------------------------------------------
+% Kapitel: Einleitung
+% ----------------------------------------------------------------------------------
+\section{Einleitung}
+%Leiten Sie in diesem Abschnitt in das Fach YIMB und das zu erstellende Projekt ein. Beschreiben Sie kurz die Fragestellung, die in diesem Wahlpflichtfach gelöst werden soll. Stellen Sie Ihr vorhandenes Vorwissen dar, das in dieser Veranstaltung für Sie von Nutzen sein könnte/ist/war, etc.
+YIMB oder \glqq Implementierung von Brettspielen am Beispiel ReversiXT\grqq{} stellt ein Gruppensoftwareprojekt dar, das für diverse Aspekte eines 
+Informatikstudiengangs ein Praktikum bietet. Ein Programm, das eine Modifikation von Reversi - ReversiXT - implementiert, soll auch eine künstliche 
+Intelligenz beinhalten, die sich über das Netzwerk mit anderen K.I. messen soll. Algorithmen und Datenstrukturen sowie Netzwerkprogrammierung sind 
+damit die am häufigsten beanspruchten Gebiete der Informatik in der Umsetzung des Projekts.
+
+% TODO ggf neuschreiben
+
+\newpage
+% ----------------------------------------------------------------------------------
+% Kapitel: Allgemeine Informationen
+% ----------------------------------------------------------------------------------
+\section{Allgemeine Informationen}
+
+\subsection{Projektname}
+Um dem Projekt eine persönliche Note zu verleihen wurde das Programm \glqq \textbf{Bryx}\grqq{} getauft.
+
+
+\subsection{Team und Kommunikation}
+%Beschreiben Sie in diesem Abschnitt Ihr Team. Welche Person hat welche Aufgaben wahrgenommen, wie wurden Aufgaben aufgeteilt und wie wurde kommuniziert, etc.
+Das Team und die Aufgabenverteilung sehen wie folgt aus:
+\begin{itemize}
+	\item Andrej Utz: Entwickeln, Programmieren, Testen, Dokumentieren
+\end{itemize}
+
+Ursprünglich bestand das Team aus einer weiteren Person: Georg Fichtl. Weil die von ihm erhoffte Anrechnung des YIMB-Faches an das dritte Studienabschnitt durch formale Einschränkungen scheiterte, ließ er seine Motivation fallen und verließ das Team.
+
+Zur Kommunikation wurde Discord (\url{https://discordapp.com}) benutzt, welches sich am Besten als eine Kombination eines IRC- und TeamSpeak-Clients
+beschreiben lässt:
+
+% TODO Besseres Bild
+\begin{minipage}{\linewidth}
+	\centering
+	\includegraphics[width=0.6\linewidth]{pics/bryx-chat.png}
+	\captionof{figure}[Discord-Chat]{Der \#bryx-Channel in Discord}
+	\label{fig:discord}
+\end{minipage}
+
+Das persistente Chatprotokoll erlaubt Austausch und Festhaltung der Ideen und für längere Diskussionen kann man auch Sprachkommunikation nutzen.
+
+\subsection{Technische Daten}
+%Beschreiben Sie u.a.\ in welcher Programmiersprache und unter welchem Betriebssystem Sie entwickeln, welche IDEs Sie nutzen, welche zusätzlichen Tools bei Ihrer Projektentwicklung Einsatz gefunden haben, etc.
+Bei jedem der Folgenden Einträge steht ein Vorteil dessen, der für die Wahl ausschlaggebend war.
+
+\begin{itemize}
+\item Programmiersprache: C++ \\
+Native Ausführung und deterministische Speicherverwaltung.
+\item Compiler: clang + libcxx \\
+Bessere Fehlermeldungen im Vergleich zu GCC.
+\item Betriebssystem: Arch Linux \\
+Standardbetriebssystem des Teams.
+\item Projektgenerator: CMake \\
+Einfache und einheitliche Generierung der Projektdateien.
+\item IDE: QtCreator \\
+Eine gute OSS Alternative zu Visual Studio, die u.a. CMake versteht und dank Clang Static Analyzer semantische Fehler während des Schreibens anzeigt.
+\item Dokumentationsgenerator: Doxygen \\
+De facto Standard zum Erstellen von Dokumentationen aus dem Quellcode.
+\end{itemize}
+
+\subsection{Datenstruktur}
+Als Grundlange für die Speicherung des Spielfeldes wurde der STL-Container \texttt{std::vector} aus der Standardbibliothek benutzt. Dieser ist unter der Haube nichts weiter als ein eindimensionaler, heapallokierter Array mit Verfolgung der Größe und Zugriffschecks. Der Zugriff auf Felder erfolgt über ihre X,Y-Koordinaten.
+Ein Feld sieht wie folgt aus:
+
+\begin{lstlisting}[caption=Cell Struktur, label=lst:cell-struct]
+struct Cell
+{
+	struct Transition
+	{
+		Cell* target;
+		Direction out;
+	};
+	
+	Map& map;
+	const Vec2 pos;
+	
+	Cell::Type type;
+	std::array<Transition, 8> transitions;
+};
+\end{lstlisting}
+
+\texttt{Cell} speichert - neben dem eigentlichem Feldtyp - noch ihre Position als Vektor, eine Referenz zum Spielfeld und einen festen Array mit 8 Transitionen, welche den ihren Ausgangsrichtungen entsprechen.
+Eine \texttt{Transition} beinhaltet einen Zeiger auf eine andere Zelle und die Ausrichtung, die ein Zug bekommt, nachdem er die Transition passiert hat.
+Bei Nichtexistenz der \texttt{Transition} ist der Zeiger auf die \texttt{Cell} standardmäßig \texttt{NULL}.
+
+Die Variante aus \texttt{std::vector} und \texttt{std::array} wurde genommen, um Cache-Misses der CPU zu mindern.
+
+
+%Beschreiben Sie die Datenstruktur, die Sie zur Speicherung des Spielfeldes in Ihrem Client nutzen. Gehen Sie auf Besonderheiten ein und erklären Sie, wie diese funktionieren und was Sie sich davon erhoffen. Geben Sie falls möglich auch eine schematische Darstellung/ein Bild der Datenstruktur an.
+
+
+\newpage
+% ----------------------------------------------------------------------------------
+% Kapitel: Spielfeldbewertung
+% ----------------------------------------------------------------------------------
+\section{Spielfeldbewertung}
+\subsection{Spielfeldbewertung: 1. Vorschlag}
+Beschreiben Sie wie in der zugehörigen Projektaufgabe gefordert eine erste Heuristik.
+
+\subsection{Spielfeldbewertung: 2. Vorschlag}
+Beschreiben Sie wie in der zugehörigen Projektaufgabe gefordert eine zweite Heuristik.
+
+\subsection{Final implementierte Spielfeldbewertung}
+Beschreiben Sie abschließend, welche Heuristik final in Ihrem Client umgesetzt ist. Beschreiben Sie dazu auch Werte von Parametern (Kriterien und Gewichtungen), die Sie in den einzelnen Implementierungen nutzen. Welche statischen Vorberechnungen Sie machen, um z.B.\ das Spielfeld zu analysieren, etc.
+
+
+\newpage
+% ----------------------------------------------------------------------------------
+% Kapitel: Statistiken
+% ----------------------------------------------------------------------------------
+\section{Statistiken}
+Integrieren Sie in diesen Abschnitt alle Ergebnisse von Projektaufgaben, die mit Erstellungen von Statistiken zu tun haben. Geben Sie dabei auch Diagramme an und interpretieren Sie die darin dargestellten Kurven. Beschreiben Sie zu jedem implementierten Verfahren, ob und welchen Nutzen es aus Ihrer Sicht gebracht hat.
+
+\subsection{Vergleich ... und ...}
+
+\subsection{Vergleich ..., ... und ...}
+
+\subsection{...}
+
+
+\newpage
+% ----------------------------------------------------------------------------------
+% Kapitel: Bombenphase
+% ----------------------------------------------------------------------------------
+\section{Bombenphase}
+Beschreiben Sie, wie Sie Bomben werfen (z.\,B.\ die eingesetzte Bewertungsheuristik und, ob Sie in die Tiefe rechnen und falls ja, wie tief Sie rechnen)
+
+
+\newpage
+% ----------------------------------------------------------------------------------
+% Kapitel: Eigene Spielfelder
+% ----------------------------------------------------------------------------------
+\section{Wettbewerbs-Spielfelder}
+Beschreiben Sie in diesem Abschnitt die Spielfelder, die Sie für den Wettbewerb eingereicht haben/einreichen wollen. Fügen Sie in diesen Abschnitt auch die entsprechenden Bilder der Karten ein, geben Sie Zusatzinformationen wie Spieleranzahl, Bombenanzahl und -stärke, Anzahl Überschreibsteine etc.\ an.
+
+Beschreiben Sie außerdem, warum sie die jeweiligen Karten eingereicht haben: in welcher Hinsicht versprechen Sie sich von den eingereichten Karten Vorteile; in wie weit sind diese Karten auf Ihren Client und die darin implementierte Heuristik zugeschnitten, etc.
+
+
+\newpage
+% ----------------------------------------------------------------------------------
+% Kapitel: Fazit
+% ----------------------------------------------------------------------------------
+\section{Fazit}
+Beschreiben Sie in diesem Abschnitt u.a.\ was Ihnen an diesem Fach gefallen hat und welche Verbesserungsvorschläge Sie für künftige Veranstaltungen haben. Was konnten Sie dazulernen, in welchen Bereichen haben Sie sich verbessert. Welche Problemsituationen gab es während der Projekterstellung, wie sind Sie diese angegangen und wie haben Sie diese gelöst. Was haben Sie evtl.\ vermisst.
+
+
+\newpage
+% ----------------------------------------------------------------------------------
+% Kleine Einführung in LaTeX-Elemente
+% ----------------------------------------------------------------------------------
+\section{\LaTeX-Elemente}
+Dieser Abschnitt soll nicht Bestandteil des Projektberichtes sein, sondern beinhaltet lediglich einige Informationen über \LaTeX-Distributionen, Editoren und \LaTeX-Elemente, die Ihnen beim Einstieg in das \LaTeX-Textsatzsystem helfen sollen.
+
+\subsection{\LaTeX-Distributionen nach Betriebssystemen}
+
+\subsubsection{\LaTeX-Distributionen}
+Folgende Haupt-\LaTeX-Distributionen stehen Ihnen zur Verfügung:
+\begin{itemize}
+  \item Windows:\quad \texttt{MiKTeX}\quad Webseite:\quad\url{http://www.miktex.org}
+  \item Linux/Unix:\quad \texttt{TeX Live}\quad Webseite:\quad\url{http://tug.org/texlive/}
+  \item Mac OS:\quad \texttt{MacTeX}\quad Webseite:\quad\url{http://www.tug.org/mactex/}
+\end{itemize}
+
+\subsubsection{\LaTeX-Editoren}
+Auf folgenden Webseiten können Sie einige hilfreiche \LaTeX-Editoren finden:
+\begin{itemize}
+  \item Windows/Linux/Mac OS: \url{http://www.xm1math.net/texmaker/}
+  \item Windiws: \url{http://www.texniccenter.org/}
+  \item Mac OS: \url{http://pages.uoregon.edu/koch/texshop/}
+\end{itemize}
+
+Falls bei den oben genannten Editoren kein passender vorhanden war, findet sich auf Wikipedia eine Zusammenstellung vieler weiterer \LaTeX-Editoren:\\[1em]
+\hspace*{3cm}\url{https://en.wikipedia.org/wiki/Comparison_of_TeX_editors}
+
+
+\subsection{Unterabschnitt}
+Zum Einfügen eines Bildes, siehe Abbildung \ref{fig:reversi01}, wird die \textit{minipage}-Umgebung genutzt, da die Bilder so gut positioniert werden können.
+
+\vspace{1em}
+\begin{minipage}{\linewidth}
+	\centering
+	\includegraphics[width=0.6\linewidth]{pics/gamefield01.png}
+	\captionof{figure}[Spielfeld 01]{Unbespieltes Spielfeld\footnotemark }
+	\label{fig:reversi01}
+\end{minipage}
+\footnotetext{Diesem Spielfeld wurden noch keine Spieler zugewiesen (daher die dunklen Spielsteine)}
+
+Nachdem das Spielt gestartet wurde und beiden Spielphasen durchlaufen wurden, siegt schließlich der Spieler mit der Farbe rot.
+
+\vspace{1em}
+\begin{minipage}{\linewidth}
+	\centering
+	\includegraphics[width=0.6\linewidth]{pics/gamefield02.png}
+	\captionof{figure}[Spielfeld 02]{Finales Spielfeld\footnotemark }
+	\label{fig:reversi2}
+\end{minipage}
+\footnotetext{Das Spielfeld nach der Zug- und Bombenphase. Spieler rot gewinnt eindeutig.}
+
+\subsection{Tabellen}
+In diesem Abschnitt wird eine Tabelle (siehe Tabelle \ref{tab:beispiel}) dargestellt.
+
+\vspace{1em}
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{|l|l|l|}
+		\hline
+		\textbf{Name} & \textbf{Name} & \textbf{Name}\\
+		\hline
+		1 & 2 & 3\\
+		\hline
+		4 & 5 & 6\\
+		\hline
+		7 & 8 & 9\\
+		\hline
+	\end{tabular}
+	\caption{Beispieltabelle}
+	\label{tab:beispiel}
+\end{table}
+
+
+\subsection{Auflistung}
+Für Auflistungen wird die \textit{enumerate}- oder \textit{itemize}-Umgebung genutzt.
+
+\begin{itemize}
+	\item Nur
+	\item ein
+	\item Beispiel.
+\end{itemize}
+
+\subsection{Listings}
+Zuletzt ein Beispiel für ein Listing, in dem Quellcode eingebunden werden kann, siehe Listing \ref{lst:arduino}.
+
+\vspace{1em}
+\begin{lstlisting}[caption=Arduino Beispielprogramm, label=lst:arduino]
+int ledPin = 13;
+void setup() {
+    pinMode(ledPin, OUTPUT);
+}
+void loop() {
+    digitalWrite(ledPin, HIGH);
+    delay(500);
+    digitalWrite(ledPin, LOW);
+    delay(500);
+}
+\end{lstlisting}
+
+\subsection{Tipps}
+Die Quellen befinden sich in der Datei \textit{quellen.bib}. Eine Buch- und eine Online-Quelle sind beispielhaft eingefügt. [Vgl. \cite{buch}, \cite{online}]
+
+\pagebreak
+
+% ----------------------------------------------------------------------------------------------------------
+% Kapitel
+% ----------------------------------------------------------------------------------------------------------
+\section{Kapitel}
+Lorem ipsum dolor sit amet.
+
+\subsection{Unterkapitel}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+\subsection{Unterkapitel}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+\pagebreak
+
+% ----------------------------------------------------------------------------------------------------------
+% Literatur
+% ----------------------------------------------------------------------------------------------------------
+\renewcommand\refname{Quellenverzeichnis}
+\bibliographystyle{alpha}
+\bibliography{quellen}
+\pagebreak
+
+% ----------------------------------------------------------------------------------------------------------
+% Anhang
+% ----------------------------------------------------------------------------------------------------------
+\pagenumbering{Roman}
+\setcounter{page}{1}
+\lhead{Anhang \thesection}
+
+\begin{appendix}
+\section*{Anhang}
+\phantomsection
+\addcontentsline{toc}{section}{Anhang}
+\addtocontents{toc}{\vspace{-0.5em}}
+
+\section{GUI}
+Ein toller Anhang.
+
+\subsection*{Screenshot}
+\label{app:screenshot}
+Unterkategorie, die nicht im Inhaltsverzeichnis auftaucht.
+
+\end{appendix}
+
+
+\end{document}
