@@ -42,6 +42,8 @@ struct Game
 
 	~Game();
 
+	void inverse();
+
 	std::vector<Move> possibleMoves() const;
 	std::vector<Move> possibleMovesOn(Cell& cell) const;
 	Move::Error testMove(Move& move) const;

@@ -14,6 +14,17 @@ Game::~Game()
 	delete map;
 }
 
+void Game::inverse()
+{
+	for(i32 x = 0; x < map->width; x++)
+	for(i32 y = 0; y < map->height; y++)
+	{
+		Cell& c = map->at(x,y);
+		if(c.isPlayer())
+			c.type = (Cell::Type) (((u32)c.type+1) % players);
+	}
+}
+
 std::vector<Move> Game::possibleMoves() const
 {
 	std::vector<Move> moves;
