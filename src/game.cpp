@@ -36,10 +36,7 @@ std::vector<Move> Game::possibleMovesOn(Cell& cell) const
 	{
 		Move move { cell, (Direction) dir };
 		if(testMove(move) == Move::Error::NONE)
-		{
 			moves.push_back(move);
-			continue;
-		}
 	}
 
 	return moves;
@@ -57,11 +54,11 @@ Move::Error Game::testMove(Move& move) const
 	Cell* cur = move.start.getNeighbor(moveDir);
 	while(cur && cur->isCaptureable())
 	{
+		move.end = cur;
 		if(cur->type == me)
-			return Move::Error::WRONG_PATH;
+			return Move::Error::PATH_BLOCKED;
 
 		move.stones.push_back(cur);
-
 #if DEBUG
 		fmt::print("\nNEW STONE: {}\n", cur->asString());
 		map->print({cur->pos});
@@ -75,10 +72,13 @@ Move::Error Game::testMove(Move& move) const
 		} else
 			cur = cur->getNeighbor(moveDir);
 	}
-	if(move.stones.empty() || !cur)
+	if(move.stones.empty())
 		return Move::Error::NO_STONES_CAPTURED;
 
-	move.end = cur;
+	move.end = (cur) ?: move.stones.back();
+
+	if(!cur || !cur->isFree())
+			return Move::Error::LINE_FULL;
 
 	return Move::Error::NONE;
 }
@@ -186,8 +186,8 @@ std::string Move::err2str(Move::Error err)
 	switch(err)
 	{
 	case Error::NO_STONES_CAPTURED: return "no stones to capture";
-	case Error::TARGET_OCCUPIED: return "target field is occupied";
-	case Error::WRONG_PATH: return "path is not correct";
+	case Error::LINE_FULL: return "no free field in move line found";
+	case Error::PATH_BLOCKED: return "path is not correct";
 	case Error::WRONG_START: return "start field is not in possesion";
 	default:
 		return "none";
