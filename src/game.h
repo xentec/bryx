@@ -42,11 +42,10 @@ struct Game
 
 	~Game();
 
-	void inverse();
-
 	std::vector<Move> possibleMoves() const;
 	std::vector<Move> possibleMovesOn(Cell& cell) const;
 	Move::Error testMove(Move& move) const;
+	void execute(const Move& move);
 
 	static Game load(std::istream& file);
 private:

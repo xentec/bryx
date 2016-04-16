@@ -14,17 +14,6 @@ Game::~Game()
 	delete map;
 }
 
-void Game::inverse()
-{
-	for(i32 x = 0; x < map->width; x++)
-	for(i32 y = 0; y < map->height; y++)
-	{
-		Cell& c = map->at(x,y);
-		if(c.isPlayer())
-			c.type = (Cell::Type) (((u32)c.type+1) % players);
-	}
-}
-
 std::vector<Move> Game::possibleMoves() const
 {
 	std::vector<Move> moves;
@@ -46,7 +35,9 @@ std::vector<Move> Game::possibleMovesOn(Cell& cell) const
 	for(u8 dir = Direction::N; dir < Direction::LAST; dir++)
 	{
 		Move move { cell, (Direction) dir };
-		if(testMove(move) == Move::Error::NONE)
+		Move::Error err = testMove(move);
+		move.err = err;
+		if(err == Move::Error::NONE)
 			moves.push_back(move);
 	}
 
@@ -92,6 +83,68 @@ Move::Error Game::testMove(Move& move) const
 			return Move::Error::LINE_FULL;
 
 	return Move::Error::NONE;
+}
+
+void Game::execute(const Move &move)
+{
+	for(Cell* c: move.stones)
+		c->type = me;
+
+	if(move.override)
+	{
+		overrides--;
+		move.end->type = me;
+		return;
+	}
+
+	Cell::Type new_color;
+
+	Cell::Type lastCell = move.end->type; // first make a complete move...
+	move.end->type = me;
+
+	switch(lastCell) // ...then look at special cases
+	{
+	case Cell::Type::BONUS:
+		if(/* extreme complex calculation */ rand() % 2)
+			bombs++;
+		else
+			overrides++;
+		break;
+
+	case Cell::Type::CHOICE:
+
+		new_color = Cell::Type::P1; // TODO: think about color choice
+		if(me == new_color)
+			break;
+
+		for(i32 x = 0; x < map->width; x++)
+		for(i32 y = 0; y < map->height; y++)
+		{
+			Cell& c = map->at(x,y);
+
+			if(c.type == me)
+				c.type = new_color;
+			else if(c.type == new_color)
+				c.type = me;
+		}
+		me = new_color;
+
+		break;
+	case Cell::Type::INVERSION:
+		for(i32 x = 0; x < map->width; x++)
+		for(i32 y = 0; y < map->height; y++)
+		{
+			Cell& c = map->at(x,y);
+			if(c.isPlayer())
+			{
+				u32 p1 = (u32) Cell::Type::P1;
+				u32 ply = (u32) c.type - p1;
+				c.type = (Cell::Type) ((ply+1) % players + p1);
+			}
+		}
+		break;
+	default: break;
+	}
 }
 
 Game Game::load(std::istream& file)
