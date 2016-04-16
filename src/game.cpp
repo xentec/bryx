@@ -72,7 +72,7 @@ void Game::execute(Move &move)
 
 	if(move.override)
 	{
-		if(overrides == 0)
+		if(move.player.overrides == 0)
 			throw std::runtime_error("no overrides left");
 		move.player.overrides--;
 	}
