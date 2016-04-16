@@ -20,7 +20,7 @@ Direction str2dir(string input);
 struct Map;
 struct Cell
 {
-	enum class Type : char
+	enum Type : char
 	{
 		// standard fields
 		VOID = '-',
