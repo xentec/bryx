@@ -87,7 +87,7 @@ Cell &Cell::operator=(const Cell &other)
 
 bool Cell::operator ==(const Cell& other) const
 {
-	return pos == other.pos; //NOTE: maybe also type check
+	return pos == other.pos && type == other.type;
 }
 
 bool Cell::operator !=(const Cell& other) const
