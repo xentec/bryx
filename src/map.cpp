@@ -248,10 +248,10 @@ void Map::print(std::unordered_set<Vec2> highlight, bool colored, bool ansi) con
 			{
 			case Cell::Type::BONUS:     color = color::CYAN_LIGHT; break;
 			case Cell::Type::CHOICE:    color = color::RED_LIGHT;  break;
-			case Cell::Type::EMPTY:     color = color::GRAY_LIGHT;  break;
-			case Cell::Type::EXPANSION: color = color::CYAN_LIGHT;  break;
-			case Cell::Type::INVERSION: color = color::YELLOW;	    break;
-			case Cell::Type::VOID:      color = color::GRAY;        break;
+			case Cell::Type::EMPTY:     color = color::GRAY_LIGHT; break;
+			case Cell::Type::EXPANSION: color = color::CYAN_LIGHT; break;
+			case Cell::Type::INVERSION: color = color::YELLOW;	   break;
+			case Cell::Type::VOID:      color = color::GRAY;       break;
 			default:
 				if (c.isPlayer())
 					color = color::YELLOW;

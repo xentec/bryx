@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	fmt::print("Bryx - an ReversiXT implementation\n");
+	fmt::print("Bryx - a ReversiXT implementation\n");
 	fmt::print("Mode: {}\n", mode2str(opts.mode));
 	fmt::print("Loading map {} ... ", opts.mapPath);
 
@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
 
 	fmt::print("Done!\n");
 
-	fmt::print("Players: {}\n", game.players);
+	fmt::print("Players: {}\n", game.players.size());
 	fmt::print("Overrides: {}\n", game.overrides);
 	fmt::print("Bombs: {} ({})\n", game.bombs, game.bombsStrength);
 	fmt::print("Map: {}x{}\n", game.map->width, game.map->height);
@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
 			for(Cell* c: move.stones)
 				c->type = game.me;
 	*/
-			player = (player+1) % game.players;
+			player = (player+1) % game.players.size();
 			game.me = (Cell::Type)((u32)Cell::Type::P1 + player);
 			end = end && moves.empty();
 			if(player == 0)
@@ -266,7 +266,7 @@ int main(int argc, char* argv[])
 	}
 
 
-	std::vector<std::pair<Cell::Type, u32>> scores(game.players, {Cell::Type::VOID,0});
+	std::vector<std::pair<Cell::Type, u32>> scores(game.players.size(), {Cell::Type::VOID,0});
 
 	for(i32 x = 0; x < game.map->width; x++)
 	for(i32 y = 0; y < game.map->height; y++)
