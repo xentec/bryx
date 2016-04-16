@@ -49,7 +49,7 @@ T input(Cell::Type player, string key)
 void usage(Options& opts, const string& arg, const string& param)
 {
 	fmt::print("usage: {} [options] <spectator|pvp> <map path>\n", opts.progName);
-	fmt::print("       {} [options] <client> <host>\n", opts.progName);
+	fmt::print("       {} [options] <client>        <host>\n", opts.progName);
 	std::exit(0);
 }
 
@@ -149,9 +149,6 @@ int main(int argc, char* argv[])
 	game.map->print();
 
 	u32 moveNum = 0;
-	u32 player = 0;
-	bool end = true;
-
 	switch(opts.mode)
 	{
 	case Mode::SPECTATE:
@@ -159,11 +156,13 @@ int main(int argc, char* argv[])
 		srand(time(NULL));
 		do
 		{
+			Player& ply = game.nextPlayer();
+
 			fmt::print("\n");
-			fmt::print("Player {}\n", (char) game.me);
+			fmt::print("Player {}\n", (char) ply.color);
 			fmt::print("##########\n");
 
-			std::vector<Move> moves = game.possibleMoves();
+			std::vector<Move> moves = ply.possibleMoves();
 
 			u32 stoneSum = 0;
 			u32 stoneMax = 0;
@@ -204,8 +203,8 @@ int main(int argc, char* argv[])
 //				for(Move* bm: bestMoves)
 //					fmt::print("\t{}>{} --> {}\n", bm->start.pos, dir2str(bm->dir), bm->end->pos);
 */
-//				Move& move = *bestMoves[bestMoves.size() > 1 ? rand() % (bestMoves.size()-1) : 0];
-				Move& move = moves[moves.size() > 1 ? rand() % (moves.size()-1) : 0];
+				Move& move = *bestMoves[bestMoves.size() > 1 ? rand() % (bestMoves.size()-1) : 0];
+//				Move& move = moves[moves.size() > 1 ? rand() % (moves.size()-1) : 0];
 				std::unordered_set<Vec2> hl;
 				hl.insert(move.start.pos);
 				hl.insert(move.end->pos);
@@ -213,51 +212,47 @@ int main(int argc, char* argv[])
 				for(Cell* c: move.stones)
 					hl.insert(c->pos);
 
+				fmt::print("{}:{} --> {}\n\n", move.start.pos, dir2str(move.dir), move.end->pos);
 				game.execute(move);
 				game.map->print(hl);
 				moveNum++;
 			} else
 			{
-				fmt::print("Cannot move\n", (char) game.me);
+				game.pass();
+				fmt::print("Cannot move\n");
 			}
-	/*
-			Vec2 from;
-			string dirStr;
 
-			from = input<Vec2>(game.me, "Start [Vec2]"); fmt::print("\n");
-			from = { 8, 2 };
-
-			game.map->print({from});
-
-			dirStr = input<string>(game.me, "Direction [Dir]");	fmt::print("\n");
-			dirStr = "W";
-
-
-			Direction dir = str2dir(dirStr);
-			Move move { game.map->at(from), dir };
-
-			Move::Error res = game.testMove(move);
-			fmt::print("Errors? {}\n", Move::err2str(res));
-
-			if(res != Move::Error::NONE) return 0;
-					u32 ply = (u32) c.type - ;
-			for(Cell* c: move.stones)
-				c->type = game.me;
-	*/
-			player = (player+1) % game.players.size();
-			game.me = (Cell::Type)((u32)Cell::Type::P1 + player);
-			end = end && moves.empty();
-			if(player == 0)
-			{
-				if(end)
-					break;
-				end = true;
-			}
-		} while(true);
+		} while(!game.hasEnded());
 	}
 	break;
 	case Mode::PVP:
 		fmt::print("not implemented yet\n"); return 0;
+
+		/*
+				Vec2 from;
+				string dirStr;
+
+				from = input<Vec2>(game.me, "[x y dir]> "); fmt::print("\n");
+				from = { 8, 2 };
+
+				game.map->print({from});
+
+				dirStr = input<string>(game.me, "");	fmt::print("\n");
+
+
+				Direction dir = str2dir(dirStr);
+				Move move { game.map->at(from), dir };
+
+				Move::Error res = game.testMove(move);
+				fmt::print("Errors? {}\n", Move::err2str(res));
+
+				if(res != Move::Error::NONE) return 0;
+						u32 ply = (u32) c.type - ;
+				for(Cell* c: move.stones)
+					c->type = game.me;
+		*/
+
+
 		break;
 	case Mode::CLIENT:
 		fmt::print("not implemented yet\n"); return 0;

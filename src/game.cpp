@@ -6,7 +6,8 @@
 #include <fstream>
 
 
-Game::Game()
+Game::Game():
+	currentPlayer(0), moveless(0)
 {}
 
 Game::~Game()
@@ -14,41 +15,22 @@ Game::~Game()
 	delete map;
 }
 
-std::vector<Move> Game::possibleMoves() const
+Player& Game::nextPlayer()
 {
-	std::vector<Move> moves;
-
-	for(i32 x = 0; x < map->width; x++)
-	for(i32 y = 0; y < map->height; y++)
-	{
-		auto cellMoves = possibleMovesOn(map->at(x, y));
-		moves.insert(moves.end(), cellMoves.begin(), cellMoves.end());
-	}
-
-	return moves;
+	currentPlayer = (currentPlayer+1) % players.size();
+	return players[currentPlayer];
 }
 
-std::vector<Move> Game::possibleMovesOn(Cell& cell) const
+bool Game::hasEnded()
 {
-	std::vector<Move> moves;
-
-	for(u8 dir = Direction::N; dir < Direction::LAST; dir++)
-	{
-		Move move { cell, (Direction) dir };
-		Move::Error err = testMove(move);
-		move.err = err;
-		if(err == Move::Error::NONE)
-			moves.push_back(move);
-	}
-
-	return moves;
+	return moveless == players.size();
 }
 
 Move::Error Game::testMove(Move& move) const
 {
 	move.stones.clear();
 
-	if(move.start.type != me)
+	if(move.start.type != move.player.color)
 		return Move::Error::WRONG_START;
 
 	Direction moveDir = move.dir;
@@ -57,14 +39,10 @@ Move::Error Game::testMove(Move& move) const
 	while(cur && cur->isCaptureable())
 	{
 		move.end = cur;
-		if(cur->type == me)
+		if(cur->type == move.player.color)
 			return Move::Error::PATH_BLOCKED;
 
 		move.stones.push_back(cur);
-#if DEBUG
-		fmt::print("\nNEW STONE: {}\n", cur->asString());
-		map->print({cur->pos});
-#endif
 
 		Cell::Transition tr = cur->transitions[(usz) moveDir];
 		if(tr.target)
@@ -85,36 +63,32 @@ Move::Error Game::testMove(Move& move) const
 	return Move::Error::NONE;
 }
 
-void Game::execute(const Move &move)
+void Game::execute(Move &move)
 {
+	moveless = 0;
+
 	for(Cell* c: move.stones)
-		c->type = me;
+		c->type = move.player.color;
 
 	if(move.override)
 	{
-		overrides--;
-		move.end->type = me;
-		return;
+		if(overrides == 0)
+			throw std::runtime_error("no overrides left");
+		move.player.overrides--;
 	}
 
-	Cell::Type new_color;
-
 	Cell::Type lastCell = move.end->type; // first make a complete move...
-	move.end->type = me;
+	move.end->type = move.player.color;
 
 	switch(lastCell) // ...then look at special cases
 	{
 	case Cell::Type::BONUS:
-		if(/* extreme complex calculation */ rand() % 2)
-			bombs++;
-		else
-			overrides++;
+		move.player.bonus();
 		break;
-
 	case Cell::Type::CHOICE:
-
-		new_color = Cell::Type::P1; // TODO: think about color choice
-		if(me == new_color)
+	{
+		Player& swap = move.player.choice();
+		if(move.player.color == swap.color)
 			break;
 
 		for(i32 x = 0; x < map->width; x++)
@@ -122,13 +96,15 @@ void Game::execute(const Move &move)
 		{
 			Cell& c = map->at(x,y);
 
-			if(c.type == me)
-				c.type = new_color;
-			else if(c.type == new_color)
-				c.type = me;
+			if(c.type == move.player.color)
+				c.type = swap.color;
+			else if(c.type == swap.color)
+				c.type = move.player.color;
 		}
-		me = new_color;
-
+		Cell::Type tmp = swap.color;
+		swap.color = move.player.color;
+		move.player.color = tmp;
+	}
 		break;
 	case Cell::Type::INVERSION:
 		for(i32 x = 0; x < map->width; x++)
@@ -136,15 +112,21 @@ void Game::execute(const Move &move)
 		{
 			Cell& c = map->at(x,y);
 			if(c.isPlayer())
-			{
-				u32 p1 = (u32) Cell::Type::P1;
-				u32 ply = (u32) c.type - p1;
-				c.type = (Cell::Type) ((ply+1) % players.size() + p1);
-			}
+				c.type = (Cell::Type) ((c.type - Cell::Type::P1+1) % players.size() + Cell::Type::P1);
 		}
+
+		for(Player& ply: players)
+			ply.color = (Cell::Type) ((ply.color - Cell::Type::P1+1) % players.size() + Cell::Type::P1);
+
 		break;
-	default: break;
+	default:
+		break;
 	}
+}
+
+void Game::pass()
+{
+	moveless++;
 }
 
 Game Game::load(std::istream& file)
@@ -152,25 +134,29 @@ Game Game::load(std::istream& file)
 	using std::stoi;
 
 	Game game;
+
 	game.players.assign(stoi(readline(file)), Player(game, Cell::Type::VOID));
+	for(u32 i = 0; i < game.players.size(); i++)
+		game.players[i].color = (Cell::Type) (Cell::Type::P1 + i);
+
 	game.overrides = stoi(readline(file));
 
-	std::vector<string> s;
+	std::vector<string> tmp;
 
 	// Bombs
-	s = splitString(readline(file), ' ');
-	if(s.size() < 2)
-		throw std::runtime_error("Failed to parse map: bombs delimiter not found");
+	tmp = splitString(readline(file), ' ');
+	if(tmp.size() < 2)
+		throw std::runtime_error("Failed to parse map: bombs delimiter not found"); // TODO: better error messages placement
 
-	game.bombs = stoi(s[0]);
-	game.bombsStrength = stoi(s[1]);
+	game.bombs = stoi(tmp[0]);
+	game.bombsStrength = stoi(tmp[1]);
 
 	// Map size
-	s = splitString(readline(file), ' ');
-	if(s.size() < 2)
+	tmp = splitString(readline(file), ' ');
+	if(tmp.size() < 2)
 		throw std::runtime_error("Failed to parse map: map dimensions delimiter not found");
 
-	game.map = new Map(stoi(s[1]), stoi(s[0]));
+	game.map = new Map(stoi(tmp[1]), stoi(tmp[0]));
 
 	for (i32 y = 0; y < game.map->height; y++)
 	{
@@ -196,13 +182,13 @@ Game Game::load(std::istream& file)
 		if(line.empty()) continue;
 
 		// Parse Transistion
-		s = splitString(line, ' ');
+		tmp = splitString(line, ' ');
 
-		Cell &from = game.map->at(stoi(s.at(0)), stoi(s.at(1))),
-			   &to = game.map->at(stoi(s.at(4)), stoi(s.at(5)));
+		Cell &from = game.map->at(stoi(tmp.at(0)), stoi(tmp.at(1))),
+			   &to = game.map->at(stoi(tmp.at(4)), stoi(tmp.at(5)));
 
-		Direction in = static_cast<Direction>(stoi(s.at(2))),
-				 out = static_cast<Direction>(stoi(s.at(6)));
+		Direction in = static_cast<Direction>(stoi(tmp.at(2))),
+				 out = static_cast<Direction>(stoi(tmp.at(6)));
 
 		try {
 			from.addTransistion(in, out, &to);

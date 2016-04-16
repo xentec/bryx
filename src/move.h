@@ -5,6 +5,9 @@
 
 #include <vector>
 
+struct Game;
+struct Player;
+
 struct Move
 {
 	enum class Error
@@ -16,9 +19,11 @@ struct Move
 		NO_STONES_CAPTURED,
 	};
 
-	Move(Cell& start, Direction dir);
+	Move(Player& player, Cell& start, Direction dir);
 	Move(const Move& other);
 	Move& operator =(const Move& other);
+
+	Player& player;
 
 	Cell &start, *end;
 	Direction dir;

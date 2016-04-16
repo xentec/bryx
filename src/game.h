@@ -8,9 +8,9 @@
 ///TODO: State analysis: check for moves and possible map expansion
 
 struct Player;
+
 struct Game
 {
-	Cell::Type me = Cell::Type::P1;
 	std::vector<Player> players;
 	u32 overrides;
 	u32 bombs;
@@ -19,13 +19,18 @@ struct Game
 
 	~Game();
 
-	std::vector<Move> possibleMoves() const;
-	std::vector<Move> possibleMovesOn(Cell& cell) const;
+	Player& nextPlayer();
+	bool hasEnded();
+
 	Move::Error testMove(Move& move) const;
-	void execute(const Move& move);
+	void execute(Move& move);
+	void pass();
 
 	static Game load(std::istream& file);
 private:
 	Game();
+
+	u32 currentPlayer;
+	u32 moveless;
 };
 

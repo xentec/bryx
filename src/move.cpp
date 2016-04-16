@@ -1,26 +1,33 @@
 #include "move.h"
 
-Move::Move(Cell& start, Direction dir):
-	start(start), end(nullptr), dir(dir)
+#include "game.h"
+
+Move::Move(Player& player, Cell& start, Direction dir):
+	player(player),
+	start(start), end(nullptr), dir(dir),
+	err(Error::NONE),
+	stones(), override(false)
 {}
 
 Move::Move(const Move& other):
+	player(other.player),
 	start(other.start), end(other.end), dir(other.dir),
 	err(other.err),
-	stones(other.stones)
+	stones(other.stones), override(other.override)
 {}
 
-Move&Move::operator =(const Move& other)
+Move& Move::operator =(const Move& other)
 {
 	start = other.start;
 	dir = other.dir;
 	end = other.end;
 	err = other.err;
 	stones = other.stones;
+	override = other.override;
 	return *this;
 }
 
-std::string Move::err2str(Move::Error err)
+string Move::err2str(Move::Error err)
 {
 	switch(err)
 	{
