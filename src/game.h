@@ -11,16 +11,29 @@ struct Player;
 
 struct Game
 {
-	std::vector<Player> players;
-	u32 overrides;
-	u32 bombs;
-	u32 bombsStrength;
 	Map* map;
+	std::vector<Player*> players;
+
+	struct {
+		u32 players;
+		u32 overrides;
+		u32 bombs;
+		u32 bombsStrength;
+	} defaults;
+
+	struct {
+		u32 moves;
+		u32 overrides;
+		u32 inversions;
+	} stats;
 
 	~Game();
 
+	void addPlayer(Player* player, const string& name = "");
 	Player& nextPlayer();
+
 	bool hasEnded();
+	void run();
 
 	Move::Error testMove(Move& move) const;
 	void execute(Move& move);

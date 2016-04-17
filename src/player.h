@@ -11,18 +11,21 @@ struct Move;
 
 struct Player
 {
-	Player(Game& game, Cell::Type type);
+	Player();
 	Player& operator =(const Player& other);
+	virtual ~Player();
+
+	virtual Move move() = 0;
+	virtual Player& choice() = 0;
+	virtual void bonus() = 0;
 
 	std::vector<Move> possibleMoves();
 	std::vector<Move> possibleMovesOn(Cell& cell);
 
-	Player& choice() const;
-	void bonus();
+	u32 id;
 
-	Cell::Type color;
-	u32 bombs;
 	u32 overrides;
+	u32 bombs;
 
-	Game& game;
+	Game* game;
 };

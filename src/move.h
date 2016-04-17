@@ -19,13 +19,15 @@ struct Move
 		NO_STONES_CAPTURED,
 	};
 
-	Move(Player& player, Cell& start, Direction dir);
+	Move(Player& player, Cell* start, Direction dir);
 	Move(const Move& other);
 	Move& operator =(const Move& other);
 
+	string asString() const;
+
 	Player& player;
 
-	Cell &start, *end;
+	Cell *start, *end;
 	Direction dir;
 	Error err;
 

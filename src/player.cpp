@@ -2,25 +2,33 @@
 
 #include "game.h"
 
-Player::Player(Game& game, Cell::Type type):
-	game(game), color(type)
+Player::Player():
+	id(-1), overrides(0), bombs(0), game(nullptr)
 {}
 
 Player& Player::operator =(const Player& other)
 {
-	color = other.color;
-	game = other.game;
+	id = other.id;
+	overrides = other.overrides;
+	bombs = other.bombs;
 	return *this;
 }
+
+Player::~Player()
+{}
 
 std::vector<Move> Player::possibleMoves()
 {
 	std::vector<Move> moves;
 
-	for(i32 x = 0; x < game.map->width; x++)
-	for(i32 y = 0; y < game.map->height; y++)
+	for(i32 x = 0; x < game->map->width; x++)
+	for(i32 y = 0; y < game->map->height; y++)
 	{
-		auto cellMoves = possibleMovesOn(game.map->at(x, y));
+		Cell& c = game->map->at(x, y);
+		if(!c.isPlayer(id))
+			continue;
+
+		auto cellMoves = possibleMovesOn(c);
 		moves.insert(moves.end(), cellMoves.begin(), cellMoves.end());
 	}
 
@@ -33,26 +41,17 @@ std::vector<Move> Player::possibleMovesOn(Cell& cell)
 
 	for(u8 dir = Direction::N; dir < Direction::LAST; dir++)
 	{
-		Move move { *this, cell, (Direction) dir };
-		Move::Error err = game.testMove(move);
-		move.err = err;
-		if(err == Move::Error::NONE)
-			moves.push_back(move);
+		Move move { *this, &cell, (Direction) dir };
+		move.err = game->testMove(move);
+
+		switch(move.err)
+		{
+		// add a override necessity with LINE_FULL but view it as a possible move
+		case Move::Error::LINE_FULL: move.override = true; // hence the lack of break
+		case Move::Error::NONE:	moves.push_back(move); break;
+		default: break;
+		}
 	}
 
 	return moves;
-}
-
-Player& Player::choice() const
-{
-	// TODO: better choice algo
-	return game.players[rand() % game.players.size()];
-}
-
-void Player::bonus()
-{
-	if(/* extremly complex calculation */ rand() % 2)
-		bombs++;
-	else
-		overrides++;
 }

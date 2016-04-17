@@ -41,7 +41,7 @@ std::string readline(std::basic_istream<char> &stream)
 
 
 ConsoleFormat::ConsoleFormat(u8 color, ConsoleFormat::Attribute attr):
-	color(color), attr(attr)
+	attr(attr), color(color)
 {}
 
 std::string ConsoleFormat::asString() const

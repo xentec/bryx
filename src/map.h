@@ -82,7 +82,7 @@ struct Map
 	const Cell& at(const Vec2& pos) const;
 
 	string asString();
-	void print(std::unordered_set<Vec2> highlight = std::unordered_set<Vec2>(), bool colored = true, bool ansi = true) const;
+	void print(std::unordered_set<Cell*> highlight = std::unordered_set<Cell*>(), bool colored = true, bool ansi = true) const;
 
 	const u32 width, height;
 private:

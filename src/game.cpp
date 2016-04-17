@@ -7,18 +7,31 @@
 
 
 Game::Game():
+	defaults{ 0, 0, 0, 0 }, stats { 0, 0, 0 },
 	currentPlayer(0), moveless(0)
 {}
 
 Game::~Game()
 {
+	for(Player* ply: players)
+		delete ply;
 	delete map;
+}
+
+void Game::addPlayer(Player* player, const string& name)
+{
+	player->game = this;
+	player->id = players.size();
+	player->bombs = defaults.bombs;
+	player->overrides = defaults.overrides;
+
+	players.push_back(player);
 }
 
 Player& Game::nextPlayer()
 {
 	currentPlayer = (currentPlayer+1) % players.size();
-	return players[currentPlayer];
+	return *players[currentPlayer];
 }
 
 bool Game::hasEnded()
@@ -26,20 +39,29 @@ bool Game::hasEnded()
 	return moveless == players.size();
 }
 
+void Game::run()
+{
+	do
+	{
+		Move move = nextPlayer().move();
+		execute(move);
+	} while(!hasEnded());
+}
+
 Move::Error Game::testMove(Move& move) const
 {
 	move.stones.clear();
 
-	if(move.start.type != move.player.color)
+	if(!move.start->isPlayer(move.player.id))
 		return Move::Error::WRONG_START;
 
 	Direction moveDir = move.dir;
 
-	Cell* cur = move.start.getNeighbor(moveDir);
+	Cell* cur = move.start->getNeighbor(moveDir);
 	while(cur && cur->isCaptureable())
 	{
 		move.end = cur;
-		if(cur->type == move.player.color)
+		if(cur->isPlayer(move.player.id))
 			return Move::Error::PATH_BLOCKED;
 
 		move.stones.push_back(cur);
@@ -65,10 +87,15 @@ Move::Error Game::testMove(Move& move) const
 
 void Game::execute(Move &move)
 {
-	moveless = 0;
+	if(move.stones.empty())
+	{
+		moveless++;
+		return;
+	} else
+		moveless = 0;
 
 	for(Cell* c: move.stones)
-		c->type = move.player.color;
+		c->setPlayer(move.player.id);
 
 	if(move.override)
 	{
@@ -78,7 +105,8 @@ void Game::execute(Move &move)
 	}
 
 	Cell::Type lastCell = move.end->type; // first make a complete move...
-	move.end->type = move.player.color;
+	move.end->setPlayer(move.player.id);
+
 
 	switch(lastCell) // ...then look at special cases
 	{
@@ -88,7 +116,7 @@ void Game::execute(Move &move)
 	case Cell::Type::CHOICE:
 	{
 		Player& swap = move.player.choice();
-		if(move.player.color == swap.color)
+		if(move.player.id == swap.id)
 			break;
 
 		for(i32 x = 0; x < map->width; x++)
@@ -96,14 +124,14 @@ void Game::execute(Move &move)
 		{
 			Cell& c = map->at(x,y);
 
-			if(c.type == move.player.color)
-				c.type = swap.color;
-			else if(c.type == swap.color)
-				c.type = move.player.color;
+			if(c.isPlayer(move.player.id))
+				c.setPlayer(swap.id);
+			else if(c.isPlayer(swap.id))
+				c.setPlayer(move.player.id);
 		}
-		Cell::Type tmp = swap.color;
-		swap.color = move.player.color;
-		move.player.color = tmp;
+		u32 tmp = swap.id;
+		swap.id = move.player.id;
+		move.player.id = tmp;
 	}
 		break;
 	case Cell::Type::INVERSION:
@@ -112,16 +140,17 @@ void Game::execute(Move &move)
 		{
 			Cell& c = map->at(x,y);
 			if(c.isPlayer())
-				c.type = (Cell::Type) ((c.type - Cell::Type::P1+1) % players.size() + Cell::Type::P1);
+				c.setPlayer((c.type - Cell::Type::P1 + 1) % players.size());
 		}
 
-		for(Player& ply: players)
-			ply.color = (Cell::Type) ((ply.color - Cell::Type::P1+1) % players.size() + Cell::Type::P1);
+		for(Player* ply: players)
+			ply->id = (ply->id +1) % players.size();
 
 		break;
 	default:
 		break;
 	}
+	stats.moves++;
 }
 
 void Game::pass()
@@ -135,11 +164,8 @@ Game Game::load(std::istream& file)
 
 	Game game;
 
-	game.players.assign(stoi(readline(file)), Player(game, Cell::Type::VOID));
-	for(u32 i = 0; i < game.players.size(); i++)
-		game.players[i].color = (Cell::Type) (Cell::Type::P1 + i);
-
-	game.overrides = stoi(readline(file));
+	game.defaults.players = stoi(readline(file));
+	game.defaults.overrides = stoi(readline(file));
 
 	std::vector<string> tmp;
 
@@ -148,8 +174,8 @@ Game Game::load(std::istream& file)
 	if(tmp.size() < 2)
 		throw std::runtime_error("Failed to parse map: bombs delimiter not found"); // TODO: better error messages placement
 
-	game.bombs = stoi(tmp[0]);
-	game.bombsStrength = stoi(tmp[1]);
+	game.defaults.bombs = stoi(tmp[0]);
+	game.defaults.bombsStrength = stoi(tmp[1]);
 
 	// Map size
 	tmp = splitString(readline(file), ' ');

@@ -1,6 +1,8 @@
 #include "map.h"
 #include "game.h"
 #include "util.h"
+#include "ai.h"
+
 
 #include <cppformat/format.h>
 
@@ -29,7 +31,7 @@ struct Options
 {
 	string progName;
 
-	Mode mode;
+	Mode mode = Mode::UNKNOWN;
 
 	string host;
 	string mapPath;
@@ -38,10 +40,10 @@ struct Options
 
 template<class T>
 inline
-T input(Cell::Type player, string key)
+T input(string player, string key)
 {
 	T var;
-	fmt::print("P{} {} > ", (char) player, key);
+	fmt::print("P{} {} > ", player, key);
 //	std::cin >> var;
 	return var;
 }
@@ -142,124 +144,54 @@ int main(int argc, char* argv[])
 
 	fmt::print("Done!\n");
 
-	fmt::print("Players: {}\n", game.players.size());
-	fmt::print("Overrides: {}\n", game.overrides);
-	fmt::print("Bombs: {} ({})\n", game.bombs, game.bombsStrength);
+	fmt::print("Players: {}\n", game.defaults.players);
+	fmt::print("Overrides: {}\n", game.defaults.overrides);
+	fmt::print("Bombs: {} ({})\n", game.defaults.bombs, game.defaults.bombsStrength);
 	fmt::print("Map: {}x{}\n", game.map->width, game.map->height);
 	game.map->print();
 
-	u32 moveNum = 0;
+	srand(time(NULL));
+
 	switch(opts.mode)
 	{
 	case Mode::SPECTATE:
-	{
-		srand(time(NULL));
-		do
-		{
-			Player& ply = game.nextPlayer();
-
-			fmt::print("\n");
-			fmt::print("Player {}\n", (char) ply.color);
-			fmt::print("##########\n");
-
-			std::vector<Move> moves = ply.possibleMoves();
-
-			u32 stoneSum = 0;
-			u32 stoneMax = 0;
-			std::vector<Move*> bestMoves;
-			for(Move& m: moves)
-			{
-				int stones = m.stones.size();
-				stoneSum += stones;
-				if(stones > stoneMax)
-				{
-					bestMoves.clear();
-					stoneMax = stones;
-					bestMoves.push_back(&m);
-					continue;
-				}
-				if(stones == stoneMax)
-					bestMoves.push_back(&m);
-			}
-
-			if(moves.size())
-			{
-/*				fmt::print("{} moves with {} possible captures\n", (char)game.me, moves.size(), stoneMax);
-
-				for(Move& move: moves)
-				{
-					fmt::print("{}>{} --> {}\n\n", move.start.pos, dir2str(move.dir), move.end->pos);
-					std::unordered_set<Vec2> hl;
-					hl.insert(move.start.pos);
-					hl.insert(move.end->pos);
-
-					for(Cell* c: move.stones)
-						hl.insert(c->pos);
-
-//					game.map->print(hl);
-				}
-
-//				fmt::print("Best moves being:\n");
-//				for(Move* bm: bestMoves)
-//					fmt::print("\t{}>{} --> {}\n", bm->start.pos, dir2str(bm->dir), bm->end->pos);
-*/
-				Move& move = *bestMoves[bestMoves.size() > 1 ? rand() % (bestMoves.size()-1) : 0];
-//				Move& move = moves[moves.size() > 1 ? rand() % (moves.size()-1) : 0];
-				std::unordered_set<Vec2> hl;
-				hl.insert(move.start.pos);
-				hl.insert(move.end->pos);
-
-				for(Cell* c: move.stones)
-					hl.insert(c->pos);
-
-				fmt::print("{}:{} --> {}\n\n", move.start.pos, dir2str(move.dir), move.end->pos);
-				game.execute(move);
-				game.map->print(hl);
-				moveNum++;
-			} else
-			{
-				game.pass();
-				fmt::print("Cannot move\n");
-			}
-
-		} while(!game.hasEnded());
-	}
-	break;
+		for(u32 i = 0; i < game.defaults.players; i++)
+			game.addPlayer(new AI());
+		break;
 	case Mode::PVP:
-		fmt::print("not implemented yet\n"); return 0;
-
-		/*
-				Vec2 from;
-				string dirStr;
-
-				from = input<Vec2>(game.me, "[x y dir]> "); fmt::print("\n");
-				from = { 8, 2 };
-
-				game.map->print({from});
-
-				dirStr = input<string>(game.me, "");	fmt::print("\n");
-
-
-				Direction dir = str2dir(dirStr);
-				Move move { game.map->at(from), dir };
-
-				Move::Error res = game.testMove(move);
-				fmt::print("Errors? {}\n", Move::err2str(res));
-
-				if(res != Move::Error::NONE) return 0;
-						u32 ply = (u32) c.type - ;
-				for(Cell* c: move.stones)
-					c->type = game.me;
-		*/
-
-
-		break;
 	case Mode::CLIENT:
-		fmt::print("not implemented yet\n"); return 0;
-		break;
-	default: return 0;
+		fmt::print("not implemented yet\n");
+	default:
+		return 0;
 	}
 
+
+	do
+	{
+		Player& ply = game.nextPlayer();
+
+		fmt::print("\n");
+		fmt::print("Player {}\n", ply.id+1);
+		fmt::print("##########\n");
+
+		Move move = ply.move();
+
+		if(move.stones.size())
+		{
+			fmt::print("{}\n", move.asString());
+
+			std::unordered_set<Cell*> hl;
+			hl.insert(move.start);
+			hl.insert(move.end);
+			hl.insert(move.stones.begin(), move.stones.end());
+
+			game.map->print(hl);
+		} else
+			fmt::print("Cannot move\n");
+
+		game.execute(move);
+
+	} while(!game.hasEnded());
 
 	std::vector<std::pair<Cell::Type, u32>> scores(game.players.size(), {Cell::Type::VOID,0});
 
@@ -284,7 +216,7 @@ int main(int argc, char* argv[])
 	fmt::print("########\n\n");
 	game.map->print();
 
-	fmt::print("Moves: {}\n", moveNum);
+	fmt::print("Moves: {}\n", game.stats.moves);
 	fmt::print("Scores:\n");
 	for(usz i = 0; i < scores.size(); i++)
 	{

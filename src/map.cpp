@@ -160,7 +160,8 @@ void Cell::addTransistion(Direction in, Direction out, Cell* target)
 	if(!target || target->type == Cell::Type::VOID)
 		throw std::runtime_error(fmt::format("transistion points to void cell ({})", target ? target->asString() : ""));
 
-	transitions[(usz) in] = { target, (Direction)(((u32)out + 4) % 8) }; // reverse out direction
+	Transition& t = transitions[(usz) in];
+	t = { target, (Direction)((out + 4) % 8) }; // reverse out direction
 }
 
 
@@ -234,7 +235,7 @@ string Map::asString()
 
 
 // TODO: color und ansi flags
-void Map::print(std::unordered_set<Vec2> highlight, bool colored, bool ansi) const
+void Map::print(std::unordered_set<Cell*> highlight, bool colored, bool ansi) const
 {
 	fmt::print("   ");
 	for (usz x = 0; x < width; x++)
@@ -271,7 +272,7 @@ void Map::print(std::unordered_set<Vec2> highlight, bool colored, bool ansi) con
 					color = color::YELLOW;
 			}
 
-			if(highlight.size() && highlight.find(c.pos) != highlight.end()) {
+			if(highlight.size() && highlight.find((Cell*) &c) != highlight.end()) {
 				color.color += 10;
 				//color.attr = ConsoleFormat::BLINK;
 			}

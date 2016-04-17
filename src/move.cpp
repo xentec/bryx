@@ -2,7 +2,7 @@
 
 #include "game.h"
 
-Move::Move(Player& player, Cell& start, Direction dir):
+Move::Move(Player& player, Cell* start, Direction dir):
 	player(player),
 	start(start), end(nullptr), dir(dir),
 	err(Error::NONE),
@@ -25,6 +25,11 @@ Move& Move::operator =(const Move& other)
 	stones = other.stones;
 	override = other.override;
 	return *this;
+}
+
+string Move::asString() const
+{
+	return fmt::format("{}:{} --> {}", start->pos, dir2str(dir), end ? end->pos : Vec2{-1,-1});
 }
 
 string Move::err2str(Move::Error err)
