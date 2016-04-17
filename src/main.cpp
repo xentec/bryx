@@ -165,13 +165,12 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-
 	do
 	{
 		Player& ply = game.nextPlayer();
 
 		fmt::print("\n");
-		fmt::print("Player {}\n", ply.id+1);
+		fmt::print("Player {}\n", ply.name);
 		fmt::print("##########\n");
 
 		Move move = ply.move();

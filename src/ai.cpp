@@ -2,7 +2,9 @@
 
 #include "game.h"
 
-AI::AI(): Player()
+u32 AI::nameNum = 1;
+
+AI::AI(): Player(fmt::format("bryx {}", nameNum++))
 {}
 
 AI::~AI()

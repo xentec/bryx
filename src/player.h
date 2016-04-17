@@ -11,7 +11,7 @@ struct Move;
 
 struct Player
 {
-	Player();
+	Player(const string& name);
 	Player& operator =(const Player& other);
 	virtual ~Player();
 
@@ -23,6 +23,7 @@ struct Player
 	std::vector<Move> possibleMovesOn(Cell& cell);
 
 	u32 id;
+	string name;
 
 	u32 overrides;
 	u32 bombs;

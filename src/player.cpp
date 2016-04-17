@@ -2,8 +2,8 @@
 
 #include "game.h"
 
-Player::Player():
-	id(-1), overrides(0), bombs(0), game(nullptr)
+Player::Player(const string& name):
+	id(-1), name(name), overrides(0), bombs(0), game(nullptr)
 {}
 
 Player& Player::operator =(const Player& other)

@@ -10,4 +10,6 @@ struct AI : Player
 	virtual Move move();
 	virtual void bonus();
 	virtual Player& choice();
+
+	static u32 nameNum;
 };
