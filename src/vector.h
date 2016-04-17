@@ -118,7 +118,7 @@ struct Vector
 	{
 		T data[N];
 		struct {
-			T x, y, z, w;
+			T x, y;
 		};
 	};
 };
