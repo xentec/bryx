@@ -20,7 +20,7 @@ Direction str2dir(string input);
 struct Map;
 struct Cell
 {
-	enum Type : char
+	enum Type : u8
 	{
 		// standard fields
 		VOID = '-',
@@ -54,6 +54,8 @@ struct Cell
 
 	bool isFree() const;
 	bool isPlayer() const;
+	bool isPlayer(i32 player) const;
+	void setPlayer(i32 player);
 	bool isCaptureable() const;
 
 	Cell* getNeighbor(Direction dir, bool with_trans = true) const;
