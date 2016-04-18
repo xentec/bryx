@@ -17,9 +17,11 @@ enum Direction : u8
 };
 Vec2 dir2vec(Direction dir);
 string dir2str(Direction dir);
+inline string dir2str(u32 i) { return dir2str((Direction) i); }
 Direction str2dir(string input);
 
 struct Map;
+
 struct Cell
 {
 	enum Type : u8

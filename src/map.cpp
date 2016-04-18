@@ -56,7 +56,7 @@ Direction str2dir(std::string input)
 
 	auto dir = tbl.find(input);
 	if(dir == tbl.end())
-		throw std::out_of_range(fmt::format("Direction {} invalid", input));
+		throw std::runtime_error(fmt::format("Direction {} invalid", input));
 	return dir->second;
 }
 

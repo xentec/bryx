@@ -54,3 +54,9 @@ std::string ConsoleFormat::asString() const
 	return fmt::format("\e[{};{}m", attr, color);
 #endif
 }
+
+string toLower(string str)
+{
+	for(char& c: str) c = tolower(c);
+	return str;
+}

@@ -29,7 +29,7 @@ struct Game
 
 	~Game();
 
-	void addPlayer(Player* player, const string& name = "");
+	void addPlayer(Player* player);
 	Player& nextPlayer();
 
 	bool hasEnded();

@@ -18,7 +18,7 @@ Game::~Game()
 	delete map;
 }
 
-void Game::addPlayer(Player* player, const string& name)
+void Game::addPlayer(Player* player)
 {
 	player->game = this;
 	player->id = players.size();
@@ -30,8 +30,7 @@ void Game::addPlayer(Player* player, const string& name)
 
 Player& Game::nextPlayer()
 {
-	currentPlayer = (currentPlayer+1) % players.size();
-	return *players[currentPlayer];
+	return *players[currentPlayer++ % players.size()];
 }
 
 bool Game::hasEnded()

@@ -1,14 +1,15 @@
 #include "map.h"
 #include "game.h"
 #include "util.h"
-#include "ai.h"
 
+#include "ai.h"
+#include "human.h"
 
 #include <cppformat/format.h>
 
 #include <fstream>
 #include <functional>
-
+#include <iostream>
 
 enum class Mode
 {
@@ -36,17 +37,6 @@ struct Options
 	string host;
 	string mapPath;
 };
-
-
-template<class T>
-inline
-T input(string player, string key)
-{
-	T var;
-	fmt::print("P{} {} > ", player, key);
-//	std::cin >> var;
-	return var;
-}
 
 void usage(Options& opts, const string& arg, const string& param)
 {
@@ -159,6 +149,26 @@ int main(int argc, char* argv[])
 			game.addPlayer(new AI());
 		break;
 	case Mode::PVP:
+		fmt::print("\n");
+		for(u32 i = 0; i < game.defaults.players; i++)
+		{
+			fmt::print("Player {}: human (h) or computer (c)? ", i+1);
+			string input;
+			std::cin >> input;
+			if(input.size() && toLower(input)[0] == 'h')
+			{
+				fmt::print("Player {}, enter your name: ", i+1);
+				std::cin >> input;
+				game.addPlayer(new Human(input));
+			} else
+			{
+				Player* ai = new AI();
+				ai->name.back() = '0'+i+1;
+				fmt::print("Player {} is {}\n", i+1, ai->name);
+				game.addPlayer(ai);
+			}
+		}
+		break;
 	case Mode::CLIENT:
 		fmt::print("not implemented yet\n");
 	default:
@@ -170,14 +180,20 @@ int main(int argc, char* argv[])
 		Player& ply = game.nextPlayer();
 
 		fmt::print("\n");
-		fmt::print("Player {}\n", ply.name);
-		fmt::print("##########\n");
+		fmt::print("Player {} {}\n", ply.id+1, ply.name);
+		fmt::print("##########");
+
+		for(usz i = 0; i < ply.name.size(); i++)
+			fmt::print("#");
+		fmt::print("\n");
 
 		Move move = ply.move();
 
+		game.execute(move);
+
 		if(move.stones.size())
 		{
-			fmt::print("{}\n", move.asString());
+			fmt::print("\n\t{}\n\n", move.asString());
 
 			std::unordered_set<Cell*> hl;
 			hl.insert(move.start);
@@ -186,9 +202,8 @@ int main(int argc, char* argv[])
 
 			game.map->print(hl);
 		} else
-			fmt::print("Cannot move\n");
+			fmt::print("No move\n");
 
-		game.execute(move);
 
 	} while(!game.hasEnded());
 
