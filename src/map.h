@@ -3,6 +3,8 @@
 #include "global.h"
 #include "vector.h"
 
+#include <iterator>
+
 #include <array>
 #include <vector>
 #include <unordered_set>
@@ -66,6 +68,7 @@ struct Cell
 	const Vec2 pos;
 	Cell::Type type;
 	std::array<Transition, 8> transitions;
+
 	Map& map;
 };
 
@@ -90,4 +93,58 @@ private:
 	bool checkPos(const Vec2& pos) const;
 
 	std::vector<Cell> data;
+
+public:
+	template<class T>
+	struct iterator : std::iterator<std::random_access_iterator_tag, T>
+	{
+		typedef T   value_type;
+		typedef T*  pointer;
+		typedef T&  reference;
+		typedef iterator<T> iter;
+
+		reference operator*()  { return map.at(x,y);  }
+		pointer operator->()   { return &map.at(x,y); }
+
+		iter& operator++()
+		{
+			if(++x == map.width)
+				x = 0, ++y;
+			return *this;
+		}
+		iter operator++(int)
+		{
+			iter pre = *this;
+			++(*this);
+			return pre;
+		}
+
+		iter& operator=(const iter& other)
+		{
+			x = other.x, y = other.y, map = other.map;
+			return *this;
+		}
+		bool operator==(const iter& other) const
+		{
+			return x == other.x && y == other.y && &map == &other.map;
+		}
+		bool operator!=(const iter& other) const
+		{
+			return !(*this == other);
+		}
+
+		iterator(Map&map, u32 x, u32 y): x(x), y(y), map(map) {}
+	private:
+		usz x, y;
+		Map& map;
+	};
+
+	Map::iterator<Cell> begin();
+	Map::iterator<Cell> end();
+
+	Map::iterator<const Cell> cbegin();
+	Map::iterator<const Cell> cend();
 };
+
+
+

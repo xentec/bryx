@@ -64,13 +64,13 @@ Direction str2dir(std::string input)
 // Cell
 //#######
 Cell::Cell(Map& map, Type type):
-	pos{-1,-1}, type(type), map(map), transitions()
+	pos{-1,-1}, type(type), transitions(), map(map)
 {
 	transitions.fill({nullptr, Direction::N});
 }
 
 Cell::Cell(const Cell &other):
-	pos(other.pos), type(other.type), map(other.map), transitions(other.transitions)
+	pos(other.pos), type(other.type), transitions(other.transitions), map(other.map)
 {}
 
 Cell::~Cell()
@@ -288,4 +288,24 @@ void Map::print(std::unordered_set<Cell*> highlight, bool colored, bool ansi) co
 bool Map::checkPos(const Vec2& pos) const
 {
 	return inBox(pos, Vec2::O, {(i32)width-1, (i32)height-1});
+}
+
+Map::iterator<Cell> Map::begin()
+{
+	return Map::iterator<Cell>{ *this, 0, 0 };
+}
+
+Map::iterator<Cell> Map::end()
+{
+	return Map::iterator<Cell>{ *this, width-1, height-1 };
+}
+
+Map::iterator<const Cell> Map::cbegin()
+{
+	return Map::iterator<const Cell>{ *this, 0, 0 };
+}
+
+Map::iterator<const Cell> Map::cend()
+{
+	return Map::iterator<const Cell>{ *this, width-1, height-1 };
 }

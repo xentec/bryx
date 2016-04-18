@@ -119,11 +119,8 @@ void Game::execute(Move &move)
 		if(move.player.id == swap.id)
 			break;
 
-		for(i32 x = 0; x < map->width; x++)
-		for(i32 y = 0; y < map->height; y++)
+		for(Cell& c: *map)
 		{
-			Cell& c = map->at(x,y);
-
 			if(c.isPlayer(move.player.id))
 				c.setPlayer(swap.id);
 			else if(c.isPlayer(swap.id))
@@ -135,10 +132,8 @@ void Game::execute(Move &move)
 	}
 		break;
 	case Cell::Type::INVERSION:
-		for(i32 x = 0; x < map->width; x++)
-		for(i32 y = 0; y < map->height; y++)
+		for(Cell& c: *map)
 		{
-			Cell& c = map->at(x,y);
 			if(c.isPlayer())
 				c.setPlayer((c.type - Cell::Type::P1 + 1) % players.size());
 		}

@@ -194,10 +194,8 @@ int main(int argc, char* argv[])
 
 	std::vector<std::pair<Cell::Type, u32>> scores(game.players.size(), {Cell::Type::VOID,0});
 
-	for(i32 x = 0; x < game.map->width; x++)
-	for(i32 y = 0; y < game.map->height; y++)
+	for(Cell& c: *game.map)
 	{
-		Cell &c = game.map->at(x, y);
 		if(c.isPlayer())
 		{
 			auto& e = scores[(usz)c.type - (usz)Cell::Type::P1];

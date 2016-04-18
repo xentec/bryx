@@ -20,11 +20,8 @@ Player::~Player()
 std::vector<Move> Player::possibleMoves()
 {
 	std::vector<Move> moves;
-
-	for(i32 x = 0; x < game->map->width; x++)
-	for(i32 y = 0; y < game->map->height; y++)
+	for(Cell& c: *game->map)
 	{
-		Cell& c = game->map->at(x, y);
 		if(!c.isPlayer(id))
 			continue;
 
