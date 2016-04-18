@@ -60,7 +60,8 @@ struct Cell
 	void setPlayer(i32 player);
 	bool isCaptureable() const;
 
-	Cell* getNeighbor(Direction dir, bool with_trans = true) const;
+	Cell* getDirectNeighbor(Direction dir) const;
+	Cell* getNeighbor(Direction& dir) const;
 	void addTransistion(Direction in, Direction out, Cell* target);
 
 	static bool isValid(char ch);

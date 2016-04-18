@@ -138,14 +138,22 @@ bool Cell::isCaptureable() const
 	return type == Type::EXPANSION || isPlayer();
 }
 
-
-Cell* Cell::getNeighbor(Direction dir, bool with_trans) const
+Cell*Cell::getDirectNeighbor(Direction dir) const
 {
-	const Transition& t = transitions[(usz)dir];
-	if(with_trans && t.target) return t.target;
-
 	Vec2 dirPos = pos + dir2vec(dir);
 	return map.checkPos(dirPos) ? &map.at(dirPos) : nullptr;
+}
+
+
+Cell* Cell::getNeighbor(Direction& dir) const
+{
+	const Transition& t = transitions[(usz)dir];
+	if(t.target)
+	{
+		dir = t.out;
+		return t.target;
+	}
+	return getDirectNeighbor(dir);
 }
 
 void Cell::addTransistion(Direction in, Direction out, Cell* target)
@@ -153,15 +161,14 @@ void Cell::addTransistion(Direction in, Direction out, Cell* target)
 	if(type == Cell::Type::VOID)
 		throw std::runtime_error(fmt::format("adding transistion to void cell ({})", pos));
 
-	Cell* wall = getNeighbor(in, false);
+	Cell* wall = getDirectNeighbor(in);
 	if(wall && wall->type != Cell::Type::VOID)
 		throw std::runtime_error(fmt::format("transistion exit is not void ({}:{})", pos, dir2str(in)));
 
 	if(!target || target->type == Cell::Type::VOID)
 		throw std::runtime_error(fmt::format("transistion points to void cell ({})", target ? target->asString() : ""));
 
-	Transition& t = transitions[(usz) in];
-	t = { target, (Direction)((out + 4) % 8) }; // reverse out direction
+	transitions[(usz) in] = { target, (Direction)((out + 4) % 8) }; // reverse out direction
 }
 
 

@@ -65,15 +65,9 @@ Move::Error Game::testMove(Move& move) const
 			return Move::Error::PATH_BLOCKED;
 
 		move.stones.push_back(cur);
-
-		Cell::Transition tr = cur->transitions[(usz) moveDir];
-		if(tr.target)
-		{
-			cur = tr.target;
-			moveDir = tr.out;
-		} else
-			cur = cur->getNeighbor(moveDir);
+		cur = cur->getNeighbor(moveDir);
 	}
+
 	if(move.stones.empty())
 		return Move::Error::NO_STONES_CAPTURED;
 

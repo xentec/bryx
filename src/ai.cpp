@@ -38,7 +38,7 @@ Move AI::move()
 	Move move  { *this, nullptr, Direction::N };
 
 #if RANDOM
-	if(bestMoves.size())
+	if(moves.size())
 	{
 		move = moves[moves.size() > 1 ? rand() % (moves.size()-1) : 0];
 	}
@@ -46,7 +46,7 @@ Move AI::move()
 	if(bestMoves.size())
 	{
 		move = *bestMoves[0];
-//		move = *bestMoves[bestMoves.size() > 1 ? rand() % (bestMoves.size()-1) : 0];
+		//move = *bestMoves[bestMoves.size() > 1 ? rand() % (bestMoves.size()-1) : 0];
 	}
 #endif
 
