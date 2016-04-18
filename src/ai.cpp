@@ -45,8 +45,8 @@ Move AI::move()
 #else
 	if(bestMoves.size())
 	{
-		move = *bestMoves[0];
-		//move = *bestMoves[bestMoves.size() > 1 ? rand() % (bestMoves.size()-1) : 0];
+		//move = *bestMoves[0];
+		move = *bestMoves[bestMoves.size() > 1 ? rand() % (bestMoves.size()-1) : 0];
 	}
 #endif
 
@@ -56,7 +56,19 @@ Move AI::move()
 Player& AI::choice()
 {
 	// TODO: better choice algo
-	return *game->players[rand() % game->players.size()];
+	//return *game->players[rand() % game->players.size()];
+	u32 maxScore = 0;
+	Player *choice;
+	for(Player* p: game->players)
+	{
+		u32 s = p->score();
+		if(s > maxScore)
+		{
+			choice = p;
+			maxScore = s;
+		}
+	}
+	return *choice;
 }
 
 void AI::bonus()

@@ -1,11 +1,9 @@
 #pragma once
 
 #include "global.h"
-#include "map.h"
-
 #include <vector>
 
-
+struct Cell;
 struct Game;
 struct Move;
 
@@ -21,6 +19,8 @@ struct Player
 
 	std::vector<Move> possibleMoves();
 	std::vector<Move> possibleMovesOn(Cell& cell);
+
+	u32 score();
 
 	u32 id;
 	string name;
