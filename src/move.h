@@ -3,6 +3,7 @@
 #include "global.h"
 #include "map.h"
 
+#include <list>
 #include <vector>
 
 struct Game;
@@ -14,24 +15,23 @@ struct Move
 	{
 		NONE,
 		WRONG_START,
-		LINE_FULL,
-		PATH_BLOCKED,
+		NO_CONNECTIONS,
 		NO_STONES_CAPTURED,
 	};
 
-	Move(Player& player, Cell* start, Direction dir);
+	Move(Player& player, Cell* target, bool override);
 	Move(const Move& other);
 	Move& operator =(const Move& other);
 
 	string asString() const;
+	void print() const;
 
 	Player& player;
 
-	Cell *start, *end;
-	Direction dir;
+	Cell *target;
 	Error err;
 
-	std::vector<Cell*> stones;
+	std::vector<std::list<Cell*> > captures;
 	bool override;
 
 	static string err2str(Move::Error err);

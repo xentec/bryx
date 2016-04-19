@@ -19,16 +19,16 @@ Player& Player::operator =(const Player& other)
 Player::~Player()
 {}
 
-std::vector<Move> Player::possibleMoves()
+std::vector<Move> Player::possibleMoves(bool override)
 {
 	std::vector<Move> moves;
 	for(Cell& c: *game->map)
 	{
-		if(!c.isPlayer(id))
-			continue;
+		Move move { *this, &c, override };
+		move.err = game->testMove(move);
 
-		auto cellMoves = possibleMovesOn(c);
-		moves.insert(moves.end(), cellMoves.begin(), cellMoves.end());
+		if(move.err == Move::Error::NONE)
+			moves.push_back(move);
 	}
 
 	return moves;
@@ -37,21 +37,6 @@ std::vector<Move> Player::possibleMoves()
 std::vector<Move> Player::possibleMovesOn(Cell& cell)
 {
 	std::vector<Move> moves;
-
-	for(u8 dir = Direction::N; dir < Direction::LAST; dir++)
-	{
-		Move move { *this, &cell, (Direction) dir };
-		move.err = game->testMove(move);
-
-		switch(move.err)
-		{
-		// add a override necessity with LINE_FULL but view it as a possible move
-		case Move::Error::LINE_FULL: move.override = true; // hence the lack of break
-		case Move::Error::NONE:	moves.push_back(move); break;
-		default: break;
-		}
-	}
-
 	return moves;
 }
 
@@ -63,7 +48,9 @@ u32 Player::score()
 	for(Move& m: possibleMoves())
 	{
 		u32 moveScore = 0;
-		for(Cell* c: m.stones)
+
+		for(auto& line: m.captures)
+		for(Cell* c: line)
 		{
 			switch(c->type)
 			{

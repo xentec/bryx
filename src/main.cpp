@@ -10,6 +10,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <unordered_map>
 
 enum class Mode
 {
@@ -189,21 +190,22 @@ int main(int argc, char* argv[])
 
 		Move move = ply.move();
 
+		if(!move.target)
+		{
+			fmt::print("No move\n");
+			game.pass();
+			continue;
+		}
+
+		fmt::print("\n\t{}\n\n", move.asString());
+
 		game.execute(move);
 
-		if(move.stones.size())
-		{
-			fmt::print("\n\t{}\n\n", move.asString());
+		move.print();
 
-			std::unordered_set<Cell*> hl;
-			hl.insert(move.start);
-			hl.insert(move.end);
-			hl.insert(move.stones.begin(), move.stones.end());
-
-			game.map->print(hl);
-		} else
-			fmt::print("No move\n");
-
+		fmt::print("State scores\n");
+		for(Player* p: game.players)
+			fmt::print("Player {}: {}\n", p->id+1, p->score());
 
 	} while(!game.hasEnded());
 

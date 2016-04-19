@@ -17,7 +17,7 @@ struct Player
 	virtual Player& choice() = 0;
 	virtual void bonus() = 0;
 
-	std::vector<Move> possibleMoves();
+	std::vector<Move> possibleMoves(bool override = false);
 	std::vector<Move> possibleMovesOn(Cell& cell);
 
 	u32 score();

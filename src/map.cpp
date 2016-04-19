@@ -96,11 +96,12 @@ bool Cell::operator !=(const Cell& other) const
 {
 	return !(*this == other);
 }
-
+/*
 bool Cell::operator <(const Cell& other) const
 {
 	return pos.y < other.pos.y ? true : pos.x < other.pos.x;
 }
+*/
 
 string Cell::asString() const
 {
@@ -249,7 +250,7 @@ string Map::asString()
 
 
 // TODO: color und ansi flags
-void Map::print(std::set<Cell> highlight, bool colored, bool ansi) const
+void Map::print(std::unordered_map<const Cell*,ConsoleFormat> highlight, bool colored, bool ansi) const
 {
 	fmt::print("   ");
 	for (usz x = 0; x < width; x++)
@@ -286,14 +287,11 @@ void Map::print(std::set<Cell> highlight, bool colored, bool ansi) const
 					color = color::YELLOW;
 			}
 
-			if(highlight.size())
+			if(!highlight.empty())
 			{
-				if(*highlight.begin() == c)
-					color.setBG(ConsoleFormat::RED);
-				else if(*highlight.end() == c)
-					color.setBG(ConsoleFormat::GREEN);
-				else if(highlight.find(c) != highlight.end())
-					color.setBG(ConsoleFormat::BLUE);
+				const auto& hl = highlight.find(&c);
+				if(hl != highlight.cend())
+					color = hl->second;
 			}
 			fmt::print("{}{}{} ", color, (char)c.type, color::RESET);
 		}

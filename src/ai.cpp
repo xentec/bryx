@@ -14,6 +14,8 @@ Move AI::move()
 {
 	std::vector<Move> moves = possibleMoves();
 
+	fmt::print("Possible moves: {}\n", moves.size());
+
 	u32 stoneSum = 0;
 	u32 stoneMax = 0;
 	std::vector<Move*> bestMoves;
@@ -22,7 +24,7 @@ Move AI::move()
 		if(m.override)
 			continue;
 
-		int stones = m.stones.size();
+		int stones = m.captures.size();
 		stoneSum += stones;
 		if(stones > stoneMax)
 		{

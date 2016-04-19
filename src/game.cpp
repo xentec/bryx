@@ -5,6 +5,7 @@
 #include <cppformat/format.h>
 #include <fstream>
 
+#include <list>
 
 Game::Game():
 	defaults{ 0, 0, 0, 0 }, stats { 0, 0, 0 },
@@ -49,46 +50,47 @@ void Game::run()
 
 Move::Error Game::testMove(Move& move) const
 {
-	move.stones.clear();
-
-	if(!move.start->isPlayer(move.player.id))
+	if(!move.target->isFree() || move.target->isPlayer(move.player.id) || (move.target->isCaptureable() && !move.override))
 		return Move::Error::WRONG_START;
 
-	Direction moveDir = move.dir;
-
-	Cell* cur = move.start->getNeighbor(moveDir);
-	while(cur && cur->isCaptureable())
+	for(u32 dir = Direction::N; dir < Direction::LAST; dir++)
 	{
-		move.end = cur;
-		if(cur->isPlayer(move.player.id))
-			return Move::Error::PATH_BLOCKED;
+		Direction moveDir = (Direction) dir;
+		std::list<Cell*> line;
 
-		move.stones.push_back(cur);
-		cur = cur->getNeighbor(moveDir);
+		Cell* cur = move.target->getNeighbor(moveDir);
+		while(cur && cur->isCaptureable())
+		{
+			if(cur->isPlayer(move.player.id))
+			{
+				if(!line.empty())
+				{
+					fmt::print("LINE FOUND!\n");
+					move.captures.push_back(line);
+				}
+				break;
+			}
+			line.push_back(cur);
+			cur = cur->getNeighbor(moveDir);
+		}
+
+//		fmt::print("DIR: {}\n", dir2str(dir));
+//		line.push_front(move.target);
+//		map->print(line);
+//		fmt::print("\n");
 	}
 
-	if(move.stones.empty())
-		return Move::Error::NO_STONES_CAPTURED;
-
-	move.end = (cur) ?: move.stones.back();
-
-	if(!cur || !cur->isFree())
-			return Move::Error::LINE_FULL;
-
-	return Move::Error::NONE;
+	return move.captures.empty() ? Move::Error::NO_CONNECTIONS : Move::Error::NONE;
 }
 
 void Game::execute(Move &move)
 {
-	if(move.stones.empty())
+	if(move.captures.empty())
 	{
 		moveless++;
 		return;
 	} else
 		moveless = 0;
-
-	for(Cell* c: move.stones)
-		c->setPlayer(move.player.id);
 
 	if(move.override)
 	{
@@ -97,11 +99,16 @@ void Game::execute(Move &move)
 		move.player.overrides--;
 	}
 
-	Cell::Type lastCell = move.end->type; // first make a complete move...
-	move.end->setPlayer(move.player.id);
+	Cell::Type targetCell = move.target->type; // first make a complete move...
+
+	move.target->setPlayer(move.player.id);
+
+	for(auto& line: move.captures)
+	for(Cell* c: line)
+		c->setPlayer(move.player.id);
 
 
-	switch(lastCell) // ...then look at special cases
+	switch(targetCell) // ...then look at special cases
 	{
 	case Cell::Type::BONUS:
 		move.player.bonus();

@@ -5,6 +5,8 @@
 #include "game.h"
 #include "util.h"
 
+#include "consoleformat.h"
+
 #include <iostream>
 #include <sstream>
 
@@ -27,11 +29,8 @@ Move Human::move()
 	if(possibleMoves().empty())
 		return move;
 
-	Vec2 start;
-	string dirStr;
-
 	do {
-		fmt::print("Select your move (carefully) [x y direction OR 'pass']: ");
+		fmt::print("Place your stone (carefully) [x y OR 'pass']: ");
 
 		try {
 			string input;
@@ -39,16 +38,13 @@ Move Human::move()
 			if(toLower(input) == "pass")
 				return move;
 
-			Vec2 start;
-			start.x = std::stoi(input);
+			Vec2 target;
+			target.x = std::stoi(input);
 			std::cin >> input;
-			start.y = std::stoi(input);
-			std::cin >> input;
+			target.y = std::stoi(input);
 
-			fmt::print("VEC: {} \n", start);
-
-			move.start = &game->map->at(start);
-			move.dir = str2dir(input);
+			fmt::print("VEC: {} \n", target);
+			move.target = &game->map->at(target);
 		} catch(std::out_of_range& ex)
 		{
 			error(ex.what());
@@ -70,13 +66,13 @@ Move Human::move()
 			continue;
 		}
 
-		game->testMove(move);
-		std::unordered_set<Cell*> hl {move.stones.begin(), move.stones.end()};
-		hl.insert(move.start);
-		hl.insert(move.end);
+		move.err = game->testMove(move);
+
+		move.print();
 
 		switch(move.err)
 		{
+/*
 		case Move::Error::LINE_FULL:
 			game->map->print(hl);
 
@@ -91,7 +87,7 @@ Move Human::move()
 				goto ret;
 			}
 			break;
-		case Move::Error::NONE:	goto ret; break;
+*/		case Move::Error::NONE:	goto ret; break;
 		default:
 			fmt::print("You move is invalid: {}\n", Move::err2str(move.err));
 		}
