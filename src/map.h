@@ -2,13 +2,14 @@
 
 #include "global.h"
 #include "vector.h"
+#include "util.h"
 
 #include <iterator>
 
 #include <array>
 #include <vector>
 #include <unordered_set>
-#include <unordered_map>
+#include <set>
 
 
 enum Direction : u8
@@ -53,6 +54,7 @@ struct Cell
 	Cell& operator =(const Cell& other);
 	bool operator ==(const Cell& other) const;
 	bool operator !=(const Cell& other) const;
+	bool operator <(const Cell& other) const;
 
 	string asString() const;
 
@@ -88,7 +90,8 @@ struct Map
 	const Cell& at(const Vec2& pos) const;
 
 	string asString();
-	void print(std::unordered_set<Cell*> highlight = std::unordered_set<Cell*>(), bool colored = true, bool ansi = true) const;
+
+	void print(std::set<Cell> highlight = {}, bool colored = true, bool ansi = true) const;
 
 	const u32 width, height;
 private:
@@ -149,5 +152,14 @@ public:
 	Map::iterator<const Cell> cend();
 };
 
+template<class Iter>
+inline std::set<Cell> highlighter(Iter begin, Iter end)
+{
+	std::set<Cell> set;
 
+	for(;begin != end; begin++)
+		set.insert(**begin);
+
+	return set;
+}
 

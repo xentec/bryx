@@ -1,8 +1,10 @@
 #include "map.h"
 
-#include "util.h"
+#include "consoleformat.h"
 
 #include <cppformat/format.h>
+
+#include <unordered_map>
 
 // Direction
 //############
@@ -93,6 +95,11 @@ bool Cell::operator ==(const Cell& other) const
 bool Cell::operator !=(const Cell& other) const
 {
 	return !(*this == other);
+}
+
+bool Cell::operator <(const Cell& other) const
+{
+	return pos.y < other.pos.y ? true : pos.x < other.pos.x;
 }
 
 string Cell::asString() const
@@ -234,7 +241,7 @@ string Map::asString()
 		{
 			str << (char) at(x,y).type << ' ';
 		}
-		str << fmt::format("{}\n", color::RESET) ;
+		str << "\n";
 	}
 
 	return str.str();
@@ -242,7 +249,7 @@ string Map::asString()
 
 
 // TODO: color und ansi flags
-void Map::print(std::unordered_set<Cell*> highlight, bool colored, bool ansi) const
+void Map::print(std::set<Cell> highlight, bool colored, bool ansi) const
 {
 	fmt::print("   ");
 	for (usz x = 0; x < width; x++)
@@ -257,11 +264,11 @@ void Map::print(std::unordered_set<Cell*> highlight, bool colored, bool ansi) co
 
 	for (usz y = 0; y < height; y++)
 	{
-		fmt::print("{}", color::RESET);
 		if(y%2 == 0)
 			fmt::print("{:2} ", y);
 		else
 			fmt::print(" | ");
+
 		for (usz x = 0; x < width; x++)
 		{
 			ConsoleFormat color;
@@ -279,16 +286,19 @@ void Map::print(std::unordered_set<Cell*> highlight, bool colored, bool ansi) co
 					color = color::YELLOW;
 			}
 
-			if(highlight.size() && highlight.find((Cell*) &c) != highlight.end()) {
-				color.color += 10;
-				//color.attr = ConsoleFormat::BLINK;
+			if(highlight.size())
+			{
+				if(*highlight.begin() == c)
+					color.setBG(ConsoleFormat::RED);
+				else if(*highlight.end() == c)
+					color.setBG(ConsoleFormat::GREEN);
+				else if(highlight.find(c) != highlight.end())
+					color.setBG(ConsoleFormat::BLUE);
 			}
-
 			fmt::print("{}{}{} ", color, (char)c.type, color::RESET);
 		}
 		fmt::print("\n");
 	}
-	fmt::print("{}", color::RESET);
 }
 
 
