@@ -37,24 +37,6 @@ std::string readline(std::basic_istream<char> &stream)
 	return str;
 }
 
-
-
-
-ConsoleFormat::ConsoleFormat(u8 color, ConsoleFormat::Attribute attr):
-	attr(attr), color(color)
-{}
-
-std::string ConsoleFormat::asString() const
-{
-#if _WIN32
-	static HANDLE hCon = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(hCon, (WORD)color);
-	return "";
-#else
-	return fmt::format("\e[{};{}m", attr, color);
-#endif
-}
-
 string toLower(string str)
 {
 	for(char& c: str) c = tolower(c);
