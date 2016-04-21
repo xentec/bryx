@@ -19,12 +19,14 @@ Player& Player::operator =(const Player& other)
 Player::~Player()
 {}
 
-std::vector<Move> Player::possibleMoves(bool override)
+std::vector<Move> Player::possibleMoves()
 {
 	std::vector<Move> moves;
 	for(Cell& c: *game->map)
 	{
-		Move move { *this, &c, override };
+		Move move { *this, &c };
+		move.override = overrides && c.isCaptureable();
+
 		move.err = game->testMove(move);
 
 		if(move.err == Move::Error::NONE)

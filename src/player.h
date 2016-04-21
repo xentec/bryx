@@ -17,9 +17,7 @@ struct Player
 	virtual Player& choice() = 0;
 	virtual void bonus() = 0;
 
-	std::vector<Move> possibleMoves(bool override = false);
-	std::vector<Move> possibleMovesOn(Cell& cell);
-
+	std::vector<Move> possibleMoves();
 	u32 score(bool inventory = false);
 
 	u32 id;

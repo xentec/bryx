@@ -4,11 +4,11 @@
 #include "map.h"
 #include "consoleformat.h"
 
-Move::Move(Player& player, Cell* target, bool override):
+Move::Move(Player& player, Cell* target):
 	player(player),
 	target(target),
 	err(Error::NONE),
-	captures(), override(override)
+	captures(), override(false)
 {}
 
 Move::Move(const Move& other):

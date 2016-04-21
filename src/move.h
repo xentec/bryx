@@ -19,7 +19,7 @@ struct Move
 		NO_STONES_CAPTURED,
 	};
 
-	Move(Player& player, Cell* target, bool override);
+	Move(Player& player, Cell* target);
 	Move(const Move& other);
 	Move& operator =(const Move& other);
 
