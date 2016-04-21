@@ -183,12 +183,15 @@ int main(int argc, char* argv[])
 
 		fmt::print("\n");
 		fmt::print("Player {} {}\n", ply.id+1, ply.name);
-		fmt::print("##########");
 
+		fmt::print("##########");
 		for(usz i = 0; i < ply.name.size(); i++)
 			fmt::print("#");
 		fmt::print("\n");
 
+		fmt::print("Overrides: {}\n", ply.overrides);
+		fmt::print("Bombs: {}\n", ply.bombs);
+		fmt::print("\n");
 		fmt::print("State scores\n");
 		for(Player* p: game.players)
 			fmt::print("Player {}: {}\n", p->id+1, p->score());
