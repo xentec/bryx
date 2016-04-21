@@ -138,7 +138,7 @@ struct Cell
 Eine \texttt{Transition} beinhaltet einen Zeiger auf eine andere Zelle und die Ausrichtung, die ein Zug bekommt, nachdem er die Transition passiert hat.
 Bei Nichtexistenz der \texttt{Transition} ist der Zeiger auf die \texttt{Cell} standardmäßig \texttt{NULL}.
 
-Die Variante aus \texttt{std::vector} und \texttt{std::array} wurde genommen, um Cache-Misses der CPU zu mindern.
+Die Variante aus \texttt{std::vector} und \texttt{std::array} wurde genommen, damit die Felder beieinander angrenzen. Damit werden Cache-Misses der CPU beim sequentiellen Zugriff gemindert.
 
 
 %Beschreiben Sie die Datenstruktur, die Sie zur Speicherung des Spielfeldes in Ihrem Client nutzen. Gehen Sie auf Besonderheiten ein und erklären Sie, wie diese funktionieren und was Sie sich davon erhoffen. Geben Sie falls möglich auch eine schematische Darstellung/ein Bild der Datenstruktur an.
