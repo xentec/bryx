@@ -34,37 +34,18 @@ std::vector<Move> Player::possibleMoves(bool override)
 	return moves;
 }
 
-std::vector<Move> Player::possibleMovesOn(Cell& cell)
-{
-	std::vector<Move> moves;
-	return moves;
-}
-
-u32 Player::score()
+u32 Player::score(bool inventory)
 {
 	u32 score = 0;
-	score += 2*bombs*game->defaults.bombsStrength;
-	score += 5*overrides;
+	if(inventory)
+	{
+		score += 2*bombs*game->defaults.bombsStrength;
+		score += 5*overrides;
+	}
+
 	for(Move& m: possibleMoves())
 	{
-		u32 moveScore = 0;
-
-		for(auto& line: m.captures)
-		for(Cell* c: line)
-		{
-			switch(c->type)
-			{
-			case Cell::Type::BONUS: moveScore += 10; break;
-			case Cell::Type::CHOICE: moveScore += 30; break;
-			case Cell::Type::INVERSION: moveScore += 20; break;
-			default:
-				moveScore++;
-			}
-		}
-		if(m.override)
-			moveScore /= 2;
-
-		score += moveScore;
+		score += m.score();
 	}
 	return score;
 }

@@ -20,7 +20,7 @@ struct Player
 	std::vector<Move> possibleMoves(bool override = false);
 	std::vector<Move> possibleMovesOn(Cell& cell);
 
-	u32 score();
+	u32 score(bool inventory = false);
 
 	u32 id;
 	string name;

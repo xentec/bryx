@@ -24,7 +24,7 @@ Human::~Human()
 
 Move Human::move()
 {
-	Move move { *this, nullptr, Direction::N };
+	Move move { *this, nullptr };
 
 	if(possibleMoves().empty())
 		return move;
