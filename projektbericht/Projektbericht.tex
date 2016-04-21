@@ -99,7 +99,7 @@ Bessere Fehlermeldungen im Vergleich zu GCC.
 Standardbetriebssystem des Teams.
 \item Projektgenerator: CMake - \url{https://cmake.org} \\
 Einfache und einheitliche Generierung der Projektdateien.
-\item IDE: QtCreator - \url{http://wiki.qt.io/Category:Tools::QtCreator} \\
+\item IDE: QtCreator - \url{http://wiki.qt.io/Qt_Creator} \\
 Eine echte Open Source Alternative zu Visual Studio, die u.a. CMake versteht und dank Clang Static Analyzer semantische Fehler während des Schreibens anzeigt.
 \item Dokumentationsgenerator: Doxygen - \url{http://www.stack.nl/~dimitri/doxygen} \\
 De facto Standard zum Erstellen von Dokumentationen aus dem Quellcode.
@@ -117,16 +117,16 @@ Typsichere Zeichenkettenformatierung und Konsolenausgabe.
 Als Grundlange für die Speicherung des Spielfeldes wurde der STL-Container \texttt{std::vector} aus der Standardbibliothek benutzt. Dieser ist unter der Haube nichts weiter als ein eindimensionaler, heapallokierter Array mit Verfolgung der Größe und Zugriffschecks. Der Zugriff auf Felder erfolgt über ihre X,Y-Koordinaten.
 Ein Feld sieht wie folgt aus:
 
-\begin{lstlisting}[caption=Cell Struktur, label=lst:cell-struct]
+\begin{lstlisting}[caption=\texttt{Cell} Struktur, label=lst:cell-struct]
 struct Cell
 {
 	struct Transition
 	{
-		Cell* target;
+		Cell *target;
 		Direction out;
 	};
 	
-	Map& map;
+	Map &map;
 	const Vec2 pos;
 	
 	Cell::Type type;
@@ -167,11 +167,6 @@ Beschreiben Sie abschließend, welche Heuristik final in Ihrem Client umgesetzt 
 Integrieren Sie in diesen Abschnitt alle Ergebnisse von Projektaufgaben, die mit Erstellungen von Statistiken zu tun haben. Geben Sie dabei auch Diagramme an und interpretieren Sie die darin dargestellten Kurven. Beschreiben Sie zu jedem implementierten Verfahren, ob und welchen Nutzen es aus Ihrer Sicht gebracht hat.
 
 \subsection{Vergleich ... und ...}
-
-\subsection{Vergleich ..., ... und ...}
-
-\subsection{...}
-
 
 \newpage
 % ----------------------------------------------------------------------------------
