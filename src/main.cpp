@@ -176,6 +176,7 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
+
 	do
 	{
 		Player& ply = game.nextPlayer();
@@ -187,6 +188,10 @@ int main(int argc, char* argv[])
 		for(usz i = 0; i < ply.name.size(); i++)
 			fmt::print("#");
 		fmt::print("\n");
+
+		fmt::print("State scores\n");
+		for(Player* p: game.players)
+			fmt::print("Player {}: {}\n", p->id+1, p->score());
 
 		Move move = ply.move();
 
@@ -200,14 +205,9 @@ int main(int argc, char* argv[])
 		fmt::print("\n\t{}\n\n", move.asString());
 
 		game.execute(move);
-
 		move.print();
-
-		fmt::print("State scores\n");
-		for(Player* p: game.players)
-			fmt::print("Player {}: {}\n", p->id+1, p->score());
-
-	} while(!game.hasEnded());
+	}
+	while(!game.hasEnded());
 
 	std::vector<std::pair<Cell::Type, u32>> scores(game.players.size(), {Cell::Type::VOID,0});
 
