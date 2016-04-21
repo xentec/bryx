@@ -11,7 +11,15 @@ struct ConsoleFormat
 		NORMAL = 0, BOLD = 1, UNDERLINE = 4, BLINK = 5, REVERSE = 7, INVISIBLE = 8
 	};
 
-#ifndef _WIN32
+#ifdef _WIN32
+	enum Color
+	{
+		BLACK = 0, BLUE, GREEN, CYAN, RED, MAGENTA, YELLOW, WHITE
+	};
+
+	inline void setFG(Color c) { fg = c; }
+	inline void setBG(Color c) { bg = c; }
+#else
 	enum Color
 	{
 		RESET = 0, BLACK = 30, RED = 31, GREEN = 32, YELLOW = 32, BLUE = 34, MAGENTA = 35, CYAN = 36, WHITE = 37
@@ -19,14 +27,6 @@ struct ConsoleFormat
 
 	inline void setFG(Color c) { fg = c; }
 	inline void setBG(Color c) { bg = c + 10; }
-#else
-	enum Color
-	{
-		BLACK = 0, BLUE, GREEN, CYAN, RED, MAGENTA, YELLOW, WHITE
-	};
-
-	inline void setFG(Color c) { fg = c + 30; }
-	inline void setBG(Color c) { bg = c + 40; }
 #endif
 
 	ConsoleFormat(u8 fg = 0, Attribute attr = NORMAL);
