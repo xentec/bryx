@@ -50,34 +50,39 @@ void Game::run()
 
 Move::Error Game::testMove(Move& move) const
 {
-	if(!move.target->isFree() || move.target->isPlayer(move.player.id) || (move.target->isCaptureable() && !move.override))
+	if(move.target->type == Cell::Type::VOID || (move.target->isCaptureable() && !move.override))
 		return Move::Error::WRONG_START;
+
+	Direction banned = Direction::LAST;
 
 	for(u32 dir = Direction::N; dir < Direction::LAST; dir++)
 	{
 		Direction moveDir = (Direction) dir;
-		std::list<Cell*> line;
+		if(dir == banned)
+			continue;
 
+		Cell* cp = move.target;
+
+		std::list<Cell*> line;
 		Cell* cur = move.target->getNeighbor(moveDir);
 		while(cur && cur->isCaptureable())
 		{
+			if(cp == cur) // we're in a loop!
+			{
+				 // do not try the same dir you came from while looping
+				banned = (Direction) ((moveDir+4) % (Direction::LAST-1));
+				break;
+			}
+
 			if(cur->isPlayer(move.player.id))
 			{
 				if(!line.empty())
-				{
-					fmt::print("LINE FOUND!\n");
 					move.captures.push_back(line);
-				}
 				break;
 			}
 			line.push_back(cur);
 			cur = cur->getNeighbor(moveDir);
 		}
-
-//		fmt::print("DIR: {}\n", dir2str(dir));
-//		line.push_front(move.target);
-//		map->print(line);
-//		fmt::print("\n");
 	}
 
 	return move.captures.empty() ? Move::Error::NO_CONNECTIONS : Move::Error::NONE;
