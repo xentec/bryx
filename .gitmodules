@@ -1,3 +1,6 @@
 [submodule "extern/cppformat"]
 	path = extern/cppformat
 	url = https://github.com/cppformat/cppformat
+[submodule "extern/dyad"]
+	path = extern/dyad
+	url = https://github.com/rxi/dyad

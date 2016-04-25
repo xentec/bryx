@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 2.8.12)
 
-project(Bryx CXX)
+project(Bryx)
 
 set(USE_LIBCXX 1)
+
+add_library(dyad OBJECT extern/dyad/src/dyad.h extern/dyad/src/dyad.c)
 
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -22,5 +24,5 @@ endif()
 
 file(GLOB_RECURSE SOURCES src/*.h src/*.cpp)
 
-add_executable(bryx ${SOURCES})
+add_executable(bryx ${SOURCES} $<TARGET_OBJECTS:dyad>)
 target_link_libraries(bryx ${LIBS})
