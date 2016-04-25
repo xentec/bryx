@@ -1,12 +1,13 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 2.8.12)
 
-project(Bryx)
+project(Bryx CXX)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(USE_LIBCXX 1)
 
-if(NOT WIN32)
-	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-stdlib=libc++ -Wall")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+if(${USE_LIBCXX})
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -Wall")
 endif()
 
 add_subdirectory(extern/cppformat)
@@ -15,7 +16,7 @@ list(APPEND LIBS
 	cppformat
 )
 
-if(NOT WIN32)
+if(${USE_LIBCXX})
 	list(APPEND LIBS c++ c++abi m c gcc_s gcc)
 endif()
 
