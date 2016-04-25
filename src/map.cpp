@@ -113,13 +113,15 @@ bool Cell::isFree() const
 {
 	switch(type)
 	{
-	case Type::EXPANSION:
-	case Type::VOID:
-		return false;
+	case Type::EMPTY:
+	case Type::BONUS:
+	case Type::CHOICE:
+	case Type::INVERSION:
+		return true;
 	default:
-		return !isPlayer();
+		break;
 	}
-	return true;
+	return false;
 }
 
 bool Cell::isPlayer() const
@@ -248,43 +250,84 @@ string Map::asString()
 	return str.str();
 }
 
+void Map::print(bool colored, bool ansi) const
+{
+	std::unordered_map<const Cell*, ConsoleFormat> hl;
+	print(hl, colored, ansi);
+}
+
 
 // TODO: color und ansi flags
 void Map::print(std::unordered_map<const Cell*,ConsoleFormat> highlight, bool colored, bool ansi) const
 {
+	string space = ansi ? "": " ";
+
 	fmt::print("   ");
 	for (usz x = 0; x < width; x++)
 	{
-		if(x%2 == 0)
-			fmt::print("{:^2}", x);
+		if(x%5 == 0)
+			fmt::print("{:-<2}", x++);
 		else
-			fmt::print("- ");
+			fmt::print("-{}", space);
 	}
 
 	fmt::print("\n");
 
+
 	for (usz y = 0; y < height; y++)
 	{
-		if(y%2 == 0)
+		if(y%5 == 0)
 			fmt::print("{:2} ", y);
 		else
 			fmt::print(" | ");
 
 		for (usz x = 0; x < width; x++)
 		{
-			ConsoleFormat color;
 			const Cell& c = at(x, y);
-			switch (c.type)
+
+			ConsoleFormat color;
+			string ch;
+
+			if(colored)
 			{
-			case Cell::Type::BONUS:     color = color::CYAN_LIGHT; break;
-			case Cell::Type::CHOICE:    color = color::RED_LIGHT;  break;
-			case Cell::Type::EMPTY:     color = color::GRAY_LIGHT; break;
-			case Cell::Type::EXPANSION: color = color::CYAN_LIGHT; break;
-			case Cell::Type::INVERSION: color = color::YELLOW;	   break;
-			case Cell::Type::VOID:      color = color::GRAY;       break;
-			default:
-				if (c.isPlayer())
-					color = color::YELLOW;
+				switch (c.type)
+				{
+				case Cell::Type::VOID:      color = color::GRAY;       break;
+				case Cell::Type::EMPTY:     color = color::GRAY_LIGHT; break;
+
+				case Cell::Type::BONUS:     color = color::YELLOW;     break;
+				case Cell::Type::CHOICE:    color = color::GREEN_LIGHT;break;
+				case Cell::Type::INVERSION: color = color::RED_LIGHT;  break;
+
+				case Cell::Type::EXPANSION: color = color::WHITE;      break;
+
+				case Cell::Type::P1:        color = color::RED;        break;
+				case Cell::Type::P2:        color = color::BLUE;       break;
+				case Cell::Type::P3:        color = color::GREEN;      break;
+				case Cell::Type::P4:        color = color::BROWN;      break;
+				case Cell::Type::P5:        color = color::MAGENTA;    break;
+				case Cell::Type::P6:        color = color::YELLOW;     break;
+				case Cell::Type::P7:        color = color::GRAY;       break;
+				case Cell::Type::P8:        color = color::CYAN;       break;
+				default: break;
+				}
+			}
+
+			if(ansi)
+			{
+				switch (c.type)
+				{
+				case Cell::Type::BONUS:
+				case Cell::Type::CHOICE:
+				case Cell::Type::INVERSION: ch = "░"; break;
+				case Cell::Type::EMPTY:     ch = " "; break;
+				case Cell::Type::VOID:      ch = "█"; break;
+
+				case Cell::Type::EXPANSION: ch = "x"; break;
+
+				default:
+					ch = (const char*) &c.type;
+				}
 			}
 
 			if(!highlight.empty())
@@ -293,7 +336,7 @@ void Map::print(std::unordered_map<const Cell*,ConsoleFormat> highlight, bool co
 				if(hl != highlight.cend())
 					color = hl->second;
 			}
-			fmt::print("{}{}{} ", color, (char)c.type, color::RESET);
+			fmt::print("{}{}{}{}", color, ch, color::RESET, space);
 		}
 		fmt::print("\n");
 	}

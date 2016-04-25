@@ -92,7 +92,8 @@ struct Map
 
 	string asString();
 
-	void print(std::unordered_map<const Cell*,ConsoleFormat> highlight = {}, bool colored = true, bool ansi = true) const;
+	void print(bool colored = true, bool ansi = true) const;
+	void print(std::unordered_map<const Cell*,ConsoleFormat> highlight, bool colored = true, bool ansi = true) const;
 
 	const u32 width, height;
 private:
