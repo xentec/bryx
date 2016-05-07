@@ -1,13 +1,11 @@
 #pragma once
 
 #include "global.h"
-#include "map.h"
 #include "move.h"
 #include "player.h"
 
-///TODO: State analysis: check for moves and possible map expansion
-
 struct Player;
+struct Map;
 
 struct Game
 {

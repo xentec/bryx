@@ -1,11 +1,11 @@
 #pragma once
 
 #include "global.h"
-#include "map.h"
 
 #include <list>
 #include <vector>
 
+struct Cell;
 struct Game;
 struct Player;
 

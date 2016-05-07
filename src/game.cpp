@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include "map.h"
 #include "util.h"
 
 #include <cppformat/format.h>

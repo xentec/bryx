@@ -1,6 +1,8 @@
 #pragma once
 
 #include "global.h"
+#include "cell.h"
+
 #include <vector>
 
 struct Cell;
