@@ -41,11 +41,8 @@ struct Cell
 	};
 
 
-	Cell(Map &map, Type type);
-	Cell(const Cell& other);
-	~Cell();
+	Cell(Map &map, Vec2 pos, Type type);
 
-	Cell& operator =(const Cell& other);
 	bool operator ==(const Cell& other) const;
 	bool operator !=(const Cell& other) const;
 

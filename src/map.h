@@ -15,8 +15,6 @@ struct Map
 {
 	Map(u32 width, u32 height);
 
-	void clear(Cell::Type type = Cell::Type::VOID);
-
 	inline Cell& at(i32 x, i32 y) { return at({x, y}); }
 	inline const Cell& at(i32 x, i32 y) const  { return at({x, y}); }
 

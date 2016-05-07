@@ -63,26 +63,10 @@ Direction str2dir(std::string input)
 
 // Cell
 //#######
-Cell::Cell(Map& map, Type type):
-	pos{-1,-1}, type(type), transitions(), map(map)
+Cell::Cell(Map& map, Vec2 pos, Type type):
+	pos(pos), type(type), transitions(), map(map)
 {
 	transitions.fill({nullptr, Direction::N});
-}
-
-Cell::Cell(const Cell &other):
-	pos(other.pos), type(other.type), transitions(other.transitions), map(other.map)
-{}
-
-Cell::~Cell()
-{
-	// for break points
-}
-
-Cell &Cell::operator=(const Cell &other)
-{
-	type = other.type;
-	transitions = other.transitions;
-	return *this;
 }
 
 bool Cell::operator ==(const Cell& other) const

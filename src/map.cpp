@@ -9,23 +9,13 @@
 // Map
 //########
 Map::Map(u32 width, u32 height):
-	width(width), height(height), data(width*height, Cell(*this, Cell::Type::VOID))
+	width(width), height(height)
 {
-	Vec2 pos;
+	data.reserve(width*height);
+
 	for(i32 x = 0; x < width; x++)
 	for(i32 y = 0; y < height; y++)
-	{
-		pos = { x, y };
-		// dirty, but necessary const hack to set right position
-		*const_cast<Vec2*>(&at(pos).pos) = pos;
-	}
-
-}
-
-void Map::clear(Cell::Type type)
-{
-	for(Cell& c: data)
-		c.type = Cell::Type::VOID;
+		data.push_back(Cell(*this, {x, y}, Cell::Type::VOID));
 }
 
 Cell& Map::at(const Vec2 &pos)
