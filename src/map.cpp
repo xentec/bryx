@@ -22,6 +22,29 @@ Map::Map(u32 width, u32 height):
 		data.push_back(Cell(*this, {x, y}, Cell::Type::VOID));
 }
 
+Map::Map(const Map& other):
+	width(other.width), height(other.height)
+{
+	data.reserve(width*height);
+
+	for(i32 x = 0; x < width; x++)
+	for(i32 y = 0; y < height; y++)
+	{
+		Cell o = other.at(x,y);
+		Cell c(*this, {x, y}, o.type);
+		for(u32 dir = Direction::N; dir < Direction::_LAST; dir++)
+		{
+			Cell::Transition& ot = o.transitions[dir];
+			if(!ot.target)
+				continue;
+
+			Cell& trg = at(ot.target->pos);
+			c.transitions[dir] = Cell::Transition{ &trg, ot.entry };
+		}
+		data.push_back(std::move(c));
+	}
+}
+
 Cell& Map::at(const vec &pos)
 {
 	if(!checkPos(pos))
@@ -83,12 +106,11 @@ void Map::print(std::unordered_map<const Cell*,ConsoleFormat> highlight, bool co
 			fmt::print(" | ");
 
 		ConsoleFormat color;
-		string ch;
-		ch.reserve(1);
 
 		for (usz x = 0; x < width; x++)
 		{
 			const Cell& c = at(x, y);
+			string ch = " ";
 
 			if(colored)
 			{
