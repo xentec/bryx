@@ -97,26 +97,26 @@ Cell* Cell::getNeighbor(Direction& dir) const
 	const Transition& t = transitions[(usz)dir];
 	if(t.target)
 	{
-		dir = t.out;
+		dir = t.entry;
 		return t.target;
 	}
 	Cell* c = getDirectNeighbor(dir);
 	return c && c->type != Cell::Type::VOID ? c : nullptr;
 }
 
-void Cell::addTransistion(Direction in, Direction out, Cell* target)
+void Cell::addTransistion(Direction exit, Direction entry, Cell* target)
 {
 	if(type == Cell::Type::VOID)
 		throw std::runtime_error(fmt::format("adding transistion to void cell ({})", pos));
 
-	Cell* wall = getDirectNeighbor(in);
+	Cell* wall = getDirectNeighbor(exit);
 	if(wall && wall->type != Cell::Type::VOID)
-		throw std::runtime_error(fmt::format("transistion exit is not void ({}:{})", pos, dir2str(in)));
+		throw std::runtime_error(fmt::format("transistion exit is not void ({}:{})", pos, dir2str(exit)));
 
 	if(!target || target->type == Cell::Type::VOID)
 		throw std::runtime_error(fmt::format("transistion points to void cell ({})", target ? target->asString() : ""));
 
-	transitions[(usz) in] = { target, dir180(out) }; // reverse out direction
+	transitions[(usz) exit] = { target, entry }; // reverse out direction
 }
 
 

@@ -215,12 +215,12 @@ Game Game::load(std::istream& file)
 		Cell &from = map.at(stoi(tmp.at(0)), stoi(tmp.at(1))),
 			   &to = map.at(stoi(tmp.at(4)), stoi(tmp.at(5)));
 
-		Direction in = static_cast<Direction>(stoi(tmp.at(2))),
-				 out = static_cast<Direction>(stoi(tmp.at(6)));
+		Direction exit = static_cast<Direction>(stoi(tmp.at(2))),
+				 entry = static_cast<Direction>(stoi(tmp.at(6)));
 
 		try {
-			from.addTransistion(in, out, &to);
-			to.addTransistion(out, in, &from);
+			from.addTransistion(exit, dir180(entry), &to);
+			to.addTransistion(entry, dir180(exit), &from);
 		}
 		catch(std::out_of_range& e)
 		{

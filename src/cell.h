@@ -37,7 +37,7 @@ struct Cell
 	struct Transition
 	{
 		Cell* target;
-		Direction out;
+		Direction entry;
 	};
 
 
@@ -57,9 +57,10 @@ struct Cell
 
 	Cell* getDirectNeighbor(Direction dir) const;
 	Cell* getNeighbor(Direction& dir) const;
-	void addTransistion(Direction in, Direction out, Cell* target);
+	void addTransistion(Direction exit, Direction entry, Cell* target);
 
 	static bool isValid(char ch);
+
 
 	const Vec2 pos;
 	Cell::Type type;
