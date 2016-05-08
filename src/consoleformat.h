@@ -22,7 +22,7 @@ struct ConsoleFormat
 #else
 	enum Color
 	{
-		RESET = 0, BLACK = 30, RED = 31, GREEN = 32, YELLOW = 32, BLUE = 34, MAGENTA = 35, CYAN = 36, WHITE = 37
+		RESET = 0, BLACK = 30, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE
 	};
 
 	inline void setFG(Color c) { fg = c; }

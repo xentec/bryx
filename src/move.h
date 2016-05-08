@@ -28,13 +28,15 @@ struct Move
 	string asString() const;
 	void print() const;
 
+
 	Player& player;
 
 	Cell *target;
-	Error err;
-
-	std::vector<std::list<Cell*> > captures;
 	bool override;
+
+	Error err;
+	std::vector<std::list<Cell*> > captures;
+
 
 	static string err2str(Move::Error err);
 };
