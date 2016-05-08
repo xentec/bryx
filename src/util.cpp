@@ -9,7 +9,7 @@
 #undef VOID
 #endif
 
-std::vector<string> splitString(string str, char at)
+std::vector<string> splitString(const string& str, char at)
 {
 	std::stringstream stream(str);
 	std::string item;
@@ -30,7 +30,7 @@ std::basic_istream<char> & readline(std::basic_istream<char> &stream, string &st
 	return ret;
 }
 
-std::string readline(std::basic_istream<char> &stream)
+string readline(std::basic_istream<char> &stream)
 {
 	string str;
 	readline(stream, str);

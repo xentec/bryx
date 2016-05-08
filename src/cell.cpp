@@ -4,63 +4,6 @@
 
 #include <unordered_map>
 
-// Direction
-//############
-Vec2 dir2vec(Direction dir)
-{
-	switch(dir)
-	{
-	case Direction::N:  return {0,-1};
-	case Direction::NE: return {1,-1};
-	case Direction::E:  return {1, 0};
-	case Direction::SE: return {1, 1};
-	case Direction::S:  return {0, 1};
-	case Direction::SW: return {-1,1};
-	case Direction::W:  return {-1,0};
-	case Direction::NW: return {-1,-1};
-	default:
-		return {0,0};
-	}
-}
-
-string dir2str(Direction dir)
-{
-	switch(dir)
-	{
-	case Direction::N:  return "N";
-	case Direction::NE: return "NE";
-	case Direction::E:  return "E";
-	case Direction::SE: return "SE";
-	case Direction::S:  return "S";
-	case Direction::SW: return "SW";
-	case Direction::W:  return "W";
-	case Direction::NW: return "NW";
-	default:
-		return "!";
-	}
-}
-
-Direction str2dir(std::string input)
-{
-	static std::unordered_map<string, Direction> tbl =
-	{
-		{"N", Direction::N},
-		{"NE", Direction::NE},
-		{"E", Direction::E},
-		{"SE", Direction::SE},
-		{"S", Direction::S},
-		{"SW", Direction::SW},
-		{"W", Direction::W},
-		{"NW", Direction::NW},
-	};
-
-	auto dir = tbl.find(input);
-	if(dir == tbl.end())
-		throw std::runtime_error(fmt::format("Direction {} invalid", input));
-	return dir->second;
-}
-
-
 // Cell
 //#######
 Cell::Cell(Map& map, Vec2 pos, Type type):
@@ -192,4 +135,61 @@ bool Cell::isValid(char ch)
 	default:
 		return Cell::Type::P1 <= ct && ct <= Cell::Type::P8;
 	}
+}
+
+
+// Direction
+//############
+Vec2 dir2vec(Direction dir)
+{
+	switch(dir)
+	{
+	case Direction::N:  return {0,-1};
+	case Direction::NE: return {1,-1};
+	case Direction::E:  return {1, 0};
+	case Direction::SE: return {1, 1};
+	case Direction::S:  return {0, 1};
+	case Direction::SW: return {-1,1};
+	case Direction::W:  return {-1,0};
+	case Direction::NW: return {-1,-1};
+	default:
+		return {0,0};
+	}
+}
+
+string dir2str(Direction dir)
+{
+	switch(dir)
+	{
+	case Direction::N:  return "N";
+	case Direction::NE: return "NE";
+	case Direction::E:  return "E";
+	case Direction::SE: return "SE";
+	case Direction::S:  return "S";
+	case Direction::SW: return "SW";
+	case Direction::W:  return "W";
+	case Direction::NW: return "NW";
+	default:
+		return "!";
+	}
+}
+
+Direction str2dir(std::string input)
+{
+	static std::unordered_map<string, Direction> tbl =
+	{
+		{"N", Direction::N},
+		{"NE", Direction::NE},
+		{"E", Direction::E},
+		{"SE", Direction::SE},
+		{"S", Direction::S},
+		{"SW", Direction::SW},
+		{"W", Direction::W},
+		{"NW", Direction::NW},
+	};
+
+	auto dir = tbl.find(input);
+	if(dir == tbl.end())
+		throw std::runtime_error(fmt::format("Direction {} invalid", input));
+	return dir->second;
 }
