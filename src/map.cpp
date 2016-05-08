@@ -1,7 +1,5 @@
 #include "map.h"
 
-#include "consoleformat.h"
-
 #include <cppformat/format.h>
 
 #include <unordered_map>
@@ -76,14 +74,16 @@ string Map::asString()
 
 void Map::print(bool colored, bool ansi) const
 {
-	std::unordered_map<const Cell*, ConsoleFormat> hl;
+	std::unordered_map<const Cell*, console::Format> hl;
 	print(hl, colored, ansi);
 }
 
 
 // TODO: color und ansi flags
-void Map::print(std::unordered_map<const Cell*,ConsoleFormat> highlight, bool colored, bool ansi) const
+void Map::print(std::unordered_map<const Cell*, console::Format> highlight, bool colored, bool ansi) const
 {
+	using namespace console;
+
 	string space = ansi ? "": " ";
 
 	fmt::print("   ");
@@ -105,7 +105,7 @@ void Map::print(std::unordered_map<const Cell*,ConsoleFormat> highlight, bool co
 		else
 			fmt::print(" | ");
 
-		ConsoleFormat color;
+		Format color;
 
 		for (usz x = 0; x < width; x++)
 		{

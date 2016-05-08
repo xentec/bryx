@@ -5,13 +5,13 @@
 #include "game.h"
 #include "util.h"
 
-#include "consoleformat.h"
+#include "console.h"
 
 #include <iostream>
 
 static void error(string what)
 {
-	fmt::print("{}ERR: {}{}\n", color::GRAY, what, color::RESET);
+	fmt::print("{}ERR: {}{}\n", console::color::GRAY, what, console::color::RESET);
 }
 
 Human::Human(Game &game, const string& name):

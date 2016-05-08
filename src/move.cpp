@@ -2,7 +2,7 @@
 
 #include "game.h"
 #include "map.h"
-#include "consoleformat.h"
+#include "console.h"
 
 Move::Move(Player& player, Cell* target):
 	player(player),
@@ -27,16 +27,18 @@ string Move::asString() const
 
 void Move::print() const
 {
+	using namespace console;
+
 	if(!target)
 		return;
 
-	ConsoleFormat c = color::YELLOW;
-	std::unordered_map<const Cell*, ConsoleFormat> hl;
+	Format c = color::YELLOW;
+	std::unordered_map<const Cell*, Format> hl;
 
-	c.setBG(ConsoleFormat::RED);
+	c.setBG(Format::RED);
 	hl.emplace(target, c);
 
-	c.setBG(ConsoleFormat::BLUE);
+	c.setBG(Format::BLUE);
 	for(auto& list: captures)
 	{
 		auto begin = list.begin();

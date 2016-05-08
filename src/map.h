@@ -3,7 +3,7 @@
 #include "global.h"
 
 #include "cell.h"
-#include "consoleformat.h"
+#include "console.h"
 #include "vector.h"
 #include "util.h"
 
@@ -26,7 +26,7 @@ struct Map
 	string asString();
 
 	void print(bool colored = true, bool ansi = true) const;
-	void print(std::unordered_map<const Cell*,ConsoleFormat> highlight, bool colored = true, bool ansi = true) const;
+	void print(std::unordered_map<const Cell*, console::Format> highlight, bool colored = true, bool ansi = true) const;
 
 	const u32 width, height;
 private:
