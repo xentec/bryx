@@ -64,7 +64,7 @@ Move Human::move()
 			continue;
 		}
 
-		move.err = game.evaluate(move);
+		game.evaluate(move);
 
 		move.print();
 

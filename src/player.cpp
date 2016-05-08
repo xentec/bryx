@@ -33,10 +33,10 @@ std::vector<Move> Player::possibleMoves()
 	for(Cell& c: game.map)
 	{
 		Move move { *this, &c };
-		move.err = game.evaluate(move);
+		game.evaluate(move);
 
 		if(move.err == Move::Error::NONE)
-			moves.push_back(move);
+			moves.push_back(std::move(move));
 	}
 
 	return moves;

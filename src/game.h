@@ -37,7 +37,7 @@ struct Game
 	bool hasEnded();
 	void run();
 
-	Move::Error evaluate(Move& move) const;
+	void evaluate(Move& move) const;
 	void execute(Move& move);
 
 	static Game load(std::istream& file);
