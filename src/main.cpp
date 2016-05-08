@@ -138,10 +138,8 @@ int main(int argc, char* argv[])
 	fmt::print("Players: {}\n", game.defaults.players);
 	fmt::print("Overrides: {}\n", game.defaults.overrides);
 	fmt::print("Bombs: {} ({})\n", game.defaults.bombs, game.defaults.bombsStrength);
-	fmt::print("Map: {}x{}\n", game.map->width, game.map->height);
-	game.map->print();
-
-	srand(time(NULL));
+	fmt::print("Map: {}x{}\n", game.map.width, game.map.height);
+	game.map.print();
 
 	switch(opts.mode)
 	{
@@ -231,7 +229,7 @@ int main(int argc, char* argv[])
 	fmt::print("\n########\n");
 	fmt::print("GAME SET\n");
 	fmt::print("########\n\n");
-	game.map->print();
+	game.map.print();
 
 	fmt::print("Moves: {}\n", game.stats.moves);
 	fmt::print("Scores:\n");

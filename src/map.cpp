@@ -8,6 +8,10 @@
 
 // Map
 //########
+Map::Map():
+	Map(1,1)
+{}
+
 Map::Map(u32 width, u32 height):
 	width(width), height(height)
 {

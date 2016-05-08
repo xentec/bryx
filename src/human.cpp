@@ -44,7 +44,7 @@ Move Human::move()
 			target.y = std::stoi(input);
 
 			fmt::print("VEC: {} \n", target);
-			move.target = &game->map->at(target);
+			move.target = &game->map.at(target);
 		} catch(std::out_of_range& ex)
 		{
 			error(ex.what());
@@ -74,7 +74,7 @@ Move Human::move()
 		{
 /*
 		case Move::Error::LINE_FULL:
-			game->map->print(hl);
+			game->map.print(hl);
 
 			fmt::print("Your move needs an override stone");
 			if(overrides == 0)

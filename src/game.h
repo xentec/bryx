@@ -1,18 +1,18 @@
 #pragma once
 
 #include "global.h"
+#include "map.h"
 #include "move.h"
 #include "player.h"
 
 struct Player;
-struct Map;
 
 struct Game
 {
-	Map* map;
+	Map map;
 	std::vector<Player*> players;
 
-	struct {
+	struct Defaults {
 		u32 players;
 		u32 overrides;
 		u32 bombs;
@@ -39,7 +39,7 @@ struct Game
 
 	static Game load(std::istream& file);
 private:
-	Game();
+	Game(Map map);
 
 	u32 currentPlayer;
 	u32 moveless;
