@@ -57,7 +57,7 @@ Move AI::move()
 Player& AI::choice()
 {
 	// TODO: better choice algo
-	return **std::max_element(game.players.begin(), game.players.end(), [](Player* a, Player* b) { return a->score() < b->score(); });
+	return **std::max_element(game.getPlayers().begin(), game.getPlayers().end(), [](Player* a, Player* b) { return a->score() < b->score(); });
 }
 
 void AI::bonus()

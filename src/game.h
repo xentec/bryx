@@ -9,10 +9,7 @@ struct Player;
 
 struct Game
 {
-	Map map;
-	std::vector<Player*> players;
-
-	struct Defaults {
+	struct {
 		u32 players;
 		u32 overrides;
 		u32 bombs;
@@ -34,6 +31,9 @@ struct Game
 	Player& addPlayer(Player* player);
 	Player& nextPlayer();
 
+	Map& getMap() const;
+	std::vector<Player*> getPlayers() const;
+
 	bool hasEnded();
 	void run();
 
@@ -42,7 +42,10 @@ struct Game
 
 	static Game load(std::istream& file);
 protected:
-	Game(Map&& map);
+	Game();
+
+	Map* map;
+	std::vector<Player*> players;
 
 	u32 currentPlayer;
 	u32 moveless;

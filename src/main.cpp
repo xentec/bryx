@@ -140,8 +140,8 @@ int main(int argc, char* argv[])
 	fmt::print("Players: {}\n", game.defaults.players);
 	fmt::print("Overrides: {}\n", game.defaults.overrides);
 	fmt::print("Bombs: {} ({})\n", game.defaults.bombs, game.defaults.bombsStrength);
-	fmt::print("Map: {}x{}\n", game.map.width, game.map.height);
-	game.map.print();
+	fmt::print("Map: {}x{}\n", game.getMap().width, game.getMap().height);
+	game.getMap().print();
 
 	switch(opts.mode)
 	{
@@ -180,9 +180,9 @@ int main(int argc, char* argv[])
 
 
 
-	std::vector<std::pair<Cell::Type, u32>> scores(game.players.size(), {Cell::Type::VOID,0});
+	std::vector<std::pair<Cell::Type, u32>> scores(game.getPlayers().size(), {Cell::Type::VOID,0});
 
-	for(Cell& c: game.map)
+	for(Cell& c: game.getMap())
 	{
 		if(c.isPlayer())
 		{
@@ -199,7 +199,7 @@ int main(int argc, char* argv[])
 	fmt::print("\n########\n");
 	fmt::print("GAME SET\n");
 	fmt::print("########\n\n");
-	game.map.print();
+	game.getMap().print();
 
 	fmt::print("Moves: {}\n", game.stats.moves);
 	fmt::print("Scores:\n");

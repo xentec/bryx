@@ -42,7 +42,7 @@ Move Human::move()
 			std::cin >> input;
 			target.y = std::stoi(input);
 
-			move.target = &game.map.at(target);
+			move.target = &game.getMap().at(target);
 		} catch(std::out_of_range& ex)
 		{
 			error(ex.what());
@@ -129,15 +129,15 @@ Player& Human::choice()
 	u32 desired = 1;
 	do
 	{
-		fmt::print("Select another players (or yours) color by entering his number (1-{}): ", game.players.size());
+		fmt::print("Select another players (or yours) color by entering his number (1-{}): ", game.getPlayers().size());
 
 		std::cin >> desired;
 
-		if(desired < 1 || game.players.size() < desired)
+		if(desired < 1 || game.getPlayers().size() < desired)
 		{
 			fmt::print("Your choice '{}' is not valid player!", desired);
 			continue;
 		}
 	} while(false);
-	return *game.players[desired-1];
+	return *game.getPlayers()[desired-1];
 }

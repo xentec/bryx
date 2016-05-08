@@ -22,7 +22,7 @@ Player::~Player()
 std::vector<Cell *> Player::stones()
 {
 	std::vector<Cell*> s;
-	for(Cell& c: game.map)
+	for(Cell& c: game.getMap())
 		s.push_back(&c);
 	return s;
 }
@@ -30,7 +30,7 @@ std::vector<Cell *> Player::stones()
 std::vector<Move> Player::possibleMoves()
 {
 	std::vector<Move> moves;
-	for(Cell& c: game.map)
+	for(Cell& c: game.getMap())
 	{
 		Move move { *this, &c };
 		game.evaluate(move);
@@ -46,7 +46,7 @@ u32 Player::score()
 {
 	u32 score = 0;
 
-	for(Cell& c: game.map)
+	for(Cell& c: game.getMap())
 		score += c.type == color;
 
 	return score;

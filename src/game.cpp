@@ -9,9 +9,9 @@
 
 #define VERBOSE 1
 
-Game::Game(Map&& map):
-	map(map),
+Game::Game():
 	defaults{ 0, 0, 0, 0 }, stats { 0, 0, 0 },
+	map(nullptr),
 	currentPlayer(0), moveless(0)
 {}
 
@@ -34,6 +34,16 @@ Player& Game::addPlayer(Player* player)
 Player& Game::nextPlayer()
 {
 	return *players[currentPlayer++ % players.size()];
+}
+
+Map& Game::getMap() const
+{
+	return *map;
+}
+
+std::vector<Player*> Game::getPlayers() const
+{
+	return players;
 }
 
 bool Game::hasEnded()
@@ -203,10 +213,10 @@ Game Game::load(std::istream& file)
 {
 	using std::stoi;
 
-	Game::Defaults defaults;
+	Game game;
 
-	defaults.players = stoi(readline(file));
-	defaults.overrides = stoi(readline(file));
+	game.defaults.players = stoi(readline(file));
+	game.defaults.overrides = stoi(readline(file));
 
 	std::vector<string> tmp;
 
@@ -215,15 +225,16 @@ Game Game::load(std::istream& file)
 	if(tmp.size() < 2)
 		throw std::runtime_error("bombs delimiter not found"); // TODO: better error messages placement
 
-	defaults.bombs = stoi(tmp[0]);
-	defaults.bombsStrength = stoi(tmp[1]);
+	game.defaults.bombs = stoi(tmp[0]);
+	game.defaults.bombsStrength = stoi(tmp[1]);
 
 	// Map size
 	tmp = splitString(readline(file), ' ');
 	if(tmp.size() < 2)
 		throw std::runtime_error("map dimensions delimiter not found");
 
-	Map map(stoi(tmp[1]), stoi(tmp[0]));
+	game.map = new Map(stoi(tmp[1]), stoi(tmp[0]));
+	Map& map = game.getMap();
 
 	for (i32 y = 0; y < map.height; y++)
 	{
@@ -271,7 +282,5 @@ Game Game::load(std::istream& file)
 		}
 	}
 
-	Game game(std::move(map));
-	game.defaults = defaults;
 	return game;
 }
