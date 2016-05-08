@@ -23,23 +23,26 @@ struct Game
 		u32 moves;
 		u32 overrides;
 		u32 inversions;
+
+		struct {
+			std::chrono::duration<double> moveAvg, moveMax;
+		} time;
 	} stats;
 
 	~Game();
 
-	void addPlayer(Player* player);
+	Player& addPlayer(Player* player);
 	Player& nextPlayer();
 
 	bool hasEnded();
 	void run();
 
-	Move::Error testMove(Move& move) const;
+	Move::Error evaluate(Move& move) const;
 	void execute(Move& move);
-	void pass();
 
 	static Game load(std::istream& file);
-private:
-	Game(Map map);
+protected:
+	Game(Map&& map);
 
 	u32 currentPlayer;
 	u32 moveless;

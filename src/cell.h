@@ -50,8 +50,6 @@ struct Cell
 
 	bool isFree() const;
 	bool isPlayer() const;
-	bool isPlayer(i32 player) const;
-	void setPlayer(i32 player);
 	bool isCaptureable() const;
 	bool isSpecial() const;
 

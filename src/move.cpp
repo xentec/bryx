@@ -6,53 +6,22 @@
 
 Move::Move(Player& player, Cell* target):
 	player(player),
-	target(target),
-	err(Error::NONE),
-	captures(), override(false)
-{}
-
-Move::Move(const Move& other):
-	player(other.player),
-	target(other.target),
-	err(other.err),
-	captures(other.captures), override(other.override)
+	target(target), override(false),
+	err(Error::NONE), captures()
 {}
 
 Move& Move::operator =(const Move& other)
 {
+	player = other.player;
 	target = other.target;
+	override = other.override;
 	err = other.err;
 	captures = other.captures;
-	override = other.override;
 	return *this;
-}
-
-u32 Move::score() const
-{
-	u32 score = 0;
-
-	for(const std::list<Cell*>& line: captures)
-	for(Cell* c: line)
-	{
-		switch(c->type)
-		{
-		case Cell::Type::BONUS: score += 10*(player.game->defaults.bombsStrength+5)/2; break;
-		case Cell::Type::CHOICE: score += 30; break;
-		case Cell::Type::INVERSION: score += 20; break;
-		case Cell::Type::EXPANSION: score += 1; break;
-		default:
-			score += 2;
-		}
-	}
-	if(override)
-		score /= 2;
-
-	return score;
 }
 
 string Move::asString() const
 {
-	//return fmt::format("{}:{} --> {}", start->pos, dir2str(dir), end ? end->pos : Vec2{-1,-1});
 	return target->asString();
 }
 

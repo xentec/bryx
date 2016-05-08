@@ -1,10 +1,12 @@
 #include "ai.h"
 
 #include "game.h"
+#include "map.h"
 
 u32 AI::nameNum = 1;
 
-AI::AI(): Player(fmt::format("bryx {}", nameNum++))
+AI::AI(Game &game):
+	Player(game, fmt::format("bryx {}", nameNum++))
 {}
 
 AI::~AI()
@@ -14,43 +16,40 @@ Move AI::move()
 {
 	std::vector<Move> moves = possibleMoves();
 
-	fmt::print("Possible moves: {}\n", moves.size());
-
-	u32 stoneSum = 0;
-	u32 stoneMax = 0;
+	u32 scoreSum = 0;
+	u32 scoreMax = 0;
 	std::vector<Move*> bestMoves;
 	for(Move& m: moves)
 	{
 		if(m.override)
 			continue;
 
-		int stones = m.captures.size();
-		stoneSum += stones;
-		if(stones > stoneMax)
+		int score = 0; // m.score();
+		scoreSum += score;
+		if(score > scoreMax)
 		{
-			bestMoves.clear();
-			stoneMax = stones;
+			if(!m.override)
+				bestMoves.clear();
+			scoreMax = score;
 			bestMoves.push_back(&m);
 			continue;
 		}
-		if(stones == stoneMax)
+		if(score == scoreMax)
 			bestMoves.push_back(&m);
 	}
 
-	Move move  { *this, nullptr, Direction::N };
+	Move move  { *this, nullptr };
 
-#if RANDOM
-	if(moves.size())
-	{
-		move = moves[moves.size() > 1 ? rand() % (moves.size()-1) : 0];
-	}
-#else
 	if(bestMoves.size())
 	{
-		//move = *bestMoves[0];
-		move = *bestMoves[bestMoves.size() > 1 ? rand() % (bestMoves.size()-1) : 0];
+		std::sort(bestMoves.begin(), bestMoves.end(),
+			[=](Move* a, Move* b)
+			{
+				return false; // a->score() > b->score();
+			});
+
+		move = *bestMoves.front();
 	}
-#endif
 
 	return move;
 }
@@ -58,24 +57,12 @@ Move AI::move()
 Player& AI::choice()
 {
 	// TODO: better choice algo
-	//return *game->players[rand() % game->players.size()];
-	u32 maxScore = 0;
-	Player *choice;
-	for(Player* p: game->players)
-	{
-		u32 s = p->score();
-		if(s > maxScore)
-		{
-			choice = p;
-			maxScore = s;
-		}
-	}
-	return *choice;
+	return **std::max_element(game.players.begin(), game.players.end(), [](Player* a, Player* b) { return a->score() < b->score(); });
 }
 
 void AI::bonus()
 {
-	if(/* TODO: extremly complex calculation */ rand() % 2)
+	if(/* TODO: extremly complex calculation */ 0 % 2)
 		bombs++;
 	else
 		overrides++;

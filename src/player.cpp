@@ -4,8 +4,8 @@
 #include "game.h"
 
 
-Player::Player(const string& name):
-	id(-1), name(name), overrides(0), bombs(0), game(nullptr)
+Player::Player(Game &game, const string& name):
+	id(-1), name(name), overrides(0), bombs(0), game(game)
 {}
 
 Player& Player::operator =(const Player& other)
@@ -19,15 +19,21 @@ Player& Player::operator =(const Player& other)
 Player::~Player()
 {}
 
+std::vector<Cell *> Player::stones()
+{
+	std::vector<Cell*> s;
+	for(Cell& c: game.map)
+		s.push_back(&c);
+	return s;
+}
+
 std::vector<Move> Player::possibleMoves()
 {
 	std::vector<Move> moves;
-	for(Cell& c: *game->map)
+	for(Cell& c: game.map)
 	{
 		Move move { *this, &c };
-		move.override = overrides && c.isCaptureable();
-
-		move.err = game->testMove(move);
+		move.err = game.evaluate(move);
 
 		if(move.err == Move::Error::NONE)
 			moves.push_back(move);
@@ -36,18 +42,12 @@ std::vector<Move> Player::possibleMoves()
 	return moves;
 }
 
-u32 Player::score(bool inventory)
+u32 Player::score()
 {
 	u32 score = 0;
-	if(inventory)
-	{
-		score += 2*bombs*game->defaults.bombsStrength;
-		score += 5*overrides;
-	}
 
-	for(Move& m: possibleMoves())
-	{
-		score += m.score();
-	}
+	for(Cell& c: game.map)
+		score += c.type == color;
+
 	return score;
 }

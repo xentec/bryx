@@ -20,10 +20,7 @@ struct Move
 	};
 
 	Move(Player& player, Cell* target);
-	Move(const Move& other);
 	Move& operator =(const Move& other);
-
-	u32 score() const;
 
 	string asString() const;
 	void print() const;

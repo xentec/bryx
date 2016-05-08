@@ -8,15 +8,14 @@
 #include "consoleformat.h"
 
 #include <iostream>
-#include <sstream>
 
 static void error(string what)
 {
 	fmt::print("{}ERR: {}{}\n", color::GRAY, what, color::RESET);
 }
 
-Human::Human(const string& name):
-	Player(name)
+Human::Human(Game &game, const string& name):
+	Player(game, name)
 {}
 
 Human::~Human()
@@ -43,8 +42,7 @@ Move Human::move()
 			std::cin >> input;
 			target.y = std::stoi(input);
 
-			fmt::print("VEC: {} \n", target);
-			move.target = &game->map.at(target);
+			move.target = &game.map.at(target);
 		} catch(std::out_of_range& ex)
 		{
 			error(ex.what());
@@ -54,10 +52,10 @@ Move Human::move()
 		{
 			error(ex.what());
 			fmt::print("Your move's direction is invalid! Choose from ");
-			for(u32 i = Direction::N; i < Direction::LAST-1; i++)
+			for(u32 i = Direction::N; i < Direction::_LAST-1; i++)
 				fmt::print("{}, ", dir2str(i));
 
-			fmt::print("{}.\n", dir2str(Direction::LAST-1));
+			fmt::print("{}.\n", dir2str(Direction::_LAST-1));
 			continue;
 		} catch(std::exception& ex)
 		{
@@ -66,7 +64,7 @@ Move Human::move()
 			continue;
 		}
 
-		move.err = game->testMove(move);
+		move.err = game.evaluate(move);
 
 		move.print();
 
@@ -131,15 +129,15 @@ Player& Human::choice()
 	u32 desired = 1;
 	do
 	{
-		fmt::print("Select another players (or yours) color by entering his number (1-{}): ", game->players.size());
+		fmt::print("Select another players (or yours) color by entering his number (1-{}): ", game.players.size());
 
 		std::cin >> desired;
 
-		if(desired < 1 || game->players.size() < desired)
+		if(desired < 1 || game.players.size() < desired)
 		{
 			fmt::print("Your choice '{}' is not valid player!", desired);
 			continue;
 		}
 	} while(false);
-	return *game->players[desired-1];
+	return *game.players[desired-1];
 }

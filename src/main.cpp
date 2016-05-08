@@ -12,6 +12,8 @@
 #include <iostream>
 #include <unordered_map>
 
+#define VERBOSE 1
+
 enum class Mode
 {
 	SPECTATE, PVP, CLIENT, UNKNOWN = 0xFF
@@ -145,7 +147,7 @@ int main(int argc, char* argv[])
 	{
 	case Mode::SPECTATE:
 		for(u32 i = 0; i < game.defaults.players; i++)
-			game.addPlayer(new AI());
+			game.addPlayer(new AI(game));
 		break;
 	case Mode::PVP:
 		fmt::print("\n");
@@ -154,18 +156,18 @@ int main(int argc, char* argv[])
 			fmt::print("Player {}: human (h) or computer (c)? ", i+1);
 			string input;
 			std::cin >> input;
+			Player *ply = nullptr;
 			if(input.size() && toLower(input)[0] == 'h')
 			{
 				fmt::print("Player {}, enter your name: ", i+1);
 				std::cin >> input;
-				game.addPlayer(new Human(input));
+				ply = &game.addPlayer(new Human(game, input));
 			} else
 			{
-				Player* ai = new AI();
-				ai->name.back() = '0'+i+1;
-				fmt::print("Player {} is {}\n", i+1, ai->name);
-				game.addPlayer(ai);
+				ply = &game.addPlayer(new AI(game));
 			}
+			fmt::print("Player {} is {}\n", ply->id, ply->name);
+
 		}
 		break;
 	case Mode::CLIENT:
@@ -174,45 +176,13 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
+	game.run();
 
-	do
-	{
-		Player& ply = game.nextPlayer();
 
-		fmt::print("\n");
-		fmt::print("Player {} {}\n", ply.id+1, ply.name);
-
-		fmt::print("##########");
-		for(usz i = 0; i < ply.name.size(); i++)
-			fmt::print("#");
-		fmt::print("\n");
-
-		fmt::print("Overrides: {}\n", ply.overrides);
-		fmt::print("Bombs: {}\n", ply.bombs);
-		fmt::print("\n");
-		fmt::print("State scores\n");
-		for(Player* p: game.players)
-			fmt::print("Player {}: {}\n", p->id+1, p->score());
-
-		Move move = ply.move();
-
-		if(!move.target)
-		{
-			fmt::print("No move\n");
-			game.pass();
-			continue;
-		}
-
-		fmt::print("\n\t{}\n\n", move.asString());
-
-		game.execute(move);
-		move.print();
-	}
-	while(!game.hasEnded());
 
 	std::vector<std::pair<Cell::Type, u32>> scores(game.players.size(), {Cell::Type::VOID,0});
 
-	for(Cell& c: *game.map)
+	for(Cell& c: game.map)
 	{
 		if(c.isPlayer())
 		{
@@ -237,6 +207,9 @@ int main(int argc, char* argv[])
 	{
 		fmt::print("{}. Player {}: {}\n", i+1, (char) scores[i].first, scores[i].second);
 	}
+
+	fmt::print("Longest move: {} ms\n", game.stats.time.moveMax.count() * 1000);
+	fmt::print("Average move: {} ms\n", game.stats.time.moveAvg.count() * 1000);
 
 	return 0;
 }

@@ -11,7 +11,7 @@ struct Move;
 
 struct Player
 {
-	Player(const string& name);
+	Player(Game& game, const string& name);
 	Player& operator =(const Player& other);
 	virtual ~Player();
 
@@ -19,14 +19,16 @@ struct Player
 	virtual Player& choice() = 0;
 	virtual void bonus() = 0;
 
+	std::vector<Cell*> stones();
 	std::vector<Move> possibleMoves();
-	u32 score(bool inventory = false);
+	u32 score();
 
 	u32 id;
 	string name;
 
+	Cell::Type color;
 	u32 overrides;
 	u32 bombs;
 
-	Game* game;
+	Game& game;
 };

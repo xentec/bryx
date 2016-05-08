@@ -53,20 +53,6 @@ bool Cell::isPlayer() const
 	return Cell::Type::P1 <= type && type <= Cell::Type::P8;
 }
 
-bool Cell::isPlayer(i32 player) const
-{
-	return type == player + Cell::Type::P1;
-}
-
-void Cell::setPlayer(i32 player)
-{
-	if(player > 8)
-		throw std::out_of_range("player index to high");
-	type = (Cell::Type) (player + Cell::Type::P1);
-}
-
-
-
 bool Cell::isCaptureable() const
 {
 	return type == Type::EXPANSION || isPlayer();
@@ -116,7 +102,7 @@ void Cell::addTransistion(Direction exit, Direction entry, Cell* target)
 	if(!target || target->type == Cell::Type::VOID)
 		throw std::runtime_error(fmt::format("transistion points to void cell ({})", target ? target->asString() : ""));
 
-	transitions[(usz) exit] = { target, entry }; // reverse out direction
+	transitions[(usz) exit] = { target, entry };
 }
 
 
