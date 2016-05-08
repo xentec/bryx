@@ -82,12 +82,13 @@ void Map::print(std::unordered_map<const Cell*,ConsoleFormat> highlight, bool co
 		else
 			fmt::print(" | ");
 
+		ConsoleFormat color;
+		string ch;
+		ch.reserve(1);
+
 		for (usz x = 0; x < width; x++)
 		{
 			const Cell& c = at(x, y);
-
-			ConsoleFormat color;
-			string ch;
 
 			if(colored)
 			{
@@ -127,16 +128,14 @@ void Map::print(std::unordered_map<const Cell*,ConsoleFormat> highlight, bool co
 				case Cell::Type::EXPANSION: ch = "x"; break;
 
 				default:
-					ch = (const char*) &c.type;
+					ch[0] = (char) c.type;
 				}
 			}
 
-			if(!highlight.empty())
-			{
-				const auto& hl = highlight.find(&c);
-				if(hl != highlight.cend())
-					color = hl->second;
-			}
+			const auto& hl = highlight.find(&c);
+			if(hl != highlight.cend())
+				color = hl->second;
+
 			fmt::print("{}{}{}{}", color, ch, color::RESET, space);
 		}
 		fmt::print("\n");
