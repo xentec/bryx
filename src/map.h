@@ -48,8 +48,8 @@ public:
 
 		iter& operator++()
 		{
-			if(++x == map.width)
-				x = 0, ++y;
+			if(++y == map.height)
+				y = 0, ++x;
 			return *this;
 		}
 		iter operator++(int)
