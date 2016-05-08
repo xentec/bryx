@@ -6,7 +6,7 @@
 
 // Cell
 //#######
-Cell::Cell(Map& map, Vec2 pos, Type type):
+Cell::Cell(Map& map, vec pos, Type type):
 	pos(pos), type(type), transitions(), map(map)
 {
 	transitions.fill({nullptr, Direction::N});
@@ -87,7 +87,7 @@ bool Cell::isSpecial() const
 
 Cell*Cell::getDirectNeighbor(Direction dir) const
 {
-	Vec2 dirPos = pos + dir2vec(dir);
+	vec dirPos = pos + dir2vec(dir);
 	return map.checkPos(dirPos) ? &map.at(dirPos) : nullptr;
 }
 
@@ -140,7 +140,7 @@ bool Cell::isValid(char ch)
 
 // Direction
 //############
-Vec2 dir2vec(Direction dir)
+vec dir2vec(Direction dir)
 {
 	switch(dir)
 	{

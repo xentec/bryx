@@ -22,14 +22,14 @@ Map::Map(u32 width, u32 height):
 		data.push_back(Cell(*this, {x, y}, Cell::Type::VOID));
 }
 
-Cell& Map::at(const Vec2 &pos)
+Cell& Map::at(const vec &pos)
 {
 	if(!checkPos(pos))
 		throw std::out_of_range(pos.asString());
 	return data[pos.x * height + pos.y];
 }
 
-const Cell& Map::at(const Vec2 &pos) const
+const Cell& Map::at(const vec &pos) const
 {
 	if(!checkPos(pos))
 		throw std::out_of_range(pos.asString());
@@ -143,9 +143,9 @@ void Map::print(std::unordered_map<const Cell*,ConsoleFormat> highlight, bool co
 }
 
 
-bool Map::checkPos(const Vec2& pos) const
+bool Map::checkPos(const vec& pos) const
 {
-	return inBox(pos, Vec2::O, {(i32)width-1, (i32)height-1});
+	return inBox(pos, {0,0}, {(i32)width-1, (i32)height-1});
 }
 
 Map::iterator<Cell> Map::begin()

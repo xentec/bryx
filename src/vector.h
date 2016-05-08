@@ -6,157 +6,102 @@
 #include <istream>
 #include <initializer_list>
 
-template<usz N, class T>
-struct Vector
+struct vec
 {
-	using vec = Vector<N,T>;
-
-	Vector(T init = 0)
+	inline vec(i32 init = 0)
 	{
-		for(T& e : data)
+		for(i32& e : data)
 			e = init;
 	}
 
-	Vector(const vec& other)
+	inline vec(const vec& other):
+		blob(other.blob)
+	{}
+
+	inline vec(std::initializer_list<i32> list)
 	{
-		for(u32 i = 0; i < N; i++)
-			data[i] = other[i];
+		auto i = list.begin();
+		x = *i++;
+		y = *i;
 	}
 
-	Vector(std::initializer_list<T> list)
-	{
-		if(list.size() != N)
-			throw std::logic_error("element number != vector size");
-
-		usz i = 0;
-		for(T e : list)
-			data[i++] = e;
-	}
-
-	T operator[](usz index) const
+	inline i32 operator[](usz index) const
 	{
 		return data[index];
 	}
 
-	T& operator[](usz index)
+	inline i32& operator[](usz index)
 	{
 		return data[index];
 	}
 
-	bool operator ==(const vec& other) const
+	inline bool operator ==(const vec& other) const
 	{
-		for(u32 i = 0; i < N; i++)
-		{
-			if(data[i] != other[i])
-				return false;
-		}
-
-		return true;
+		return blob == other.blob;
 	}
 
-	vec operator -() const
+	inline vec operator -() const
 	{
-		vec res;
-		for(u32 i = 0; i < N; i++)
-			res[i] = -data[i];
-
-		return res;
+		return { -x, -y };
 	}
 
-	vec operator +(const vec& other) const
+	inline vec operator +(const vec& other) const
 	{
-		vec res;
-		for(u32 i = 0; i < N; i++)
-			res[i] = data[i] + other[i];
-
-		return res;
+		return { x + other.x, y+other.y };
 	}
 
-	vec operator -(const vec& other) const
+	inline vec operator -(const vec& other) const
 	{
 		return *this + -other;
 	}
 
-	vec operator *(T other) const
+	inline vec operator *(i32 other) const
 	{
-		vec res;
-		for(u32 i = 0; i < N; i++)
-			res[i] = data[i] * other;
-
-		return res;
+		return { x*other, y*other };
 	}
 
-	T operator *(const vec& other) const
+	inline i32 operator *(const vec& other) const
 	{
-		T res;
-		for(u32 i = 0; i < N; i++)
-			res += data[i] * other[i];
-
-		return res;
+		return x*other.x + y*other.y;
 	}
 
-	string asString() const
+	inline string asString() const
 	{
-		fmt::MemoryWriter str;
-		str << "[" << data[0];
-
-		for(usz i = 1; i < N; i++)
-			str << ", " << data[i];
-
-		str << "]";
-		return str.str();
+		return fmt::format("[{}, {}]", x, y);
 	}
 
-	friend std::ostream &operator<<(std::ostream &os, const vec &vec)
+	inline friend std::ostream &operator<<(std::ostream &os, const vec &vec)
 	{
 		return os << vec.asString();
 	}
 
-	static const vec O;
-
 	union
 	{
-		T data[N];
+		u64 blob;
+		i32 data[2];
 		struct {
-			T x, y;
+			i32 x, y;
 		};
 	};
 };
 
-template<usz N, class T>
-const Vector<N,T> Vector<N,T>::O;
-
 namespace std {
-	template<usz N, class T>
-	struct hash<Vector<N,T>>
+	template<>
+	struct hash<vec>
 	{
-		typedef Vector<N,T> argument_type;
+		typedef vec argument_type;
 		typedef std::size_t result_type;
 		result_type operator()(argument_type const& o) const
 		{
-			result_type h = o[0];
-			for(usz i = 1; i < N; i++)
-				h ^= (o[i] << i);
-
-			return h;
+			return o.x ^ (o.y << 1);
 		}
 	};
 }
 
-using Vec2 = Vector<2, i32>;
 
-template<class CharT, class Traits, usz N, class T>
-std::basic_istream<CharT,Traits>& operator>>(std::basic_istream<CharT,Traits>& stream, Vector<N,T>& o)
+inline bool inBox(const vec& x, const vec& begin, const vec& end)
 {
-	for(u32 i = 0; i < N; i++)
-		stream >> o[i];
-	return stream;
-}
-
-template<usz N, class T>
-bool inBox(const Vector<N,T>& x, const Vector<N,T>& begin, const Vector<N,T>& end)
-{
-	for(usz i = 0; i < N; i++)
+	for(usz i = 0; i < 2; i++)
 		if(x[i] < begin[i] || end[i] < x[i])
 			return false;
 

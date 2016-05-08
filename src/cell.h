@@ -9,7 +9,7 @@ enum Direction : u8
 {
 	N, NE, E, SE, S, SW, W, NW, _LAST
 };
-Vec2 dir2vec(Direction dir);
+vec dir2vec(Direction dir);
 string dir2str(Direction dir);
 inline string dir2str(u32 i) { return dir2str((Direction) i); }
 Direction str2dir(string input);
@@ -41,7 +41,7 @@ struct Cell
 	};
 
 
-	Cell(Map &map, Vec2 pos, Type type);
+	Cell(Map &map, vec pos, Type type);
 
 	bool operator ==(const Cell& other) const;
 	bool operator !=(const Cell& other) const;
@@ -62,7 +62,7 @@ struct Cell
 	static bool isValid(char ch);
 
 
-	const Vec2 pos;
+	const vec pos;
 	Cell::Type type;
 	std::array<Transition, 8> transitions;
 

@@ -38,7 +38,7 @@ Move Human::move()
 			if(toLower(input) == "pass")
 				return move;
 
-			Vec2 target;
+			vec target;
 			target.x = std::stoi(input);
 			std::cin >> input;
 			target.y = std::stoi(input);

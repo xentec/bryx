@@ -19,8 +19,8 @@ struct Map
 	inline Cell& at(i32 x, i32 y) { return at({x, y}); }
 	inline const Cell& at(i32 x, i32 y) const  { return at({x, y}); }
 
-	Cell& at(const Vec2& pos);
-	const Cell& at(const Vec2& pos) const;
+	Cell& at(const vec& pos);
+	const Cell& at(const vec& pos) const;
 
 	string asString();
 
@@ -30,7 +30,7 @@ struct Map
 	const u32 width, height;
 private:
 	friend struct Cell;
-	bool checkPos(const Vec2& pos) const;
+	bool checkPos(const vec& pos) const;
 
 	std::vector<Cell> data;
 
