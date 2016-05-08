@@ -13,7 +13,7 @@ vec dir2vec(Direction dir);
 string dir2str(Direction dir);
 inline string dir2str(u32 i) { return dir2str((Direction) i); }
 Direction str2dir(string input);
-inline Direction dir180(Direction in) { return (Direction) ((Direction::_LAST/2+4) % (Direction::_LAST-1)); }
+inline Direction dir180(Direction in) { return (Direction) ((in+Direction::_LAST/2) % (Direction::_LAST-1)); }
 
 struct Map;
 
