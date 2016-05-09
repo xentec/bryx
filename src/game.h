@@ -26,7 +26,10 @@ struct Game
 		} time;
 	} stats;
 
+	Game();
 	~Game();
+
+	void load(std::istream& file);
 
 	Player& addPlayer(Player* player);
 	Player& nextPlayer();
@@ -40,10 +43,7 @@ struct Game
 	void evaluate(Move& move) const;
 	void execute(Move& move);
 
-	static Game load(std::istream& file);
 protected:
-	Game();
-
 	Map* map;
 	std::vector<Player*> players;
 

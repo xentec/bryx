@@ -209,14 +209,12 @@ void Game::execute(Move &move)
 	stats.moves++;
 }
 
-Game Game::load(std::istream& file)
+void Game::load(std::istream& file)
 {
 	using std::stoi;
 
-	Game game;
-
-	game.defaults.players = stoi(readline(file));
-	game.defaults.overrides = stoi(readline(file));
+	defaults.players = stoi(readline(file));
+	defaults.overrides = stoi(readline(file));
 
 	std::vector<string> tmp;
 
@@ -225,16 +223,16 @@ Game Game::load(std::istream& file)
 	if(tmp.size() < 2)
 		throw std::runtime_error("bombs delimiter not found"); // TODO: better error messages placement
 
-	game.defaults.bombs = stoi(tmp[0]);
-	game.defaults.bombsStrength = stoi(tmp[1]);
+	defaults.bombs = stoi(tmp[0]);
+	defaults.bombsStrength = stoi(tmp[1]);
 
 	// Map size
 	tmp = splitString(readline(file), ' ');
 	if(tmp.size() < 2)
 		throw std::runtime_error("map dimensions delimiter not found");
 
-	game.map = new Map(stoi(tmp[1]), stoi(tmp[0]));
-	Map& map = game.getMap();
+	map = new Map(stoi(tmp[1]), stoi(tmp[0]));
+	Map& map = getMap(); // shadowing on purpose
 
 	for (i32 y = 0; y < map.height; y++)
 	{
@@ -281,6 +279,4 @@ Game Game::load(std::istream& file)
 			fmt::print("error in transistion [{} <-> {}]: {}\n", from.asString(), to.asString(), e.what());
 		}
 	}
-
-	return game;
 }

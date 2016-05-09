@@ -133,7 +133,8 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	Game game = Game::load(file);
+	Game game;
+	game.load(file);
 
 	fmt::print("Done!\n");
 
