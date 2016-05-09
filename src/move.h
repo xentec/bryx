@@ -13,10 +13,9 @@ struct Move
 {
 	enum class Error
 	{
-		NONE,
+		NONE = 0,
 		WRONG_START,
 		NO_CONNECTIONS,
-		NO_STONES_CAPTURED,
 	};
 
 	Move(Player& player, Cell* target);

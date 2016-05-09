@@ -103,14 +103,14 @@ void Game::run()
 
 void Game::evaluate(Move& move) const
 {
+	move.err = Move::Error::NONE;
 	if(move.target->type == Cell::Type::VOID)
 	{
 		move.err = Move::Error::WRONG_START;
 		return;
 	}
 
-	if(move.target->isCaptureable())
-		move.override = true;
+	move.override = move.target->isCaptureable();
 
 	Direction banned = Direction::_LAST;
 
