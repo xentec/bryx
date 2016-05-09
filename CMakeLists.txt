@@ -12,10 +12,10 @@ if(${USE_LIBCXX})
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -Wall")
 endif()
 
-add_subdirectory(extern/cppformat)
+add_subdirectory(extern/fmt)
 
 list(APPEND LIBS
-	cppformat
+	fmt
 )
 
 if(${USE_LIBCXX})

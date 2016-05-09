@@ -1,6 +1,6 @@
 #include "console.h"
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 using namespace console;
 

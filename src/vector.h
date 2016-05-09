@@ -2,7 +2,8 @@
 
 #include "global.h"
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <istream>
 #include <initializer_list>
 

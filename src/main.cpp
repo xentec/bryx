@@ -5,7 +5,7 @@
 #include "ai.h"
 #include "human.h"
 
-#include <cppformat/format.h>
+#include <fmt/format.h>
 
 #include <fstream>
 #include <functional>

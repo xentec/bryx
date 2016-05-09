@@ -1,7 +1,6 @@
 #include "util.h"
 #include "map.h"
 
-#include <cppformat/format.h>
 #include <sstream>
 
 #ifdef _WIN32

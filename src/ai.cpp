@@ -3,6 +3,8 @@
 #include "game.h"
 #include "map.h"
 
+#include <algorithm>
+
 AI::AI(Game &game, u32 id):
 	Player(game, id, fmt::format("bryx {}", id))
 {}
