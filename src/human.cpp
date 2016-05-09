@@ -48,15 +48,6 @@ Move Human::move()
 			error(ex.what());
 			fmt::print("Your start position is outside the map!\n");
 			continue;
-		} catch(std::runtime_error& ex)
-		{
-			error(ex.what());
-			fmt::print("Your move's direction is invalid! Choose from ");
-			for(u32 i = Direction::N; i < Direction::_LAST-1; i++)
-				fmt::print("{}, ", dir2str(i));
-
-			fmt::print("{}.\n", dir2str(Direction::_LAST-1));
-			continue;
 		} catch(std::exception& ex)
 		{
 			error(ex.what());
@@ -68,30 +59,34 @@ Move Human::move()
 
 		move.print();
 
-		switch(move.err)
+		if(move.err != Move::Error::NONE)
 		{
-/*
-		case Move::Error::LINE_FULL:
-			game->map.print(hl);
+			fmt::print("You move is invalid: {}\n", Move::err2str(move.err));
+			continue;
+		}
 
+		if(move.override)
+		{
 			fmt::print("Your move needs an override stone");
 			if(overrides == 0)
 			{
 				fmt::print(", but you don't have any! Try something else or pass.\n");
+				continue;
 			} else
 			{
 				fmt::print(". If you want to use one, type 'y': ");
-				move.override = toLower(readline(std::cin)) == "y";
-				goto ret;
+				string input;
+				std::cin >> input;
+				if(toLower(input) != "y")
+				{
+					fmt::print("Aborted!\n");
+					continue;
+				}
 			}
-			break;
-*/		case Move::Error::NONE:	goto ret; break;
-		default:
-			fmt::print("You move is invalid: {}\n", Move::err2str(move.err));
 		}
+		break;
 	} while(true);
 
-ret:
 	return move;
 }
 
