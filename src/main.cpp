@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
 	{
 	case Mode::SPECTATE:
 		for(u32 i = 0; i < game.defaults.players; i++)
-			game.addPlayer(new AI(game));
+			game.addPlayer<AI>();
 		break;
 	case Mode::PVP:
 		fmt::print("\n");
@@ -158,14 +158,15 @@ int main(int argc, char* argv[])
 			string input;
 			std::cin >> input;
 			Player *ply = nullptr;
-			if(input.size() && toLower(input)[0] == 'h')
+			if(!input.empty() && toLower(input)[0] == 'h')
 			{
 				fmt::print("Player {}, enter your name: ", i+1);
 				std::cin >> input;
-				ply = &game.addPlayer(new Human(game, input));
+				ply = &game.addPlayer<Human>();
+				ply->name = input;
 			} else
 			{
-				ply = &game.addPlayer(new AI(game));
+				ply = &game.addPlayer<AI>();
 			}
 			fmt::print("Player {} is {}\n", ply->id, ply->name);
 

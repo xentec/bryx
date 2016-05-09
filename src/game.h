@@ -31,11 +31,12 @@ struct Game
 
 	void load(std::istream& file);
 
-	Player& addPlayer(Player* player);
+	template<class P>
+	Player& addPlayer();
 	Player& nextPlayer();
 
 	Map& getMap() const;
-	std::vector<Player*> getPlayers() const;
+	std::vector<Player*>& getPlayers();
 
 	bool hasEnded();
 	void run();
@@ -51,3 +52,17 @@ protected:
 	u32 moveless;
 };
 
+
+template<class P>
+Player& Game::addPlayer()
+{
+	if(players.size() == defaults.players)
+		throw std::runtime_error("game is full");
+
+	Player* player = new P(*this, players.size());
+	player->color = (Cell::Type) (Cell::Type::P1 + player->id);
+	player->bombs = defaults.bombs;
+	player->overrides = defaults.overrides;
+	players.push_back(player);
+	return *players.back();
+}

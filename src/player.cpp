@@ -4,13 +4,16 @@
 #include "game.h"
 
 
-Player::Player(Game &game, const string& name):
-	id(-1), name(name), overrides(0), bombs(0), game(game)
+Player::Player(Game &game, u32 id, const string& name):
+	id(id), name(name),
+	overrides(0), bombs(0),
+	game(game)
 {}
 
 Player& Player::operator =(const Player& other)
 {
 	id = other.id;
+	name = other.name;
 	overrides = other.overrides;
 	bombs = other.bombs;
 	return *this;

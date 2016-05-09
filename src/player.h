@@ -11,7 +11,7 @@ struct Move;
 
 struct Player
 {
-	Player(Game& game, const string& name);
+	Player(Game& game, u32 id, const string& name = "");
 	Player& operator =(const Player& other);
 	virtual ~Player();
 

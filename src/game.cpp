@@ -21,15 +21,7 @@ Game::~Game()
 		delete ply;
 }
 
-Player& Game::addPlayer(Player* player)
-{
-	player->id = players.size();
-	player->color = (Cell::Type) (Cell::Type::P1 + player->id);
-	player->bombs = defaults.bombs;
-	player->overrides = defaults.overrides;
-	players.push_back(player);
-	return *players.back();
-}
+
 
 Player& Game::nextPlayer()
 {
@@ -53,6 +45,8 @@ bool Game::hasEnded()
 
 void Game::run()
 {
+	if(players.size() < defaults.players)
+		throw std::runtime_error("not enough players");
 
 	std::chrono::time_point<std::chrono::system_clock> start, end;
 	std::chrono::duration<double> elapsed;
@@ -215,6 +209,8 @@ void Game::load(std::istream& file)
 
 	defaults.players = stoi(readline(file));
 	defaults.overrides = stoi(readline(file));
+
+	players.reserve(defaults.players);
 
 	std::vector<string> tmp;
 

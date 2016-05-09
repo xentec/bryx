@@ -3,10 +3,8 @@
 #include "game.h"
 #include "map.h"
 
-u32 AI::nameNum = 1;
-
-AI::AI(Game &game):
-	Player(game, fmt::format("bryx {}", nameNum++))
+AI::AI(Game &game, u32 id):
+	Player(game, id, fmt::format("bryx {}", id))
 {}
 
 AI::~AI()

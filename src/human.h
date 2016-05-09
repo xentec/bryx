@@ -5,7 +5,7 @@
 
 struct Human : Player
 {
-	Human(Game& game, const string& name);
+	Human(Game& game, u32 id);
 	virtual ~Human();
 
 	virtual Move move();
