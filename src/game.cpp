@@ -41,7 +41,7 @@ Map& Game::getMap() const
 	return *map;
 }
 
-std::vector<Player*> Game::getPlayers() const
+std::vector<Player*>& Game::getPlayers()
 {
 	return players;
 }
