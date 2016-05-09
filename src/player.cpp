@@ -26,7 +26,8 @@ std::vector<Cell *> Player::stones()
 {
 	std::vector<Cell*> s;
 	for(Cell& c: game.getMap())
-		s.push_back(&c);
+		if(c.type == color)
+			s.push_back(&c);
 	return s;
 }
 
