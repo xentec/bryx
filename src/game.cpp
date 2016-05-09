@@ -113,14 +113,13 @@ void Game::evaluate(Move& move) const
 	move.override = move.target->isCaptureable();
 
 	Direction banned = Direction::_LAST;
+	Cell* cp = move.target;
 
 	for(u32 dir = Direction::N; dir < Direction::_LAST; dir++)
 	{
 		Direction moveDir = (Direction) dir;
 		if(dir == banned)
 			continue;
-
-		Cell* cp = move.target;
 
 		std::list<Cell*> line;
 		Cell* cur = move.target->getNeighbor(moveDir);
