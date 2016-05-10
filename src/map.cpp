@@ -13,33 +13,31 @@ Map::Map():
 Map::Map(u32 width, u32 height):
 	width(width), height(height)
 {
-	data.reserve(width*height);
+	data.reserve(width*height); // valgrind hates this
 
 	for(i32 x = 0; x < width; x++)
 	for(i32 y = 0; y < height; y++)
-		data.push_back(Cell(*this, {x, y}, Cell::Type::VOID));
+		data.emplace_back(*this, vec{x, y}, Cell::Type::VOID);
 }
 
 Map::Map(const Map& other):
-	width(other.width), height(other.height)
+	Map(other.width, other.height)
 {
-	data.reserve(width*height);
-
 	for(i32 x = 0; x < width; x++)
 	for(i32 y = 0; y < height; y++)
 	{
 		const Cell& o = other.at(x,y);
-		Cell c(*this, {x, y}, o.type);
+		Cell& c = at(x, y);
+
+		c.type = o.type;
 		for(u32 dir = Direction::N; dir < Direction::_LAST; dir++)
 		{
-			const Cell::Transition& ot = o.transitions[dir];
-			if(!ot.target)
+			const Cell::Transition& trn = o.transitions[dir];
+			if(!trn.target)
 				continue;
 
-			Cell& trg = at(ot.target->pos);
-			c.transitions[dir] = Cell::Transition{ &trg, ot.entry };
+			c.transitions[dir] = Cell::Transition{ &at(trn.target->pos), trn.entry };
 		}
-		data.push_back(std::move(c));
 	}
 }
 
