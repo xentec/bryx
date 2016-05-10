@@ -2,6 +2,10 @@
 
 #include <fmt/format.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 using namespace console;
 
 Format::Format(u8 fg, Format::Attribute attr):

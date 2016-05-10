@@ -5,6 +5,8 @@
 #include "move.h"
 #include "player.h"
 
+#include <chrono>
+
 struct Player;
 
 struct Game
