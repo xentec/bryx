@@ -3,8 +3,6 @@
 #include "global.h"
 #include <fmt/ostream.h>
 
-#include <ostream>
-
 namespace console
 {
 

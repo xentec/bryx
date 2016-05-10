@@ -4,7 +4,6 @@
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
-#include <istream>
 #include <initializer_list>
 
 struct vec
@@ -71,7 +70,7 @@ struct vec
 		return fmt::format("[{}, {}]", x, y);
 	}
 
-	inline friend std::ostream &operator<<(std::ostream &os, const vec &vec)
+	inline friend std::ostream& operator<<(std::ostream &os, const vec &vec)
 	{
 		return os << vec.asString();
 	}
