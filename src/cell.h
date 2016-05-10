@@ -12,7 +12,6 @@ enum Direction : u8
 vec dir2vec(Direction dir);
 string dir2str(Direction dir);
 inline string dir2str(u32 i) { return dir2str((Direction) i); }
-Direction str2dir(string input);
 inline Direction dir180(Direction in) { return (Direction) ((in+Direction::_LAST/2) % (Direction::_LAST)); }
 
 struct Map;

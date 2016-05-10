@@ -2,12 +2,12 @@
 
 #include "map.h"
 
-#include <unordered_map>
+#include <fmt/format.h>
 
 // Cell
 //#######
 Cell::Cell(Map& map, vec pos, Type type):
-	pos(pos), type(type), transitions(), map(map)
+	pos(pos), type(type), map(map)
 {
 	transitions.fill({nullptr, Direction::N});
 }
@@ -21,16 +21,10 @@ bool Cell::operator !=(const Cell& other) const
 {
 	return !(*this == other);
 }
-/*
-bool Cell::operator <(const Cell& other) const
-{
-	return pos.y < other.pos.y ? true : pos.x < other.pos.x;
-}
-*/
 
 string Cell::asString() const
 {
-	return fmt::format("{}:'{}'", pos, (char) type);
+	return string(1, type);
 }
 
 
@@ -102,7 +96,7 @@ void Cell::addTransistion(Direction exit, Direction entry, Cell* target)
 	if(!target || target->type == Cell::Type::VOID)
 		throw std::runtime_error(fmt::format("transistion points to void cell ({})", target ? target->asString() : ""));
 
-	transitions[(usz) exit] = { target, entry };
+	transitions[exit] = { target, entry };
 }
 
 
@@ -158,24 +152,4 @@ string dir2str(Direction dir)
 	default:
 		return "!";
 	}
-}
-
-Direction str2dir(std::string input)
-{
-	static std::unordered_map<string, Direction> tbl =
-	{
-		{"N", Direction::N},
-		{"NE", Direction::NE},
-		{"E", Direction::E},
-		{"SE", Direction::SE},
-		{"S", Direction::S},
-		{"SW", Direction::SW},
-		{"W", Direction::W},
-		{"NW", Direction::NW},
-	};
-
-	auto dir = tbl.find(input);
-	if(dir == tbl.end())
-		throw std::runtime_error(fmt::format("Direction {} invalid", input));
-	return dir->second;
 }
