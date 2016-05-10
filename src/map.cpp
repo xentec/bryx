@@ -28,11 +28,11 @@ Map::Map(const Map& other):
 	for(i32 x = 0; x < width; x++)
 	for(i32 y = 0; y < height; y++)
 	{
-		Cell o = other.at(x,y);
+		const Cell& o = other.at(x,y);
 		Cell c(*this, {x, y}, o.type);
 		for(u32 dir = Direction::N; dir < Direction::_LAST; dir++)
 		{
-			Cell::Transition& ot = o.transitions[dir];
+			const Cell::Transition& ot = o.transitions[dir];
 			if(!ot.target)
 				continue;
 

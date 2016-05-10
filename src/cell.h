@@ -42,6 +42,7 @@ struct Cell
 
 
 	Cell(Map &map, vec pos, Type type);
+	Cell(Cell&& other) = default;
 
 	bool operator ==(const Cell& other) const;
 	bool operator !=(const Cell& other) const;
