@@ -9,6 +9,4 @@ struct AI : Player
 	virtual ~AI();
 
 	virtual Move move();
-	virtual void bonus();
-	virtual Player& choice();
 };

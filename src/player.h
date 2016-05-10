@@ -5,7 +5,6 @@
 
 #include <vector>
 
-struct Cell;
 struct Game;
 struct Move;
 
@@ -16,8 +15,6 @@ struct Player
 	virtual ~Player();
 
 	virtual Move move() = 0;
-	virtual Player& choice() = 0;
-	virtual void bonus() = 0;
 
 	std::vector<Cell*> stones();
 	std::vector<Move> possibleMoves();

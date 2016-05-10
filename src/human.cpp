@@ -87,52 +87,51 @@ Move Human::move()
 		break;
 	} while(true);
 
+	if(move.target)
+	{
+		switch(move.target->type)
+		{
+		case Cell::Type::BONUS:
+			fmt::print("You have hit a bonus stone!\n");
+			do
+			{
+				fmt::print("Choose between an extra bomb (b) or override stone (o): ");
+
+				string input;
+				std::cin >> input;
+				string choice = toLower(input);
+
+				if(choice == "b")
+					fmt::print("You have now {} bombs.", bombs+1);
+				else if(choice == "o")
+					fmt::print("You have now {} override stones.", overrides+1);
+				else
+				{
+					fmt::print("'{}' is not a valid choice!\n", input);
+					continue;
+				}
+				break;
+			} while(true);
+			break;
+		case Cell::Type::CHOICE:
+			fmt::print("You have hit a choice stone!\n");
+			do
+			{
+				fmt::print("Select another players (or yours) color by entering his number (1-{}): ", game.getPlayers().size());
+				u32 desired = 1;
+				std::cin >> desired;
+
+				if(desired < 1 || game.getPlayers().size() < desired)
+				{
+					fmt::print("Your choice '{}' is not valid player!", desired);
+					continue;
+				}
+			} while(false);
+			break;
+		default:
+			break;
+		}
+	}
+
 	return move;
-}
-
-void Human::bonus()
-{
-	fmt::print("You have hit a bonus stone!\n");
-	do
-	{
-		fmt::print("Choose between an extra bomb (b) or override stone (o): ");
-
-		string input;
-		std::cin >> input;
-		string choice = toLower(input);
-
-		if(choice == "b")
-		{
-			bombs++;
-			fmt::print("You have now {} bombs.", bombs);
-		}
-		else if(choice == "o")
-		{
-			overrides++;
-			fmt::print("You have now {} override stones.", overrides);
-		}	else
-		{
-			fmt::print("'{}' is not a valid choice!\n", input);
-			continue;
-		}
-	} while(false);
-}
-
-Player& Human::choice()
-{
-	fmt::print("You have hit a choice stone!\n");
-	u32 desired = 1;
-	do
-	{
-		fmt::print("Select another players (or yours) color by entering his number (1-{}): ", game.getPlayers().size());
-
-		std::cin >> desired;
-
-		if(desired < 1 || game.getPlayers().size() < desired)
-		{
-			fmt::print("Your choice '{}' is not valid player!", desired);
-			continue;
-		}
-	} while(false);
-	return *game.getPlayers()[desired-1];
 }

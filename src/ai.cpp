@@ -51,21 +51,25 @@ Move AI::move()
 		move = *bestMoves.front();
 	}
 
-	return move;
-}
-
-Player& AI::choice()
-{
-	// TODO: better choice algo
-	return **std::max_element(game.getPlayers().begin(), game.getPlayers().end(),
+	if(move.target)
+	{
+		switch(move.target->type)
+		{
+		case Cell::Type::BONUS:
+			// TODO: better choice algo
+			move.bonus = Move::Bonus::OVERRIDE;
+			break;
+		case Cell::Type::CHOICE:
+			// TODO: better choice algo
+			 move.choice =
+				*std::max_element(game.getPlayers().begin(), game.getPlayers().end(),
 					[](Player* a, Player* b) { return a->score() < b->score();
 				});
-}
+			break;
+		default:
+			break;
+		}
+	}
 
-void AI::bonus()
-{
-	if(/* TODO: extremly complex calculation */ 0 % 2)
-		bombs++;
-	else
-		overrides++;
+	return move;
 }

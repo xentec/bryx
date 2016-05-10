@@ -18,17 +18,23 @@ struct Move
 		NO_CONNECTIONS,
 	};
 
+	enum Bonus
+	{
+		BOMB = 20, OVERRIDE = 21
+	};
+
 	Move(Player& player, Cell* target);
 	Move& operator =(const Move& other);
 
 	string asString() const;
 	void print() const;
 
-
 	Player& player;
 
 	Cell *target;
 	bool override;
+	Bonus bonus;
+	Player* choice;
 
 	Error err;
 	std::vector<std::list<Cell*> > captures;

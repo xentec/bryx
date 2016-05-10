@@ -151,12 +151,15 @@ void Game::evaluate(Move& move) const
 
 void Game::execute(Move &move)
 {
-	if(move.captures.empty())
+	if(!move.target || move.captures.empty())
 	{
 		moveless++;
 		return;
 	} else
 		moveless = 0;
+
+	if(move.target->type == Cell::Type::VOID)
+		throw std::runtime_error("wrong target");
 
 	if(move.override)
 	{
@@ -179,15 +182,29 @@ void Game::execute(Move &move)
 	switch(targetCell) // ...then look at special cases
 	{
 	case Cell::Type::BONUS:
-		move.player.bonus();
+		switch(move.bonus)
+		{
+		case Move::BOMB:
+			move.player.bombs++;
+			break;
+		case Move::OVERRIDE:
+			move.player.overrides++;
+			break;
+		}
 		break;
 	case Cell::Type::CHOICE:
 	{
-		Player& swap = move.player.choice();
+		Player& swap = *move.choice;
 		if(move.player.color == swap.color)
 			break;
 
-		std::swap(swap.color, move.player.color);
+		for(Cell& c: getMap())
+		{
+			if(c.type == move.player.color)
+				c.type = swap.color;
+			else if(c.type == swap.color)
+				c.type = move.player.color;
+		}
 	}
 		break;
 	case Cell::Type::INVERSION:

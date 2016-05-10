@@ -9,6 +9,4 @@ struct Human : Player
 	virtual ~Human();
 
 	virtual Move move();
-	virtual void bonus();
-	virtual Player& choice();
 };
