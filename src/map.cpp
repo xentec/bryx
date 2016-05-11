@@ -1,7 +1,8 @@
 #include "map.h"
 
-#include <fmt/format.h>
+#include "util.h"
 
+#include <fmt/format.h>
 #include <unordered_map>
 
 // Map
@@ -186,4 +187,64 @@ Map::iterator<const Cell> Map::cbegin()
 Map::iterator<const Cell> Map::cend()
 {
 	return Map::iterator<const Cell>{ *this, width-1, height-1 };
+}
+
+Map Map::load(std::istream& file)
+{
+	using std::stoi;
+
+	// Map size
+	std::vector<string> tmp = splitString(readline(file), ' ');
+	if(tmp.size() < 2)
+		throw std::runtime_error("map dimensions delimiter not found");
+
+	Map map(stoi(tmp[1]), stoi(tmp[0]));
+
+	for (i32 y = 0; y < map.height; y++)
+	{
+		std::string line = readline(file);
+		usz lm = (line.length()+1)/2;
+
+		if(lm != map.width)
+			throw std::runtime_error(fmt::format("length of line {} does not match map width: {} != {}", y+5, lm, map.width));
+
+		for(i32 x = 0; x < line.length(); x += 2) // ignore spaces inbetween
+		{
+			char c = line[x];
+			if(!Cell::isValid(c))
+				throw std::runtime_error(fmt::format("invalid cell character '{}' found at {}:{}", c, y+5, x));
+
+			map.at(x/2, y).type = static_cast<Cell::Type>(c);
+		}
+	}
+
+	string line;
+	while(readline(file, line))
+	{
+		if(line.empty()) continue;
+
+		// Parse Transistion
+		tmp = splitString(line, ' ');
+
+		Cell &from = map.at(stoi(tmp.at(0)), stoi(tmp.at(1))),
+			   &to = map.at(stoi(tmp.at(4)), stoi(tmp.at(5)));
+
+		Direction exit = static_cast<Direction>(stoi(tmp.at(2))),
+				 entry = static_cast<Direction>(stoi(tmp.at(6)));
+
+		try {
+			from.addTransistion(exit, dir180(entry), &to);
+			to.addTransistion(entry, dir180(exit), &from);
+		}
+		catch(std::out_of_range& e)
+		{
+			fmt::print("error in transistion [{} <-> {}]: position is outside the map [{}]\n", from.asString(), to.asString(), e.what());
+		}
+		catch(std::exception& e)
+		{
+			fmt::print("error in transistion [{} <-> {}]: {}\n", from.asString(), to.asString(), e.what());
+		}
+	}
+
+	return map;
 }

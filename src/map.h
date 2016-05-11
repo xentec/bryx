@@ -28,6 +28,8 @@ struct Map
 	void print(bool colored = true, bool ansi = true) const;
 	void print(std::unordered_map<const Cell*, console::Format> highlight, bool colored = true, bool ansi = true) const;
 
+	static Map load(std::istream& file);
+
 	const u32 width, height;
 private:
 	friend struct Cell;
