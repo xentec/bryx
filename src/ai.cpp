@@ -63,7 +63,7 @@ Move AI::move()
 			// TODO: better choice algo
 			 move.choice =
 				*std::max_element(game.getPlayers().begin(), game.getPlayers().end(),
-					[](Player* a, Player* b) { return a->score() < b->score();
+					[](Player* a, Player* b) { return a->stones().size() < b->stones().size();
 				});
 			break;
 		default:

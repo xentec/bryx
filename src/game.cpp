@@ -67,9 +67,6 @@ void Game::run()
 		fmt::print("Overrides: {}\n", ply.overrides);
 		fmt::print("Bombs: {}\n", ply.bombs);
 		fmt::print("\n");
-		fmt::print("State scores\n");
-		for(Player* p: players)
-			fmt::print("Player {}: {}\n", p->id+1, p->score());
 #endif
 		start = std::chrono::system_clock::now();
 		Move move = ply.move();

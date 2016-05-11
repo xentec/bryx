@@ -18,7 +18,6 @@ struct Player
 
 	std::vector<Cell*> stones();
 	std::vector<Move> possibleMoves();
-	u32 score();
 
 	u32 id;
 	string name;

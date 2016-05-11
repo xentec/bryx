@@ -46,12 +46,3 @@ std::vector<Move> Player::possibleMoves()
 	return moves;
 }
 
-u32 Player::score()
-{
-	u32 score = 0;
-
-	for(Cell& c: game.getMap())
-		score += c.type == color;
-
-	return score;
-}
