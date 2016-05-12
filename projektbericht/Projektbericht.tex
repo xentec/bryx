@@ -9,7 +9,8 @@
 % Titelseite
 % ----------------------------------------------------------------------------------------------------------
 \MyTitlepage[pics/gamefield02]{G01}{
-\texttt{andrej.utz@st.oth-regensburg.de}}
+\texttt{andrej.utz@st.oth-regensburg.de}\\
+\texttt{simon1.goldmann@st.oth-regensburg.de}}
 {??.06.\the\year} % FIXME optional: Gruppenlogo als PNG, Pflichtfelder: Gruppe, Authoren durch "\\" getrennt und Abgabedatum eingeben
 
 \setcounter{page}{1} 
@@ -50,7 +51,11 @@
 YIMB oder \glqq Implementierung von Brettspielen am Beispiel ReversiXT\grqq{} stellt ein Gruppensoftwareprojekt dar, das für diverse Aspekte eines 
 Informatikstudiengangs ein Praktikum bietet. Ein Programm, das eine Modifikation von Reversi - ReversiXT - implementiert, soll auch eine künstliche 
 Intelligenz beinhalten, die sich über das Netzwerk mit anderen K.I. messen soll. Algorithmen und Datenstrukturen sowie Netzwerkprogrammierung sind 
-damit die am häufigsten beanspruchten Gebiete der Informatik in der Umsetzung des Projekts.
+damit die am häufigsten beanspruchten Gebiete der Informatik in der Umsetzung des Projekts.\newline
+Wir haben YIMB als Y-Fach gewählt, da es -wie bereits erwähnt- mehrere wichtige Bereiche der Informatik abdeckt. Zudem bietet es die Möglichkeit unser Wissen in, für die Technische Informatik relevanten Programmiersprachen zu vertiefen. Auch die betreute, vollständige Umsetzung eines Projekts sollte sich für die Zukunft, unter anderem im Hinblick auf die kommende Bachelor-Arbeit positiv auswirken. Zusätzlich erfordert dieses Projekt, dass man sich in \glqq LaTeX\grqq einarbeitet.
+
+
+In Reversi geht es darum die Spielsteine des Gegenspielers zu übernehmen. Spielsteine werden übernommen, wenn sie durch die Steine des Gegners eingekesselt sind. Im ursprünglichen Reversi spielen zwei Spieler gegeneinander, in der Erweiterung hingegen sind bis zu acht Spieler beteiligt. Auch das quadratische Spielfeld ist in der Erweiterung stark modifiziert in Form als auch in Funktion. Zum einen werden neue Sonderfelder und Sondersteine eingeführt, zum anderen werden an Spielfeldrändern Transitionen eingebaut.\newline Zu diesen Bonusfeldern gehören Choice-, Inversions-, Expansions- und Bonusfelder. Diese Sonderfelder werden zunächst wie normale Felder behandelt, das heißt es wird zuerst ganz normal umgefärbt, und dann treten die jeweiligen Sondereffekte auf. Bei Choice-Feldern darf man die Steine mit einem beliebigen Spieler tauschen. Inversionsfelder färben die Spielsteine aller Spieler in die Farbe des jeweiligen nachfolgenden Spielers. Expansionsfelder sind Felder die durch einen übernehmbaren Nicht-Spieler Spielstein besetzt sind. Bonusfelder geben je nach Wahl eine zusätzliche Bombe oder einen Überschreibstein.\newline Die Sondersteine setzen sich aus Überschreibsteinen und Bomben -welche in der Bombenphase Verwendung finden- zusammen. Überschreibsteine können direkt auf besetzte Felder gesetzt werden. Dabei müssen sie, sofern es sich nicht um einen Expansionsstein handelt, weitere besetzte Felder umfärben.Die Bombenphase findet statt, sobald kein Spieler mehr Steine oder Überschreib-Steine setzen kann. In dieser Phase werden Bombensteine auf besetzte oder unbesetzte Spielfelder, dabei werden alle Felder in einem vorgegebenen Radius gelöscht. Jeder Spieler hat am Anfang eine Vorgegebene Anzahl an Bomben und Überschreibsteinen.
 
 % TODO ggf neuschreiben
 
