@@ -139,6 +139,8 @@ void Game::execute(Move &move)
 		case Move::OVERRIDE:
 			move.player.overrides++;
 			break;
+		default:
+			break;
 		}
 		break;
 	case Cell::Type::CHOICE:

@@ -20,7 +20,7 @@ struct Move
 
 	enum Bonus
 	{
-		BOMB = 20, OVERRIDE = 21
+		NONE = 0, BOMB = 20, OVERRIDE = 21
 	};
 
 	Move(Player& player, Cell* target);

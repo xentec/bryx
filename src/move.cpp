@@ -7,7 +7,7 @@
 Move::Move(Player& player, Cell* target):
 	player(player),
 	target(target), override(false),
-	bonus(OVERRIDE), choice(nullptr),
+	bonus(NONE), choice(nullptr),
 	err(Error::NONE), captures()
 {}
 
