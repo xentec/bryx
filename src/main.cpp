@@ -1,5 +1,6 @@
 #include "map.h"
 #include "game.h"
+#include "client.h"
 #include "util.h"
 
 #include "ai.h"
@@ -103,6 +104,7 @@ void parseArgs(Options& opts, i32 argc, char* argv[])
 	case Mode::CLIENT:
 		if(argc < 3)
 			throw std::runtime_error("no host or IP specified");
+		opts.host = argv[2];
 		break;
 	default:
 		throw std::runtime_error("invalid mode: " + string(argv[1]));
@@ -124,95 +126,108 @@ int main(int argc, char* argv[])
 
 	fmt::print("Bryx - a ReversiXT implementation\n");
 	fmt::print("Mode: {}\n", mode2str(opts.mode));
-	fmt::print("Loading map {} ... ", opts.mapPath);
-
-	std::ifstream file( opts.mapPath);
-	if (!file)
+	std::cout.flush();
+	
+	if(opts.mode != Mode::CLIENT)
 	{
-		fmt::print("FAILED!\n");
-		fmt::print("File '{}' cannot be read\n",  opts.mapPath);
-		return 0;
-	}
+		fmt::print("Loading map {} ... ", opts.mapPath);
 
-	Game game;
-	game.load(file);
-
-	fmt::print("Done!\n");
-
-	fmt::print("Players: {}\n", game.defaults.players);
-	fmt::print("Overrides: {}\n", game.defaults.overrides);
-	fmt::print("Bombs: {} ({})\n", game.defaults.bombs, game.defaults.bombsStrength);
-	fmt::print("Map: {}x{}\n", game.getMap().width, game.getMap().height);
-	game.getMap().print();
-
-	switch(opts.mode)
-	{
-	case Mode::SPECTATE:
-		for(u32 i = 0; i < game.defaults.players; i++)
-			game.addPlayer<AI>();
-		break;
-	case Mode::PVP:
-		fmt::print("\n");
-		for(u32 i = 0; i < game.defaults.players; i++)
+		std::ifstream file( opts.mapPath);
+		if (!file)
 		{
-			fmt::print("Player {}: human (h) or computer (c)? ", i+1);
-			string input;
-			std::cin >> input;
-			Player *ply = nullptr;
-			if(!input.empty() && toLower(input)[0] == 'h')
+			fmt::print("FAILED!\n");
+			fmt::print("File '{}' cannot be read\n",  opts.mapPath);
+			return 0;
+		}
+
+		Game game;
+		game.load(file);
+
+		fmt::print("Done!\n");
+
+		fmt::print("Players: {}\n", game.defaults.players);
+		fmt::print("Overrides: {}\n", game.defaults.overrides);
+		fmt::print("Bombs: {} ({})\n", game.defaults.bombs, game.defaults.bombsStrength);
+		fmt::print("Map: {}x{}\n", game.getMap().width, game.getMap().height);
+		game.getMap().print();
+
+
+		switch(opts.mode)
+		{
+		case Mode::SPECTATE:
+			for(u32 i = 0; i < game.defaults.players; i++)
+				game.addPlayer<AI>();
+			break;
+		case Mode::PVP:
+			fmt::print("\n");
+			for(u32 i = 0; i < game.defaults.players; i++)
 			{
-				fmt::print("Player {}, enter your name: ", i+1);
+				fmt::print("Player {}: human (h) or computer (c)? ", i+1);
+				string input;
+
 				std::cin >> input;
-				ply = &game.addPlayer<Human>();
-				ply->name = input;
-			} else
-			{
-				ply = &game.addPlayer<AI>();
+				Player *ply = nullptr;
+				if(!input.empty() && toLower(input)[0] == 'h')
+				{
+					fmt::print("Player {}, enter your name: ", i+1);
+					std::cin >> input;
+					ply = &game.addPlayer<Human>();
+					ply->name = input;
+				} else
+				{
+					ply = &game.addPlayer<AI>();
+				}
+				fmt::print("Player {} is {}\n", type2ply(ply->color), ply->name);
+
 			}
-			fmt::print("Player {} is {}\n", ply->id, ply->name);
-
+			break;
+		default:
+			return 0;
 		}
-		break;
-	case Mode::CLIENT:
-		fmt::print("not implemented yet\n");
-	default:
-		return 0;
-	}
 
-	game.run();
+		game.run();
 
+		std::vector<std::pair<Cell::Type, u32>> scores(game.getPlayers().size(), {Cell::Type::VOID,0});
 
-
-	std::vector<std::pair<Cell::Type, u32>> scores(game.getPlayers().size(), {Cell::Type::VOID,0});
-
-	for(Cell& c: game.getMap())
-	{
-		if(c.isPlayer())
+		for(Cell& c: game.getMap())
 		{
-			auto& e = scores[(usz)c.type - (usz)Cell::Type::P1];
-			e.first = c.type;
-			e.second++;
+			if(c.isPlayer())
+			{
+				auto& e = scores[(usz)c.type - (usz)Cell::Type::P1];
+				e.first = c.type;
+				e.second++;
+			}
+		}
+		std::sort(scores.begin(), scores.end(), [=](std::pair<Cell::Type, u32>& a, std::pair<Cell::Type, u32>& b)
+		{
+			return a.second > b.second;
+		});
+
+		fmt::print("\n########\n");
+		fmt::print("GAME SET\n");
+		fmt::print("########\n\n");
+		game.getMap().print();
+
+		fmt::print("Moves: {}\n", game.stats.moves);
+		fmt::print("Scores:\n");
+		for(usz i = 0; i < scores.size(); i++)
+		{
+			fmt::print("{}. Player {}: {}\n", i+1, (char) scores[i].first, scores[i].second);
+		}
+
+		fmt::print("Longest move: {} ms\n", game.stats.time.moveMax.count() * 1000);
+		fmt::print("Average move: {} ms\n", game.stats.time.moveAvg.count() * 1000);
+	}
+	else
+	{
+		Client client;
+		try
+		{
+			client.join(opts.host);
+		}catch (const std::exception& ex)
+		{
+			fmt::print(stderr, "Failed to join the game: {}\n", ex.what());
 		}
 	}
-	std::sort(scores.begin(), scores.end(), [=](std::pair<Cell::Type, u32>& a, std::pair<Cell::Type, u32>& b)
-	{
-		return a.second > b.second;
-	});
-
-	fmt::print("\n########\n");
-	fmt::print("GAME SET\n");
-	fmt::print("########\n\n");
-	game.getMap().print();
-
-	fmt::print("Moves: {}\n", game.stats.moves);
-	fmt::print("Scores:\n");
-	for(usz i = 0; i < scores.size(); i++)
-	{
-		fmt::print("{}. Player {}: {}\n", i+1, (char) scores[i].first, scores[i].second);
-	}
-
-	fmt::print("Longest move: {} ms\n", game.stats.time.moveMax.count() * 1000);
-	fmt::print("Average move: {} ms\n", game.stats.time.moveAvg.count() * 1000);
-
 	return 0;
 }
