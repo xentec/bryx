@@ -43,7 +43,6 @@ struct Game
 	bool hasEnded();
 	void run();
 
-	void evaluate(Move& move) const;
 	void execute(Move& move);
 
 protected:
@@ -60,7 +59,7 @@ Player& Game::addPlayer()
 {
 	if(players.size() == defaults.players)
 		throw std::runtime_error("game is full");
-
+	
 	Player* player = new P(*this, ply2type(players.size()+1));
 	player->bombs = defaults.bombs;
 	player->overrides = defaults.overrides;

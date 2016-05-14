@@ -37,12 +37,60 @@ std::vector<Move> Player::possibleMoves()
 	for(Cell& c: game.getMap())
 	{
 		Move move { *this, &c };
-		game.evaluate(move);
+		evaluate(move);
 
 		if(move.err == Move::Error::NONE)
 			moves.push_back(std::move(move));
 	}
 
 	return moves;
+}
+
+void Player::evaluate(Move& move) const
+{
+	move.err = Move::Error::NONE;
+	if(move.target->type == Cell::Type::VOID)
+	{
+		move.err = Move::Error::WRONG_START;
+		return;
+	}
+
+	move.override = move.target->isCaptureable();
+
+	Direction banned = Direction::_LAST;
+	Cell* cp = move.target;
+
+	for(u32 dir = Direction::N; dir < Direction::_LAST; dir++)
+	{
+		Direction moveDir = (Direction) dir;
+		if(dir == banned)
+			continue;
+
+		std::list<Cell*> line;
+		Cell* cur = move.target->getNeighbor(moveDir);
+		while(cur && cur->isCaptureable())
+		{
+			if(cur->type == move.player.color)
+			{
+				if(!line.empty())
+					move.captures.push_back(line);
+				break;
+			}
+
+			if(cp == cur) // we're in a loop!
+			{
+				 // do not try the same dir you came from while looping
+				banned = dir180(moveDir);
+				break;
+			}
+
+			line.push_back(cur);
+			cur = cur->getNeighbor(moveDir);
+		}
+	}
+
+	if(move.captures.empty())
+		move.err =  Move::Error::NO_CONNECTIONS;
+	return;
 }
 

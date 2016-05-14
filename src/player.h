@@ -19,7 +19,8 @@ struct Player
 	std::vector<Cell*> stones();
 	std::vector<Move> possibleMoves();
 
-	u32 id;
+	void evaluate(Move& move) const;
+
 	string name;
 
 	Cell::Type color;
