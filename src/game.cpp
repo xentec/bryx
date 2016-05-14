@@ -182,10 +182,8 @@ void Game::load(std::istream& file)
 
 	players.reserve(defaults.players);
 
-	std::vector<string> tmp;
-
 	// Bombs
-	tmp = splitString(readline(file), ' ');
+	auto tmp = splitString(readline(file), ' ');
 	if(tmp.size() < 2)
 		throw std::runtime_error("bombs delimiter not found"); // TODO: better error messages placement
 

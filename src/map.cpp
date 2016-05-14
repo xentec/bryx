@@ -56,8 +56,10 @@ const Cell& Map::at(const vec &pos) const
 	return data[pos.x * height + pos.y];
 }
 
-string Map::asString()
+string Map::asString(bool transistions)
 {
+	// TODO: Transistions
+
 	fmt::MemoryWriter str;
 	for(usz y = 0; y < height; y++)
 	{
