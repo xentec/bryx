@@ -4,6 +4,18 @@
 #include "map.h"
 
 #include <algorithm>
+#include <numeric>
+
+
+static i32 scoreOf(const Move& move)
+{
+	return std::accumulate(move.captures.begin(), move.captures.end(),
+							0, [](i32 sum, std::list<Cell*> line)
+	{
+		return sum + line.size();
+	});
+}
+
 
 AI::AI(Game &game, Cell::Type color):
 	Player(game, color, fmt::format("bryx {}", color))
@@ -16,15 +28,13 @@ Move AI::move()
 {
 	std::vector<Move> moves = possibleMoves();
 
-	u32 scoreSum = 0;
-	u32 scoreMax = 0;
+	i32 scoreSum = 0;
+	i32 scoreMax = 0;
 	std::vector<Move*> bestMoves;
 	for(Move& m: moves)
 	{
-		if(m.override)
-			continue;
+		i32 score = scoreOf(m);
 
-		int score = 0; // m.score();
 		scoreSum += score;
 		if(score > scoreMax)
 		{
@@ -34,7 +44,7 @@ Move AI::move()
 			bestMoves.push_back(&m);
 			continue;
 		}
-		if(score == scoreMax)
+		if(score == scoreMax && m.override == bestMoves.front()->override)
 			bestMoves.push_back(&m);
 	}
 
@@ -45,7 +55,7 @@ Move AI::move()
 		std::sort(bestMoves.begin(), bestMoves.end(),
 			[=](Move* a, Move* b)
 			{
-				return false; // a->score() > b->score();
+				return scoreOf(*a) > scoreOf(*b);
 			});
 
 		move = *bestMoves.front();
