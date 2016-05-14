@@ -5,7 +5,7 @@
 
 struct AI : Player
 {
-	AI(Game& game, u32 id); // TODO: maybe difficulty setting
+	AI(Game& game, Cell::Type color); // TODO: maybe difficulty setting
 	virtual ~AI();
 
 	virtual Move move();

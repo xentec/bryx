@@ -5,8 +5,8 @@
 
 #include <algorithm>
 
-AI::AI(Game &game, u32 id):
-	Player(game, id, fmt::format("bryx {}", id))
+AI::AI(Game &game, Cell::Type color):
+	Player(game, color, fmt::format("bryx {}", color))
 {}
 
 AI::~AI()

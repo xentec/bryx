@@ -4,15 +4,15 @@
 #include "game.h"
 
 
-Player::Player(Game &game, u32 id, const string& name):
-	id(id), name(name),
-	overrides(0), bombs(0),
+Player::Player(Game &game, Cell::Type color, const string& name):
+	name(name),
+	color(color), overrides(0), bombs(0),
 	game(game)
 {}
 
 Player& Player::operator =(const Player& other)
 {
-	id = other.id;
+	color = other.color;
 	name = other.name;
 	overrides = other.overrides;
 	bombs = other.bombs;

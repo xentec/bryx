@@ -5,7 +5,7 @@
 
 struct Human : Player
 {
-	Human(Game& game, u32 id);
+	Human(Game& game, Cell::Type color);
 	virtual ~Human();
 
 	virtual Move move();

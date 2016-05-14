@@ -57,7 +57,7 @@ void Game::run()
 		Player& ply = nextPlayer();
 #if VERBOSE
 		fmt::print("\n");
-		fmt::print("Player {} {}\n", ply.id+1, ply.name);
+		fmt::print("Player {} {}\n", type2ply(ply.color), ply.name);
 
 		fmt::print("##########");
 		for(usz i = 0; i < ply.name.size(); i++)
@@ -205,8 +205,11 @@ void Game::execute(Move &move)
 	}
 		break;
 	case Cell::Type::INVERSION:
-		for(Player* ply: players)
-			ply->id = (ply->id +1) % players.size();
+		for(Cell& c: getMap())
+		{
+			if(c.isPlayer())
+				c.type = ply2type((type2ply(c.type)) % players.size() - 1);
+		}
 
 		stats.inversions++;
 		break;

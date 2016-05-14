@@ -14,8 +14,8 @@ static void error(string what)
 	fmt::print("{}ERR: {}{}\n", console::color::GRAY, what, console::color::RESET);
 }
 
-Human::Human(Game &game, u32 id):
-	Player(game, id)
+Human::Human(Game &game, Cell::Type color):
+	Player(game, color)
 {}
 
 Human::~Human()

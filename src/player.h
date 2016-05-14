@@ -10,7 +10,7 @@ struct Move;
 
 struct Player
 {
-	Player(Game& game, u32 id, const string& name = "");
+	Player(Game& game, Cell::Type color, const string& name = "");
 	Player& operator =(const Player& other);
 	virtual ~Player();
 
