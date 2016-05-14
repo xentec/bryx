@@ -38,6 +38,41 @@ string readline(std::basic_istream<char> &stream)
 
 string toLower(string str)
 {
-	for(char& c: str) c = tolower(c);
+	for(char& c: str) c = static_cast<char>(tolower(c));
 	return str;
+}
+
+Scope::Scope(Scope::Callback cb)
+{
+	cbs.push(cb);
+}
+
+Scope::~Scope()
+{
+	while(!cbs.empty())
+	{
+		// call all callbacks starting with the last
+		cbs.top()();
+		cbs.pop();
+	}
+}
+
+Scope& Scope::operator +=(Scope::Callback cb)
+{
+	cbs.push(cb);
+	return *this;
+}
+
+Scope::Callback Scope::operator --()
+{
+	Callback cb = cbs.top();
+	cbs.pop();
+	return cb;
+}
+
+Scope Scope::operator --(int)
+{
+	Scope prev = *this;
+	cbs.pop();
+	return prev;
 }
