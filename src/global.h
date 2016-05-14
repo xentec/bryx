@@ -1,5 +1,11 @@
 #pragma once
 
+// Config
+
+#define DEBUG 0
+
+// #######
+
 #include <string>
 #include <memory>
 #include <cinttypes>
