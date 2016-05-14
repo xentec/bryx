@@ -14,18 +14,17 @@ Format::Format(u8 fg, Format::Attribute attr):
 
 std::string Format::asString() const
 {
-#if _WIN32
+#ifdef _WIN32
 	static HANDLE hCon = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(hCon, (WORD)fg);
 	return "";
 #else
 	fmt::MemoryWriter w;
-	w.write("\e[{}", attr);
-
-	if(fg) w.write(";{}", fg);
-	if(bg) w.write(";{}", bg);
-
-	w.write("m");
+	w << "\x1b[";
+	w << attr;
+	if(fg) { w << ";" << fg; }
+	if(bg) { w << ";" << bg; }
+	w << "m";
 	return w.str();
 #endif
 }
