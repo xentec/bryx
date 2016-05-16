@@ -69,7 +69,7 @@ void Game::run()
 		fmt::print("\n");
 #endif
 		start = std::chrono::system_clock::now();
-		Move move = ply.move();
+		Move move = ply.move(0,0);
 		end = std::chrono::system_clock::now();
 
 		elapsed = end-start;

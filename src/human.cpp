@@ -21,7 +21,7 @@ Human::Human(Game &game, Cell::Type color):
 Human::~Human()
 {}
 
-Move Human::move()
+Move Human::move(u32, u32)
 {
 	Move move { *this, nullptr };
 

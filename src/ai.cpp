@@ -24,7 +24,7 @@ AI::AI(Game &game, Cell::Type color):
 AI::~AI()
 {}
 
-Move AI::move()
+Move AI::move(u32 time, u32 depth)
 {
 	std::vector<Move> moves = possibleMoves();
 

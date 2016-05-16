@@ -8,5 +8,5 @@ struct AI : Player
 	AI(Game& game, Cell::Type color); // TODO: maybe difficulty setting
 	virtual ~AI();
 
-	virtual Move move();
+	virtual Move move(u32 time, u32 depth);
 };

@@ -8,5 +8,5 @@ struct Human : Player
 	Human(Game& game, Cell::Type color);
 	virtual ~Human();
 
-	virtual Move move();
+	virtual Move move(u32, u32);
 };

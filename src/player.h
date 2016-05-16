@@ -14,7 +14,7 @@ struct Player
 	Player& operator =(const Player& other);
 	virtual ~Player();
 
-	virtual Move move() = 0;
+	virtual Move move(u32 time, u32 depth) = 0;
 
 	std::vector<Cell*> stones();
 	std::vector<Move> possibleMoves();
