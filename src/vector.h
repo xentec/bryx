@@ -40,6 +40,11 @@ struct vec
 		return blob == other.blob;
 	}
 
+	inline bool operator !=(const vec& other) const
+	{
+		return !(blob == other.blob);
+	}
+
 	inline vec operator -() const
 	{
 		return { -x, -y };
