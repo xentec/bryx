@@ -33,20 +33,22 @@ void Move::print() const
 	if(!target)
 		return;
 
-	Format c = color::YELLOW;
-	std::unordered_map<const Cell*, Format> hl;
+	Format cf = color::YELLOW;
+	std::unordered_map<vec, Format> hl;
 
-	c.setBG(Format::RED);
-	hl.emplace(target, c);
+	cf.setBG(Format::RED);
+	hl.emplace(target->pos, cf);
 
-	c.setBG(Format::BLUE);
-	for(auto& list: captures)
+	cf.setBG(Format::BLUE);
+	for(const std::list<Cell*>& list: captures)
 	{
-		auto begin = list.begin();
-		for(; begin != list.end(); begin++)
-			hl.emplace(*begin, c);
-	}
+//		auto begin = list.begin();
+//		for(; begin != list.end(); begin++)
+//			hl.emplace(begin->pos, cf);
 
+		for(Cell* c: list)
+			hl.emplace(c->pos, cf);
+	}
 
 	target->map.print(hl);
 }

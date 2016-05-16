@@ -26,7 +26,7 @@ struct Map
 	string asString(bool transistions = true);
 
 	void print(bool colored = true, bool ansi = true) const;
-	void print(std::unordered_map<const Cell*, console::Format> highlight, bool colored = true, bool ansi = true) const;
+	void print(std::unordered_map<vec, console::Format> highlight, bool colored = true, bool ansi = true) const;
 
 	static Map load(std::istream& file);
 

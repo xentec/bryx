@@ -75,13 +75,12 @@ string Map::asString(bool transistions)
 
 void Map::print(bool colored, bool ansi) const
 {
-	std::unordered_map<const Cell*, console::Format> hl;
-	print(hl, colored, ansi);
+	print({}, colored, ansi);
 }
 
 
 // TODO: color und ansi flags
-void Map::print(std::unordered_map<const Cell*, console::Format> highlight, bool colored, bool ansi) const
+void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored, bool ansi) const
 {
 	using namespace console;
 
@@ -155,7 +154,7 @@ void Map::print(std::unordered_map<const Cell*, console::Format> highlight, bool
 				}
 			}
 
-			const auto& hl = highlight.find(&c);
+			const auto& hl = highlight.find(c.pos);
 			if(hl != highlight.cend())
 				color = hl->second;
 
