@@ -98,7 +98,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 	fmt::print("\n");
 
 
-	for (usz y = 0; y < height; y++)
+	for (i32 y = 0; y < height; y++)
 	{
 		if(y%5 == 0)
 			fmt::print("{:2} ", y);
@@ -107,7 +107,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 
 		Format color;
 
-		for (usz x = 0; x < width; x++)
+		for (i32 x = 0; x < width; x++)
 		{
 			const Cell& c = at(x, y);
 			string ch = " ";
@@ -133,7 +133,6 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 				case Cell::Type::P6:        color = color::YELLOW;     break;
 				case Cell::Type::P7:        color = color::GRAY;       break;
 				case Cell::Type::P8:        color = color::CYAN;       break;
-				default: break;
 				}
 			}
 
@@ -170,24 +169,24 @@ bool Map::checkPos(const vec& pos) const
 	return inBox(pos, {0,0}, {(i32)width-1, (i32)height-1});
 }
 
-Map::iterator<Cell> Map::begin()
+Map::iterator<Cell, Map> Map::begin()
 {
-	return Map::iterator<Cell>{ *this, 0, 0 };
+	return Map::iterator<Cell, Map>{ *this, 0, 0 };
 }
 
-Map::iterator<Cell> Map::end()
+Map::iterator<Cell, Map> Map::end()
 {
-	return Map::iterator<Cell>{ *this, width-1, height-1 };
+	return Map::iterator<Cell, Map>{ *this, width-1, height-1 };
 }
 
-Map::iterator<const Cell> Map::cbegin()
+Map::iterator<const Cell, const Map> Map::begin() const
 {
-	return Map::iterator<const Cell>{ *this, 0, 0 };
+	return Map::iterator<const Cell, const Map>{ *this, 0, 0 };
 }
 
-Map::iterator<const Cell> Map::cend()
+Map::iterator<const Cell, const Map> Map::end() const
 {
-	return Map::iterator<const Cell>{ *this, width-1, height-1 };
+	return Map::iterator<const Cell, const Map>{ *this, width-1, height-1 };
 }
 
 Map Map::load(std::istream& file)

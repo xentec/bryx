@@ -38,13 +38,13 @@ private:
 	std::vector<Cell> data;
 
 public:
-	template<class T>
+	template<class T, class M>
 	struct iterator : std::iterator<std::random_access_iterator_tag, T>
 	{
 		typedef T   value_type;
 		typedef T*  pointer;
 		typedef T&  reference;
-		typedef iterator<T> iter;
+		typedef iterator<T,M> iter;
 
 		reference operator*()  { return map.at(x,y);  }
 		pointer operator->()   { return &map.at(x,y); }
@@ -76,15 +76,15 @@ public:
 			return !(*this == other);
 		}
 
-		iterator(Map&map, u32 x, u32 y): x(x), y(y), map(map) {}
+		iterator(M &map, u32 x, u32 y): x(x), y(y), map(map) {}
 	private:
 		usz x, y;
-		Map& map;
+		M &map;
 	};
 
-	Map::iterator<Cell> begin();
-	Map::iterator<Cell> end();
+	Map::iterator<Cell,Map> begin();
+	Map::iterator<Cell,Map> end();
 
-	Map::iterator<const Cell> cbegin();
-	Map::iterator<const Cell> cend();
+	Map::iterator<const Cell, const Map> begin() const;
+	Map::iterator<const Cell, const Map> end() const;
 };
