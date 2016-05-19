@@ -24,7 +24,11 @@ Game::Game(const Game &other):
 		map = new Map(*other.map);
 
 	for(Player* p: other.players)
-		players.push_back(p->clone());
+	{
+		Player* pc = p->clone();
+		pc->game = *this;
+		players.push_back(pc);
+	}
 }
 
 Game::~Game()
