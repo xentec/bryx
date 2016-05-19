@@ -140,7 +140,6 @@ void Game::execute(Move &move)
 	for(Cell* c: move.captures)
 		c->type = move.player.color;
 
-
 	switch(targetCell) // ...then look at special cases
 	{
 	case Cell::Type::BONUS:
@@ -158,15 +157,14 @@ void Game::execute(Move &move)
 		break;
 	case Cell::Type::CHOICE:
 	{
-		Player& swap = *move.choice;
-		if(move.player.color == swap.color)
+		if(move.player.color == move.choice)
 			break;
 
 		for(Cell& c: getMap())
 		{
 			if(c.type == move.player.color)
-				c.type = swap.color;
-			else if(c.type == swap.color)
+				c.type = move.choice;
+			else if(c.type == move.choice)
 				c.type = move.player.color;
 		}
 	}

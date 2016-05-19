@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
 	fmt::print("Bryx - a ReversiXT implementation\n");
 	fmt::print("Mode: {}\n", mode2str(opts.mode));
 	std::cout.flush();
-	
+
 	if(opts.mode != Mode::CLIENT)
 	{
 		fmt::print("Loading map {} ... ", opts.mapPath);

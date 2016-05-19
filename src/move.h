@@ -34,7 +34,7 @@ struct Move
 	Cell *target;
 	bool override;
 	Bonus bonus;
-	Player* choice;
+	Cell::Type choice;
 
 	Error err;
 	std::list<Cell*> captures;
