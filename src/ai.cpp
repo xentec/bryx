@@ -5,15 +5,52 @@
 
 #include <algorithm>
 #include <numeric>
+#include <map>
 
 
-static i32 scoreOf(const Move& move)
+std::pair<Heuristic, Move> AI::bestState(Game& state, u32 depth, Heuristic a, Heuristic b)
 {
-	return std::accumulate(move.captures.begin(), move.captures.end(),
-							0, [](i32 sum, std::list<Cell*> line)
+	if(depth == 0)
+		return { evalState(state), { state.currPlayer(), nullptr }};
+
+	std::list<Move> moves = state.currPlayer().possibleMoves();
+	std::map<Heuristic, Move&> nodes;
+
+	for(Move& m: moves)
 	{
-		return sum + line.size();
-	});
+		if(m.override)
+			continue;
+
+		state.execute(m, true);
+		state.nextPlayer();
+		nodes.emplace(bestState(state, depth-1, a, b).first, m);
+		state.prevPlayer();
+		state.undo(m);
+	}
+
+	if(nodes.empty())
+		return { evalState(state), { state.currPlayer(), nullptr }};
+
+	auto best = state.currPlayer().color != color ? nodes.begin() : --nodes.end();
+	return *best;
+}
+
+Heuristic AI::evalState(const Game& state) const
+{
+	Heuristic h = 0;
+
+	for(Cell& c: state.getMap())
+	{
+		if(c.type == color)
+		{
+			h += 5;
+		} else if(c.isPlayer())
+		{
+			h -= 5;
+		}
+	}
+
+	return h;
 }
 
 
@@ -35,40 +72,7 @@ Player *AI::clone() const
 
 Move AI::move(u32 time, u32 depth)
 {
-	std::vector<Move> moves = possibleMoves();
-
-	i32 scoreSum = 0;
-	i32 scoreMax = 0;
-	std::vector<Move*> bestMoves;
-	for(Move& m: moves)
-	{
-		i32 score = scoreOf(m);
-
-		scoreSum += score;
-		if(score > scoreMax)
-		{
-			if(!m.override)
-				bestMoves.clear();
-			scoreMax = score;
-			bestMoves.push_back(&m);
-			continue;
-		}
-		if(score == scoreMax && m.override == bestMoves.front()->override)
-			bestMoves.push_back(&m);
-	}
-
-	Move move  { *this, nullptr };
-
-	if(bestMoves.size())
-	{
-		std::sort(bestMoves.begin(), bestMoves.end(),
-			[=](Move* a, Move* b)
-			{
-				return scoreOf(*a) > scoreOf(*b);
-			});
-
-		move = *bestMoves.front();
-	}
+	Move move = bestState(game, depth, 0, 0).second;
 
 	if(move.target)
 	{
@@ -80,10 +84,13 @@ Move AI::move(u32 time, u32 depth)
 			break;
 		case Cell::Type::CHOICE:
 			// TODO: better choice algo
-			 move.choice =
+			{
+			  Player* c =
 				*std::max_element(game.getPlayers().begin(), game.getPlayers().end(),
 					[](Player* a, Player* b) { return a->stones().size() < b->stones().size();
 				});
+			  move.choice = c->color;
+			}
 			break;
 		default:
 			break;
