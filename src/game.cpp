@@ -194,7 +194,7 @@ void Game::execute(Move &move, bool backup)
 		for(Cell& c: getMap())
 		{
 			if(c.isPlayer())
-				c.type = ply2type(type2ply(c.type) % players.size());
+				c.type = ply2type((type2ply(c.type)+1) % players.size());
 		}
 
 		stats.inversions++;
