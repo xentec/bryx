@@ -10,7 +10,7 @@
 #define VERBOSE 1
 
 Game::Game():
-	defaults{ 0, 0, 0, 0 }, stats { 0, 0, 0 },
+	defaults{ 0, 0, 0, 0 }, stats { 0, 0, 0, {} },
 	map(nullptr),
 	currentPlayer(0), moveless(0)
 {}
@@ -31,6 +31,8 @@ Game::~Game()
 {
 	for(Player* ply: players)
 		delete ply;
+
+	delete map;
 }
 
 
