@@ -195,6 +195,59 @@ void Game::execute(Move &move, bool backup)
 	stats.moves++;
 }
 
+void Game::undo(Move &move)
+{
+	if(move.backup.captures.empty())
+		throw std::runtime_error("move has no backup");
+
+	switch(move.backup.target) // ...then look at special cases
+	{
+	case Cell::Type::BONUS:
+		switch(move.bonus)
+		{
+		case Move::BOMB:
+			move.player.bombs--;
+			break;
+		case Move::OVERRIDE:
+			move.player.overrides--;
+			break;
+		default:
+			break;
+		}
+		break;
+	case Cell::Type::CHOICE:
+	{
+		if(move.player.color == move.choice)
+			break;
+
+		for(Cell& c: getMap())
+		{
+			if(c.type == move.player.color)
+				c.type = move.choice;
+			else if(c.type == move.choice)
+				c.type = move.player.color;
+		}
+	}
+		break;
+	case Cell::Type::INVERSION:
+		for(Cell& c: getMap())
+		{
+			if(c.isPlayer())
+				c.type = ply2type((type2ply(c.type)-1) % players.size());
+		}
+
+		stats.inversions--;
+		break;
+	default:
+		break;
+	}
+	stats.moves--;
+
+	move.target->type = move.backup.target;
+	for(auto c : move.backup.captures)
+		map->at(c.first).type = c.second;
+}
+
 void Game::load(std::istream& file)
 {
 	using std::stoi;

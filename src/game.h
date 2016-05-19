@@ -45,6 +45,7 @@ struct Game
 	void run();
 
 	void execute(Move& move, bool backup = false);
+	void undo(Move& move);
 
 protected:
 	Map* map;
