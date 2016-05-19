@@ -28,18 +28,18 @@ Player& Player::operator =(const Player& other)
 Player::~Player()
 {}
 
-std::vector<Cell *> Player::stones()
+std::list<Cell*> Player::stones()
 {
-	std::vector<Cell*> s;
+	std::list<Cell*> s;
 	for(Cell& c: game.getMap())
 		if(c.type == color)
 			s.push_back(&c);
 	return s;
 }
 
-std::vector<Move> Player::possibleMoves()
+std::list<Move> Player::possibleMoves()
 {
-	std::vector<Move> moves;
+	std::list<Move> moves;
 	for(Cell& c: game.getMap())
 	{
 		Move move { *this, &c };

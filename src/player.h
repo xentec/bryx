@@ -3,7 +3,7 @@
 #include "global.h"
 #include "cell.h"
 
-#include <vector>
+#include <list>
 
 struct Game;
 struct Move;
@@ -19,8 +19,8 @@ struct Player
 
 	virtual Move move(u32 time, u32 depth) = 0;
 
-	std::vector<Cell*> stones();
-	std::vector<Move> possibleMoves();
+	std::list<Cell*> stones();
+	std::list<Move> possibleMoves();
 
 	void evaluate(Move& move) const;
 
