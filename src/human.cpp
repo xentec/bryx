@@ -18,8 +18,17 @@ Human::Human(Game &game, Cell::Type color):
 	Player(game, color)
 {}
 
+Human::Human(const Human &other):
+	Player(other)
+{}
+
 Human::~Human()
 {}
+
+Player *Human::clone() const
+{
+	return new Human(*this);
+}
 
 Move Human::move(u32, u32)
 {

@@ -10,6 +10,12 @@ Player::Player(Game &game, Cell::Type color, const string& name):
 	game(game)
 {}
 
+Player::Player(const Player &other):
+	name(other.name),
+	color(other.color), overrides(other.overrides), bombs(other.bombs),
+	game(other.game)
+{}
+
 Player& Player::operator =(const Player& other)
 {
 	color = other.color;

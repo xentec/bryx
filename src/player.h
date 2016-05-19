@@ -11,8 +11,11 @@ struct Move;
 struct Player
 {
 	Player(Game& game, Cell::Type color, const string& name = "");
-	Player& operator =(const Player& other);
+	Player(const Player& other);
 	virtual ~Player();
+
+	Player& operator =(const Player& other);
+	virtual Player* clone() const = 0;
 
 	virtual Move move(u32 time, u32 depth) = 0;
 

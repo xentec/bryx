@@ -10,8 +10,10 @@
 struct Dummy : Player
 {
 	Dummy(Game& game, Cell::Type color): Player(game, color) {}
+	Dummy(const Dummy& other): Player(other) {}
 	virtual ~Dummy() {}
-	Move move(u32, u32) { return Move(*this, nullptr); }
+	virtual Player* clone() const { return new Dummy(*this); }
+	virtual Move move(u32, u32) { return Move(*this, nullptr); }
 };
 
 

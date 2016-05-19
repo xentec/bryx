@@ -21,8 +21,17 @@ AI::AI(Game &game, Cell::Type color):
 	Player(game, color, fmt::format("bryx {}", color))
 {}
 
+AI::AI(const AI &other):
+	Player(other)
+{}
+
 AI::~AI()
 {}
+
+Player *AI::clone() const
+{
+	return new AI(*this);
+}
 
 Move AI::move(u32 time, u32 depth)
 {
