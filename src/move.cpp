@@ -40,15 +40,9 @@ void Move::print() const
 	hl.emplace(target->pos, cf);
 
 	cf.setBG(Format::BLUE);
-	for(const std::list<Cell*>& list: captures)
-	{
-//		auto begin = list.begin();
-//		for(; begin != list.end(); begin++)
-//			hl.emplace(begin->pos, cf);
 
-		for(Cell* c: list)
-			hl.emplace(c->pos, cf);
-	}
+	for(Cell* c: captures)
+		hl.emplace(c->pos, cf);
 
 	target->map.print(hl);
 }

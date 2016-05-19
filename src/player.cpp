@@ -79,7 +79,7 @@ void Player::evaluate(Move& move) const
 			if(cur->type == move.player.color)
 			{
 				if(!line.empty())
-					move.captures.push_back(line);
+					move.captures.merge(line);
 				break;
 			}
 

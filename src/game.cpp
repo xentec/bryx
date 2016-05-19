@@ -137,8 +137,7 @@ void Game::execute(Move &move)
 
 	move.target->type = move.player.color;
 
-	for(auto& line: move.captures)
-	for(Cell* c: line)
+	for(Cell* c: move.captures)
 		c->type = move.player.color;
 
 
