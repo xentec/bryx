@@ -29,6 +29,7 @@ struct Game
 	} stats;
 
 	Game();
+	Game(const Game& game);
 	~Game();
 
 	void load(std::istream& file);

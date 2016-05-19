@@ -15,6 +15,18 @@ Game::Game():
 	currentPlayer(0), moveless(0)
 {}
 
+Game::Game(const Game &other):
+	defaults(other.defaults), stats(other.stats),
+	map(nullptr),
+	currentPlayer(other.currentPlayer), moveless(other.moveless)
+{
+	if(other.map)
+		map = new Map(*other.map);
+
+	for(Player* p: other.players)
+		players.push_back(p->clone());
+}
+
 Game::~Game()
 {
 	for(Player* ply: players)
