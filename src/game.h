@@ -44,7 +44,7 @@ struct Game
 	bool hasEnded();
 	void run();
 
-	void execute(Move& move);
+	void execute(Move& move, bool backup = false);
 
 protected:
 	Map* map;

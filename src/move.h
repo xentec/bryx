@@ -2,6 +2,8 @@
 
 #include "global.h"
 
+#include "cell.h"
+
 #include <list>
 #include <vector>
 
@@ -39,6 +41,11 @@ struct Move
 	Error err;
 	std::list<Cell*> captures;
 
+	struct Backup
+	{
+		std::list<std::pair<vec, Cell::Type> > captures;
+		Cell::Type target;
+	} backup;
 
 	static string err2str(Move::Error err);
 };

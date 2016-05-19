@@ -116,7 +116,7 @@ void Game::run()
 	while(!hasEnded());
 }
 
-void Game::execute(Move &move)
+void Game::execute(Move &move, bool backup)
 {
 	if(!move.target || move.captures.empty())
 	{
@@ -135,6 +135,13 @@ void Game::execute(Move &move)
 
 		move.player.overrides--;
 		stats.overrides++;
+	}
+
+	if(backup)
+	{
+		move.backup.target = move.target->type;
+		for(Cell* c: move.captures)
+			move.backup.captures.emplace_back(c->pos, c->type);
 	}
 
 	Cell::Type targetCell = move.target->type; // first make a complete move...
