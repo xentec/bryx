@@ -67,5 +67,5 @@ struct Cell
 	Map& map;
 };
 
-inline u8 type2ply(Cell::Type type) { return type - Cell::Type::P1 + 1; }
-inline Cell::Type ply2type(u8 ply_id) { return static_cast<Cell::Type>(ply_id - 1 + Cell::Type::P1); }
+inline u8 type2ply(Cell::Type type) { return type - Cell::Type::P1; }
+inline Cell::Type ply2type(u8 ply_id) { return static_cast<Cell::Type>(ply_id + Cell::Type::P1); }

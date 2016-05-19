@@ -59,8 +59,8 @@ Player& Game::addPlayer()
 {
 	if(players.size() == defaults.players)
 		throw std::runtime_error("game is full");
-	
-	Player* player = new P(*this, ply2type(players.size()+1));
+
+	Player* player = new P(*this, ply2type(players.size()));
 	player->bombs = defaults.bombs;
 	player->overrides = defaults.overrides;
 	players.push_back(player);
