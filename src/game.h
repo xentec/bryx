@@ -8,6 +8,7 @@
 #include <chrono>
 
 struct Player;
+struct Client;
 
 struct Game
 {
@@ -36,7 +37,10 @@ struct Game
 
 	template<class P>
 	Player& addPlayer();
+
+	Player& currPlayer() const;
 	Player& nextPlayer();
+	Player& prevPlayer();
 
 	Map& getMap() const;
 	std::vector<Player*>& getPlayers();
@@ -51,8 +55,10 @@ protected:
 	Map* map;
 	std::vector<Player*> players;
 
-	u32 currentPlayer;
+	u32 currPly;
 	u32 moveless;
+
+	friend struct Client;
 };
 
 

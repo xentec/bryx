@@ -12,13 +12,13 @@
 Game::Game():
 	defaults{ 0, 0, 0, 0 }, stats { 0, 0, 0, {} },
 	map(nullptr),
-	currentPlayer(0), moveless(0)
+	currPly(0), moveless(0)
 {}
 
 Game::Game(const Game &other):
 	defaults(other.defaults), stats(other.stats),
 	map(nullptr),
-	currentPlayer(other.currentPlayer), moveless(other.moveless)
+	currPly(other.currPly), moveless(other.moveless)
 {
 	if(other.map)
 		map = new Map(*other.map);
@@ -39,11 +39,21 @@ Game::~Game()
 	delete map;
 }
 
-
+Player& Game::currPlayer() const
+{
+	return *players[currPly];
+}
 
 Player& Game::nextPlayer()
 {
-	return *players[currentPlayer++ % players.size()];
+	currPly = (currPly+1) % players.size();
+	return currPlayer();
+}
+
+Player& Game::prevPlayer()
+{
+	currPly = (currPly-1) % players.size();
+	return currPlayer();
 }
 
 Map& Game::getMap() const
