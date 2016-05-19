@@ -47,18 +47,18 @@ void Client::join(string host, u16 port)
 		throw std::runtime_error(fmt::format("failed to load map: {}", ex.what()));
 	}
 
-	auto plyID = read<packet::PlayerID>();
+	u32 plyID = read<packet::PlayerID>().player - 1;
 
 	for(u32 i = 0; i < game.defaults.players; i++)
 	{
-		if(plyID.player - 1 == i)
+		if(plyID == i)
 			me = &game.addPlayer<AI>();
 		else
 			game.addPlayer<Dummy>();
 	}
 
 	fmt::print("\n");
-	fmt::print("My number: {}\n", me->color);
+	fmt::print("My number: {}\n", type2ply(me->color)); // TODO: ply-asString()
 	fmt::print("\n");
 
 	fmt::print("Players: {}\n", game.defaults.players);
@@ -78,30 +78,51 @@ void Client::join(string host, u16 port)
 
 				fmt::print("Got move request: time {}, depth {}\n", packet.time, packet.depth);
 
+				game.currPly = type2ply(me->color);
 				Move move = me->move(packet.time, packet.depth);
-				send(packet::MoveResponse(move.target->pos, move.bonus));
+				packet::MoveResponse resp(move.target->pos, move.bonus);
+
+				if(move.choice != Cell::Type::VOID)
+					resp.extra = type2ply(move.choice)+1;
+
+				fmt::print("Sending move: P{} -> {} ex: {}\n", type2ply(move.player.color), move.target->pos, resp.extra);
+				move.print();
+
+				send(resp);
 			}
 			break;
 		case packet::MOVE:
 			{
 				auto packet = read<packet::Move>();
 
-				fmt::print("Got player move: P{} -> {} ex: {}\n", packet.player, vec{packet.x, packet.y}, packet.extra);
+				game.currPly = packet.player - 1;
+				Player& ply = game.currPlayer();
 
-				Move move = game.getPlayers()[packet.player-1]->move(0,0);
+				fmt::print("Got player move: P{} (P{}) -> {} ex: {}\n", game.currPly, type2ply(ply.color), vec{packet.x, packet.y}, packet.extra);
+
+				Move move = ply.move(0,0);
 				move.target = &game.getMap().at(packet.x, packet.y);
-				move.bonus = static_cast<Move::Bonus>(packet.extra);
+
+				ply.evaluate(move);
+
+				if(packet.extra)
+				{
+					if(packet.extra == 20 || packet.extra == 21)
+					{
+						 move.bonus = static_cast<Move::Bonus>(packet.extra);
+					} else
+						move.choice = ply2type(packet.extra-1);
+				}
 
 				game.execute(move);
+				move.print();
 			}
 			break;
 		case packet::DISQ:
 		{
 			auto packet = read<packet::Disq>();
 
-			usz pos = packet.player - 1;
-
-			auto dp = game.getPlayers().begin()+pos;
+			auto dp = game.getPlayers().begin() + packet.player - 1;
 			if(*dp == me) // NOOOOOOOOOOOO!!!!!111111
 			{
 				fmt::print("It was nice while it lasted... ;_;\n");
