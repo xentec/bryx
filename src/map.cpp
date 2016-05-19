@@ -45,14 +45,14 @@ Map::Map(const Map& other):
 Cell& Map::at(const vec &pos)
 {
 	if(!checkPos(pos))
-		throw std::out_of_range(pos.asString());
+		throw std::out_of_range("out of range: " + pos.asString());
 	return data[pos.x * height + pos.y];
 }
 
 const Cell& Map::at(const vec &pos) const
 {
 	if(!checkPos(pos))
-		throw std::out_of_range(pos.asString());
+		throw std::out_of_range("out of range: " + pos.asString());
 	return data[pos.x * height + pos.y];
 }
 
@@ -176,7 +176,7 @@ Map::iterator<Cell, Map> Map::begin()
 
 Map::iterator<Cell, Map> Map::end()
 {
-	return Map::iterator<Cell, Map>{ *this, width-1, height-1 };
+	return Map::iterator<Cell, Map>{ *this, width, 0 };
 }
 
 Map::iterator<const Cell, const Map> Map::begin() const
@@ -186,7 +186,7 @@ Map::iterator<const Cell, const Map> Map::begin() const
 
 Map::iterator<const Cell, const Map> Map::end() const
 {
-	return Map::iterator<const Cell, const Map>{ *this, width-1, height-1 };
+	return Map::iterator<const Cell, const Map>{ *this, width, 0 };
 }
 
 Map Map::load(std::istream& file)
