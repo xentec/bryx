@@ -110,7 +110,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 		for (i32 x = 0; x < width; x++)
 		{
 			const Cell& c = at(x, y);
-			string ch = " ";
+			string ch(1, c.type);
 
 			if(colored)
 			{
