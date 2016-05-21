@@ -16,7 +16,7 @@ struct Format
 #ifdef _WIN32
 	enum Color
 	{
-		BLACK = 0, BLUE, GREEN, CYAN, RED, MAGENTA, YELLOW, WHITE
+		BLACK = 0, BLUE, GREEN, CYAN, RED, MAGENTA, YELLOW, WHITE, RESET = WHITE
 	};
 
 	inline void setFG(Color c) { fg = c; }
@@ -31,7 +31,7 @@ struct Format
 	inline void setBG(Color c) { bg = c + 10; }
 #endif
 
-	Format(u8 fg = 0, Attribute attr = NORMAL);
+	Format(u8 fg = RESET, Attribute attr = NORMAL);
 
 	string asString() const;
 
