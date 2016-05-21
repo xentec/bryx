@@ -11,6 +11,10 @@ list(APPEND LIBS
 	fmt
 )
 
+if(WIN32)
+	list(APPEND LIBS ws2_32)
+endif()
+
 file(GLOB_RECURSE SOURCES src/*.h src/*.cpp)
 
 add_executable(bryx ${SOURCES})

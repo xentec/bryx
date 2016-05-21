@@ -4,11 +4,16 @@
 
 #include <cstring> // memset
 
+#include <fmt/format.h>
+
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
 #include <sys/socket.h>
 #include <netdb.h>
 #include <unistd.h>
-
-#include <fmt/format.h>
+#endif
 
 Socket::Socket():
 	fd(-1)
@@ -16,13 +21,20 @@ Socket::Socket():
 
 Socket::~Socket()
 {
-	close();	
+	close();
 }
 
 void Socket::connect(string host, u16 port)
 {
 	i32 err;
 	addrinfo hints, *res;
+
+#ifdef _WIN32
+	WSADATA wsaData;
+	err = WSAStartup(MAKEWORD(2,2), &wsaData);
+	if (err != NO_ERROR)
+		throw std::runtime_error("wsa init failed");
+#endif
 
 	// first, load up address structs with getaddrinfo():
 
@@ -35,7 +47,7 @@ void Socket::connect(string host, u16 port)
 	{
 		err = getaddrinfo(host.c_str(), fmt::FormatInt(port).c_str(), &hints, &res);
 		Scope cs([=](){ freeaddrinfo(res); });
-	
+
 		if(err)
 			throw std::runtime_error(fmt::format("failed to resolve address: {}", gai_strerror(err)));
 
@@ -68,7 +80,11 @@ void Socket::connect(string host, u16 port)
 
 void Socket::close()
 {
+#ifdef _WIN32
+	closesocket(fd);
+#else
 	::close(fd);
+#endif
 }
 
 void Socket::send(const std::vector<u8>& payload) const
@@ -87,7 +103,7 @@ void Socket::send(const std::vector<u8>& payload) const
 	std::fflush(stdout);
 #endif
 
-	isz len = ::send(fd, payload.data(), payload.size(), 0);
+	isz len = ::send(fd, reinterpret_cast<const char*>(payload.data()), payload.size(), 0);
 	if(len < 0)
 		throw std::runtime_error(strerror(errno));
 }
@@ -96,7 +112,7 @@ std::vector<u8> Socket::recv(usz size, bool peek, bool wait) const
 {
 	std::vector<u8> buffer(size);
 
-	isz len = ::recv(fd, &buffer[0], buffer.size(), !wait*MSG_DONTWAIT | peek*MSG_PEEK | MSG_WAITALL);
+	isz len = ::recv(fd, reinterpret_cast<char*>(&buffer[0]), buffer.size(), peek*MSG_PEEK | MSG_WAITALL);
 	if(len < 0)
 		throw std::runtime_error(strerror(errno));
 

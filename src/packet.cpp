@@ -1,6 +1,11 @@
 #include "packet.h"
 
+#ifdef _WIN32
+#include <winsock2.h>
+#else
 #include <arpa/inet.h>
+#endif
+
 using namespace packet;
 
 template<class T> inline T& to(u8& data) { return *reinterpret_cast<T*>(&data); }
@@ -229,7 +234,7 @@ BombPhase::BombPhase(const Payload& data):
 
 Payload BombPhase::dump()
 {
-	return hdr.dump();	
+	return hdr.dump();
 }
 
 GameEnd::GameEnd():
