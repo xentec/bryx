@@ -7,6 +7,16 @@
 
 // Map
 //########
+
+#ifdef _WIN32
+bool Map::printColored = false;
+bool Map::printAnsi = false;
+#else
+bool Map::printColored = true;
+bool Map::printAnsi = true;
+#endif
+
+
 Map::Map():
 	Map(1,1)
 {}
@@ -112,7 +122,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 			const Cell& c = at(x, y);
 			string ch(1, c.type);
 
-			if(colored)
+			if(colored && printColored)
 			{
 				switch (c.type)
 				{
@@ -136,7 +146,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 				}
 			}
 
-			if(ansi)
+			if(ansi && printAnsi)
 			{
 				switch (c.type)
 				{

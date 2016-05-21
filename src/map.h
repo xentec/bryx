@@ -38,6 +38,9 @@ private:
 	std::vector<Cell> data;
 
 public:
+	static bool printColored;
+	static bool printAnsi;
+
 	template<class T, class M>
 	struct iterator : std::iterator<std::random_access_iterator_tag, T>
 	{
