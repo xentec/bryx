@@ -8,8 +8,8 @@
 
 using namespace console;
 
-Format::Format(u8 fg, Format::Attribute attr):
-	attr(attr), fg(fg), bg(0)
+Format::Format(Color fg, Format::Attribute attr):
+	attr(attr), fg(fg), bg(RESET)
 {}
 
 std::string Format::asString() const
@@ -23,7 +23,7 @@ std::string Format::asString() const
 	w << "\x1b[";
 	w << attr;
 	if(fg) { w << ";" << fg; }
-	if(bg) { w << ";" << bg; }
+	if(bg) { w << ";" << bg+10; }
 	w << "m";
 	return w.str();
 #endif

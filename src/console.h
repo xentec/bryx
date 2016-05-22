@@ -10,7 +10,7 @@ struct Format
 {
 	enum Attribute
 	{
-		NORMAL = 0, BOLD = 1, UNDERLINE = 4, BLINK = 5, REVERSE = 7, INVISIBLE = 8
+		NORMAL = 0, BOLD = 1, UNDERLINE = 4, BLINK = 5, INVERSE = 7, INVISIBLE = 8
 	};
 
 #ifdef _WIN32
@@ -28,15 +28,15 @@ struct Format
 	};
 
 	inline void setFG(Color c) { fg = c; }
-	inline void setBG(Color c) { bg = c + 10; }
+	inline void setBG(Color c) { bg = c; }
 #endif
 
-	Format(u8 fg = RESET, Attribute attr = NORMAL);
+	Format(Color fg = RESET, Attribute attr = NORMAL);
 
 	string asString() const;
 
 	Attribute attr;
-	u8 fg, bg;
+	Color fg, bg;
 
 
 	friend std::ostream& operator<<(std::ostream& os, const Format& format)
