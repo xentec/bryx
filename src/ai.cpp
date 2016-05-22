@@ -13,12 +13,14 @@ std::pair<Heuristic, Move> AI::bestState(Game& state, u32 depth, Heuristic a, He
 	if(depth == 0)
 		return { evalState(state), { state.currPlayer(), nullptr }};
 
-	std::list<Move> moves = state.currPlayer().possibleMoves();
+	Player& ply = state.currPlayer();
+	
+	std::list<Move> moves = ply.possibleMoves();
 	std::map<Heuristic, Move&> nodes;
 
 	for(Move& m: moves)
 	{
-		if(m.override)
+		if(m.override && ply.overrides == 0)
 			continue;
 
 		state.execute(m, true);
@@ -44,6 +46,24 @@ Heuristic AI::evalState(const Game& state) const
 		if(c.type == color)
 		{
 			h += 5;
+			
+			// Corners
+			u32 corner = 0;
+			for(u32 dir = Direction::N; dir < Direction::_LAST; dir++)
+			{
+				Direction d = (Direction) dir;
+				Cell* nc = c.getNeighbor(d);
+				if(nc)
+				{
+					if(nc->isSpecial())
+						h -= 50;
+				} else
+					corner++;
+			}
+			if(corner > 4 && corner < 7)
+				h *= corner;
+			// #################
+
 		} else if(c.isPlayer())
 		{
 			h -= 5;
