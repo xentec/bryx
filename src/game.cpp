@@ -97,7 +97,7 @@ void Game::run()
 		fmt::print("\n");
 #endif
 		start = std::chrono::system_clock::now();
-		Move move = ply.move(0,0);
+		Move move = ply.move(0,3);
 		end = std::chrono::system_clock::now();
 
 		elapsed = end-start;
@@ -256,7 +256,7 @@ void Game::undo(Move &move)
 	move.target->type = move.backup.target;
 	for(auto c : move.backup.captures)
 		map->at(c.first).type = c.second;
-
+	
 	if(move.target->isPlayer())
 		move.player.overrides++;
 }
