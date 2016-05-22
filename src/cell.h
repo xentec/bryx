@@ -44,6 +44,7 @@ struct Cell
 	Cell(Map &map, vec pos, Type type);
 	Cell(Cell&& other) = default;
 
+	Cell& operator =(const Cell& other);
 	bool operator ==(const Cell& other) const;
 	bool operator !=(const Cell& other) const;
 
@@ -59,7 +60,7 @@ struct Cell
 	void addTransistion(Direction exit, Direction entry, Cell* target);
 
 	console::Format getFormat() const;
-
+	
 	static bool isValid(char ch);
 
 
