@@ -85,7 +85,7 @@ void Client::join(string host, u16 port)
 				if(move.choice != Cell::Type::VOID)
 					resp.extra = type2ply(move.choice)+1;
 
-				fmt::print("Sending move: P{} -> {} ex: {}\n", type2ply(move.player.color), move.target->pos, resp.extra);
+				fmt::print("Sending move: {} -> {} ex: {}\n", move.player, move.target->pos, resp.extra);
 				move.print();
 
 				send(resp);
@@ -98,7 +98,7 @@ void Client::join(string host, u16 port)
 				game.currPly = packet.player - 1;
 				Player& ply = game.currPlayer();
 
-				fmt::print("Got player move: P{} (P{}) -> {} ex: {}\n", game.currPly, type2ply(ply.color), vec{packet.x, packet.y}, packet.extra);
+				fmt::print("Got player move: {} -> {} ex: {}\n", ply, vec{packet.x, packet.y}, packet.extra);
 
 				Move move = ply.move(0,0);
 				move.target = &game.getMap().at(packet.x, packet.y);

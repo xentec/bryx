@@ -177,7 +177,7 @@ int main(int argc, char* argv[])
 				{
 					ply = &game.addPlayer<AI>();
 				}
-				fmt::print("Player {} is {}\n", type2ply(ply->color)+1, ply->name);
+				fmt::print("Player name set: {}\n", *ply);
 
 			}
 			break;

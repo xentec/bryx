@@ -85,7 +85,7 @@ void Game::run()
 		Player& ply = nextPlayer();
 #if VERBOSE
 		fmt::print("\n");
-		fmt::print("Player {} {}\n", type2ply(ply.color), ply.name);
+		fmt::print("Player {}\n", ply.color);
 
 		fmt::print("##########");
 		for(usz i = 0; i < ply.name.size(); i++)

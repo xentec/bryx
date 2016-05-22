@@ -3,7 +3,6 @@
 #include "map.h"
 #include "game.h"
 
-
 Player::Player(Game &game, Cell::Type color, const string& name):
 	name(name),
 	color(color), overrides(0), bombs(0),
@@ -23,6 +22,16 @@ Player& Player::operator =(const Player& other)
 	overrides = other.overrides;
 	bombs = other.bombs;
 	return *this;
+}
+
+string Player::asString() const
+{
+	fmt::MemoryWriter w;
+	w << static_cast<char>(color);
+	if(!name.empty())
+		w.write(" \"{}\"", name); 
+	
+	return w.str();
 }
 
 Player::~Player()
@@ -99,4 +108,3 @@ void Player::evaluate(Move& move) const
 		move.err =  Move::Error::NO_CONNECTIONS;
 	return;
 }
-

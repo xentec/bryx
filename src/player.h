@@ -3,6 +3,7 @@
 #include "global.h"
 #include "cell.h"
 
+#include <fmt/ostream.h>
 #include <list>
 
 struct Game;
@@ -16,6 +17,8 @@ struct Player
 
 	Player& operator =(const Player& other);
 	virtual Player* clone() const = 0;
+	
+	string asString() const;
 
 	virtual Move move(u32 time, u32 depth) = 0;
 
@@ -31,4 +34,10 @@ struct Player
 	u32 bombs;
 
 	Game& game;
+	
+	friend std::ostream& operator<<(std::ostream &os, const Player &object)
+	{
+		return os << object.asString();
+	}
 };
+
