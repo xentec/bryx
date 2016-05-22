@@ -228,6 +228,7 @@ int main(int argc, char* argv[])
 		{
 			fmt::print(stderr, "Failed to join the game: {}\n", ex.what());
 		}
+		client.play();
 	}
 	return 0;
 }

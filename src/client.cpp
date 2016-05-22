@@ -58,7 +58,7 @@ void Client::join(string host, u16 port)
 	}
 
 	fmt::print("\n");
-	fmt::print("My number: {}\n", type2ply(me->color)); // TODO: ply-asString()
+	fmt::print("My number: {}\n", *me);
 	fmt::print("\n");
 
 	fmt::print("Players: {}\n", game.defaults.players);
@@ -66,8 +66,10 @@ void Client::join(string host, u16 port)
 	fmt::print("Bombs: {} ({})\n", game.defaults.bombs, game.defaults.bombsStrength);
 	fmt::print("Map: {}x{}\n", game.getMap().width, game.getMap().height);
 	game.getMap().print();
+}
 
-
+void Client::play()
+{
 	while(true)
 	{
 		switch(peek().type)
@@ -114,8 +116,8 @@ void Client::join(string host, u16 port)
 						move.choice = ply2type(packet.extra-1);
 				}
 
-				game.execute(move);
 				move.print();
+				game.execute(move);
 			}
 			break;
 		case packet::DISQ:
@@ -135,6 +137,7 @@ void Client::join(string host, u16 port)
 		case packet::BOMB_PHASE:
 		{
 			read<packet::BombPhase>(); // clear socket buffer
+			throw std::runtime_error("bomb phase not implemented");
 
 			// TODO: Change phase
 		}
@@ -147,6 +150,8 @@ void Client::join(string host, u16 port)
 		}
 			break;
 		default:
+			throw std::runtime_error(fmt::format("unknown packet received: {}", peek().type));
+
 			break;
 		}
 	}
