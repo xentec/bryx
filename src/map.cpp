@@ -123,28 +123,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 			string ch(1, c.type);
 
 			if(colored && printColored)
-			{
-				switch (c.type)
-				{
-				case Cell::Type::VOID:      color = color::GRAY;       break;
-				case Cell::Type::EMPTY:     color = color::GRAY_LIGHT; break;
-
-				case Cell::Type::BONUS:     color = color::YELLOW;     break;
-				case Cell::Type::CHOICE:    color = color::GREEN_LIGHT;break;
-				case Cell::Type::INVERSION: color = color::RED_LIGHT;  break;
-
-				case Cell::Type::EXPANSION: color = color::WHITE;      break;
-
-				case Cell::Type::P1:        color = color::RED;        break;
-				case Cell::Type::P2:        color = color::BLUE;       break;
-				case Cell::Type::P3:        color = color::GREEN;      break;
-				case Cell::Type::P4:        color = color::BROWN;      break;
-				case Cell::Type::P5:        color = color::MAGENTA;    break;
-				case Cell::Type::P6:        color = color::YELLOW;     break;
-				case Cell::Type::P7:        color = color::GRAY;       break;
-				case Cell::Type::P8:        color = color::CYAN;       break;
-				}
-			}
+				color = c.getFormat();
 
 			if(ansi && printAnsi)
 			{

@@ -99,6 +99,31 @@ void Cell::addTransistion(Direction exit, Direction entry, Cell* target)
 	transitions[exit] = { target, entry };
 }
 
+console::Format Cell::getFormat() const
+{
+	using namespace console;
+	switch (type)
+	{
+		case Type::VOID:      return color::GRAY;
+		case Type::EMPTY:     return color::GRAY_LIGHT;
+
+		case Type::BONUS:     return color::YELLOW;
+		case Type::CHOICE:    return color::GREEN_LIGHT;
+		case Type::INVERSION: return color::RED_LIGHT;
+
+		case Type::EXPANSION: return color::WHITE;
+
+		case Type::P1:        return color::RED;
+		case Type::P2:        return color::BLUE;
+		case Type::P3:        return color::GREEN;
+		case Type::P4:        return color::BROWN;
+		case Type::P5:        return color::MAGENTA;
+		case Type::P6:        return color::YELLOW;
+		case Type::P7:        return color::GRAY;
+		case Type::P8:        return color::CYAN;
+	}
+}
+
 
 bool Cell::isValid(char ch)
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "global.h"
+#include "console.h"
 #include "vector.h"
 
 #include <array>
@@ -56,6 +57,8 @@ struct Cell
 	Cell* getDirectNeighbor(Direction dir) const;
 	Cell* getNeighbor(Direction& dir) const;
 	void addTransistion(Direction exit, Direction entry, Cell* target);
+
+	console::Format getFormat() const;
 
 	static bool isValid(char ch);
 
