@@ -29,10 +29,10 @@ std::pair<Heuristic, Move> AI::bestState(Game& state, u32 depth, Heuristic a, He
 	}
 
 	if(nodes.empty())
-		return { evalState(state), { state.currPlayer(), nullptr }};
+		throw std::runtime_error("no moves");
 
-	auto best = state.currPlayer().color != color ? nodes.begin() : --nodes.end();
-	return *best;
+	// if player doesn't have my color, take lowest move, else hightest (std::map is a red black tree)
+	return *(state.currPlayer().color != color ? nodes.begin() : --nodes.end());
 }
 
 Heuristic AI::evalState(const Game& state) const
