@@ -256,6 +256,9 @@ void Game::undo(Move &move)
 	move.target->type = move.backup.target;
 	for(auto c : move.backup.captures)
 		map->at(c.first).type = c.second;
+
+	if(move.target->isPlayer())
+		move.player.overrides++;
 }
 
 void Game::load(std::istream& file)
