@@ -120,7 +120,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 		for (i32 x = 0; x < width; x++)
 		{
 			const Cell& c = at(x, y);
-			string ch(1, c.type);
+			string ch = c.asString();
 
 			if(colored && printColored)
 				color = c.getFormat();
@@ -136,9 +136,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 				case Cell::Type::VOID:      ch = "█"; break;
 
 				case Cell::Type::EXPANSION: ch = "x"; break;
-
-				default:
-					ch[0] = (char) c.type;
+				default: break;
 				}
 			}
 
