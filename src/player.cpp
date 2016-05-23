@@ -92,7 +92,7 @@ void Player::evaluate(Move& move) const
 				break;
 			}
 
-			if(cp == cur) // we're in a loop!
+			if(*cp == *cur) // we're in a loop!
 			{
 				 // do not try the same dir you came from while looping
 				banned = dir180(moveDir);
