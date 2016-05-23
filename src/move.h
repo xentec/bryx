@@ -18,6 +18,7 @@ struct Move
 		NONE = 0,
 		WRONG_START,
 		NO_CONNECTIONS,
+		NO_OVERRIDES,
 	};
 
 	enum Bonus

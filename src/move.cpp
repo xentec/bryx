@@ -53,6 +53,7 @@ string Move::err2str(Move::Error err)
 	switch(err)
 	{
 	case Error::NO_CONNECTIONS: return "no straight lines to same stones";
+	case Error::NO_OVERRIDES: return "missing overrides for this move";
 	case Error::WRONG_START: return "target is not free or outside the map";
 	default:
 		return "none";

@@ -29,8 +29,8 @@ string Player::asString() const
 	fmt::MemoryWriter w;
 	w << static_cast<char>(color);
 	if(!name.empty())
-		w.write(" \"{}\"", name); 
-	
+		w.write(" \"{}\"", name);
+
 	return w.str();
 }
 
@@ -71,6 +71,11 @@ void Player::evaluate(Move& move) const
 	}
 
 	move.override = move.target->isCaptureable();
+	if(move.override && overrides == 0)
+	{
+		move.err = Move::Error::NO_OVERRIDES;
+		return;
+	}
 
 	Direction banned = Direction::_LAST;
 	Cell* cp = move.target;
