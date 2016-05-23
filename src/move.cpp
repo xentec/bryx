@@ -37,14 +37,12 @@ void Move::print() const
 	std::unordered_map<vec, Format> hl;
 
 	cf.setBG(target->getFormat().fg);
-	
+	cf.setFG(Format::BLACK);
+
 	for(Cell* c: captures)
-	{
-		cf.setFG(c->getFormat().fg);
 		hl.emplace(c->pos, cf);
-	}
-	
-	cf.attr = Format::Attribute::UNDERLINE;
+
+	cf.attr = Format::Attribute::BOLD;
 	hl.emplace(target->pos, cf);
 
 	target->map.print(hl);
