@@ -102,7 +102,7 @@ void Client::play()
 
 				fmt::print("Got player move: {} -> {} ex: {}\n", ply, vec{packet.x, packet.y}, packet.extra);
 
-				Move move = ply.move({}, 0,0);
+				Move move = { ply, nullptr };
 				move.target = &game.getMap().at(packet.x, packet.y);
 
 				ply.evaluate(move);
