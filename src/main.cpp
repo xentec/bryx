@@ -39,11 +39,13 @@ struct Options
 
 	Mode mode = Mode::UNKNOWN;
 
-	string host;
+	string host = "localhost";
+	u16 port = 7777;
+
 	string mapPath;
 };
 
-void usage(Options& opts, const string& arg, const string& param)
+void usage(Options& opts, const string&, usz&, const string*)
 {
 	fmt::print("usage: {} [options] <spectator|pvp> <map path>\n", opts.progName);
 	fmt::print("       {} [options] <client>        <host>\n", opts.progName);
@@ -54,13 +56,23 @@ void usage(Options& opts, const string& arg, const string& param)
 void parseArgs(Options& opts, i32 argc, char* argv[])
 {
 
-	using Handler = std::function<void(Options&, const string&, const string&)>;
+	using Handler = std::function<void(Options&, const string&, usz& i, const string*)>;
 	//Handler map = [](Options& opts, const string& arg, const string& param){ return true; };
 	static std::unordered_map<string, Handler> handlers =
 	{
 		{"-h", &usage},
-		{"-nc", [](Options&, const string&, const string&){ Map::printColored = false; }},
-		{"-na", [](Options&, const string&, const string&){ Map::printAnsi = false; }},
+		{"-i", [](Options& opt, const string&, usz& i, const string* arg)
+			{
+				if(arg)
+					opt.mode = Mode::CLIENT, opt.host = *arg, i++;
+			}},
+		{"-p", [](Options& opt, const string&, usz& i, const string* arg)
+			{
+				if(arg)
+					opt.port = static_cast<u16>(std::stoi(*arg)), i++;
+			}},
+		{"-nc", [](Options&, const string&, usz& i, const string*){ Map::printColored = false; }},
+		{"-na", [](Options&, const string&, usz& i, const string*){ Map::printAnsi = false; }},
 	};
 
 	static std::unordered_map<string, Mode> modes =
@@ -78,22 +90,28 @@ void parseArgs(Options& opts, i32 argc, char* argv[])
 			opts.progName = opts.progName.substr(pos+1);
 	}
 
-	for(i32 i = 1; i < argc; i++)
+	for(usz i = 1; i < argc; i++)
 	{
 		string arg = argv[i];
 		auto h = handlers.find(arg);
 		if(h != handlers.end())
-			h->second(opts, arg, argv[i]);
+		{
+			string val, *p = nullptr;
+			if(i+1 < argc)
+				p = &(val = argv[i+1]);
+
+			h->second(opts, arg, i, p);
+		}
 	}
 
-
-	opts.mode = Mode::UNKNOWN;
-	if(argc < 2)
-		throw std::runtime_error("no mode selected");
-
-	auto mode = modes.find(argv[1]);
-	if(mode != modes.end())
-		opts.mode = mode->second;
+	if(opts.mode == Mode::UNKNOWN)
+	{
+		auto mode = modes.find(argv[1]);
+		if(mode != modes.end())
+			opts.mode = mode->second;
+		else
+			throw std::runtime_error("no mode selected");
+	}
 
 	switch(opts.mode)
 	{
@@ -225,7 +243,7 @@ int main(int argc, char* argv[])
 		Client client;
 		try
 		{
-			client.join(opts.host);
+			client.join(opts.host, opts.port);
 		}catch (const std::exception& ex)
 		{
 			fmt::print(stderr, "Failed to join the game: {}\n", ex.what());
