@@ -13,23 +13,17 @@ struct Format
 		NORMAL = 0, BOLD = 1, UNDERLINE = 4, BLINK = 5, INVERSE = 7, INVISIBLE = 8
 	};
 
+	enum Color
+	{
 #ifdef _WIN32
-	enum Color
-	{
 		BLACK = 0, BLUE, GREEN, CYAN, RED, MAGENTA, YELLOW, WHITE, RESET = WHITE
-	};
-
-	inline void setFG(Color c) { fg = c; }
-	inline void setBG(Color c) { bg = c; }
 #else
-	enum Color
-	{
 		RESET = 0, BLACK = 30, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE
+#endif
 	};
 
 	inline void setFG(Color c) { fg = c; }
 	inline void setBG(Color c) { bg = c; }
-#endif
 
 	Format(Color fg = RESET, Attribute attr = NORMAL);
 
