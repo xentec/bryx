@@ -85,7 +85,7 @@ void Game::run()
 		Player& ply = nextPlayer();
 #if VERBOSE
 		fmt::print("\n");
-		fmt::print("Player {}\n", ply.color);
+		fmt::print("Player {}\n", ply);
 
 		fmt::print("##########");
 		for(usz i = 0; i < ply.name.size(); i++)
@@ -95,7 +95,7 @@ void Game::run()
 		fmt::print("Overrides: {}\n", ply.overrides);
 		fmt::print("Bombs: {}\n", ply.bombs);
 		fmt::print("\n");
-		
+
 		std::list<Move> moves = ply.possibleMoves();
 		if(moves.empty())
 		{
@@ -103,13 +103,13 @@ void Game::run()
 			moveless++;
 			continue;
 		}
-		
+
 		{
 			u32 ovr = 0, num = moves.size();
 			for(Move& m: moves)
 				if(m.override)
 					ovr++;
-			
+
 			fmt::print("Moves: {} ({})\n", num-ovr, num);
 		}
 #endif
@@ -124,12 +124,12 @@ void Game::run()
 		stats.time.moveAvg += elapsed/(num*(num+1));
 		num++;
 
-		execute(move);
-
 #if VERBOSE
-		fmt::print("\n  \n\n", move.asString());
+		fmt::print("\n\n", move.asString());
 		move.print();
 #endif
+
+		execute(move);
 	}
 	while(!hasEnded());
 }
@@ -264,7 +264,7 @@ void Game::undo(Move &move)
 	move.target->type = move.backup.target;
 	for(auto c : move.backup.captures)
 		map->at(c.first).type = c.second;
-	
+
 	if(move.target->isPlayer())
 		move.player.overrides++;
 }

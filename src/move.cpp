@@ -36,7 +36,7 @@ void Move::print() const
 	Format cf;
 	std::unordered_map<vec, Format> hl;
 
-	cf.setBG(target->getFormat().fg);
+	cf.setBG(Cell::getTypeFormat(player.color).fg);
 	cf.setFG(Format::BLACK);
 
 	for(Cell* c: captures)
