@@ -60,8 +60,9 @@ struct Cell
 	void addTransistion(Direction exit, Direction entry, Cell* target);
 
 	console::Format getFormat() const;
-	
+
 	static bool isValid(char ch);
+	static console::Format getTypeFormat(Type type);
 
 
 	const vec pos;
