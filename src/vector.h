@@ -106,9 +106,5 @@ namespace std {
 
 inline bool inBox(const vec& x, const vec& begin, const vec& end)
 {
-	for(usz i = 0; i < 2; i++)
-		if(x[i] < begin[i] || end[i] < x[i])
-			return false;
-
-	return true;
+	return begin.x <= x.x && x.x <= end.x && begin.y <= x.y && x.y <= end.y;
 }
