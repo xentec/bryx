@@ -12,7 +12,7 @@ struct AI : Player
 	virtual ~AI();
 
 	virtual Player* clone() const;
-	virtual Move move(u32 time, u32 depth);
+	virtual Move move(const std::list<Move>& moves, u32 time, u32 depth);
 
 	std::pair<Heuristic, Move> bestState(Game &state, u32 depth, Heuristic a, Heuristic b);
 

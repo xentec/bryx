@@ -30,11 +30,11 @@ Player *Human::clone() const
 	return new Human(*this);
 }
 
-Move Human::move(u32, u32)
+Move Human::move(const std::list<Move>&, u32, u32)
 {
 	Move move { *this, nullptr };
 
-	if(possibleMoves().empty())
+	if(possibleMoves().empty()) // TODO Remove
 		return move;
 
 	do {

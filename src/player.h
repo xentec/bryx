@@ -20,7 +20,7 @@ struct Player
 	
 	string asString() const;
 
-	virtual Move move(u32 time, u32 depth) = 0;
+	virtual Move move(const std::list<Move>& moves, u32 time, u32 depth) = 0;
 
 	std::list<Cell*> stones();
 	std::list<Move> possibleMoves();

@@ -90,7 +90,7 @@ Player *AI::clone() const
 	return new AI(*this);
 }
 
-Move AI::move(u32 time, u32 depth)
+Move AI::move(const std::list<Move>& moves, u32 time, u32 depth)
 {
 	Move move = bestState(game, depth, 0, 0).second;
 

@@ -95,9 +95,26 @@ void Game::run()
 		fmt::print("Overrides: {}\n", ply.overrides);
 		fmt::print("Bombs: {}\n", ply.bombs);
 		fmt::print("\n");
+		
+		std::list<Move> moves = ply.possibleMoves();
+		if(moves.empty())
+		{
+			fmt::print("No move\n");
+			moveless++;
+			continue;
+		}
+		
+		{
+			u32 ovr = 0, num = moves.size();
+			for(Move& m: moves)
+				if(m.override)
+					ovr++;
+			
+			fmt::print("Moves: {} ({})\n", num-ovr, num);
+		}
 #endif
 		start = std::chrono::system_clock::now();
-		Move move = ply.move(0,3);
+		Move move = ply.move(moves,0,3);
 		end = std::chrono::system_clock::now();
 
 		elapsed = end-start;
@@ -106,15 +123,6 @@ void Game::run()
 
 		stats.time.moveAvg += elapsed/(num*(num+1));
 		num++;
-
-		if(!move.target)
-		{
-#if VERBOSE
-			fmt::print("No move\n");
-#endif
-			moveless++;
-			continue;
-		}
 
 		execute(move);
 

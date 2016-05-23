@@ -13,7 +13,7 @@ struct Dummy : Player
 	Dummy(const Dummy& other): Player(other) {}
 	virtual ~Dummy() {}
 	virtual Player* clone() const { return new Dummy(*this); }
-	virtual Move move(u32, u32) { return Move(*this, nullptr); }
+	virtual Move move(const std::list<Move>&, u32, u32) { return Move(*this, nullptr); }
 };
 
 
@@ -81,7 +81,7 @@ void Client::play()
 				fmt::print("Got move request: time {}, depth {}\n", packet.time, packet.depth);
 
 				game.currPly = type2ply(me->color);
-				Move move = me->move(packet.time, packet.depth);
+				Move move = me->move(me->possibleMoves(), packet.time, packet.depth);
 				packet::MoveResponse resp(move.target->pos, move.bonus);
 
 				if(move.choice != Cell::Type::VOID)
@@ -102,7 +102,7 @@ void Client::play()
 
 				fmt::print("Got player move: {} -> {} ex: {}\n", ply, vec{packet.x, packet.y}, packet.extra);
 
-				Move move = ply.move(0,0);
+				Move move = ply.move({}, 0,0);
 				move.target = &game.getMap().at(packet.x, packet.y);
 
 				ply.evaluate(move);
