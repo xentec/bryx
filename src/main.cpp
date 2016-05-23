@@ -59,6 +59,8 @@ void parseArgs(Options& opts, i32 argc, char* argv[])
 	static std::unordered_map<string, Handler> handlers =
 	{
 		{"-h", &usage},
+		{"-nc", [](Options&, const string&, const string&){ Map::printColored = false; }},
+		{"-na", [](Options&, const string&, const string&){ Map::printAnsi = false; }},
 	};
 
 	static std::unordered_map<string, Mode> modes =
