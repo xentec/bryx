@@ -57,7 +57,8 @@ struct Cell
 	void addTransition(Direction exit, Direction entry, Cell* target);
 
 	Cell* getDirectNeighbor(Direction dir) const;
-	Transition getNeighbor(Direction dir) const;
+	Transition& getNeighbor(Direction dir);
+	const Transition& getNeighbor(Direction dir) const;
 
 	console::Format getFormat() const;
 
@@ -80,7 +81,8 @@ struct Cell
 		typedef T&  reference;
 		typedef iterator<T,C> iter;
 
-		value_type operator*()  { return cell.getNeighbor((Direction)dir);  }
+		reference operator*()  { return cell.getNeighbor((Direction)dir);  }
+		pointer operator->()  { return &*this;  }
 
 		iter& operator++()
 		{

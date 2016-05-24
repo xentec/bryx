@@ -187,7 +187,7 @@ Map Map::load(std::istream& file)
 
 	Map map(stoi(tmp[1]), stoi(tmp[0]));
 
-	for (i32 y = 0; y < map.height; y++)
+	for (usz y = 0; y < map.height; y++)
 	{
 		std::string line = readline(file);
 		usz lm = (line.length()+1)/2;
@@ -195,13 +195,27 @@ Map Map::load(std::istream& file)
 		if(lm != map.width)
 			throw std::runtime_error(fmt::format("length of line {} does not match map width: {} != {}", y+5, lm, map.width));
 
-		for(i32 x = 0; x < line.length(); x += 2) // ignore spaces inbetween
+		for(usz x = 0; x < line.length(); x += 2) // ignore spaces inbetween
 		{
 			char c = line[x];
 			if(!Cell::isValid(c))
 				throw std::runtime_error(fmt::format("invalid cell character '{}' found at {}:{}", c, y+5, x));
 
 			map.at(x/2, y).type = static_cast<Cell::Type>(c);
+		}
+	}
+
+	// init transitions
+	for(Cell& c: map)
+	{
+		if(c.type == Cell::Type::VOID)
+			continue;
+
+		for(u32 d = Direction::N; d < Direction::_LAST; d++)
+		{
+			Direction dir = Direction(d);
+			Cell* nc = c.getDirectNeighbor(dir);
+			c.trans[d] = { nc && nc->type != Cell::Type::VOID ? nc : nullptr, dir, dir };
 		}
 	}
 

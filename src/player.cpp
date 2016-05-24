@@ -4,15 +4,15 @@
 #include "game.h"
 
 Player::Player(Game &game, Cell::Type color, const string& name):
-	name(name),
-	color(color), overrides(0), bombs(0),
-	game(game)
+    name(name),
+    color(color), overrides(0), bombs(0),
+    game(game)
 {}
 
 Player::Player(const Player &other):
-	name(other.name),
-	color(other.color), overrides(other.overrides), bombs(other.bombs),
-	game(other.game)
+    name(other.name),
+    color(other.color), overrides(other.overrides), bombs(other.bombs),
+    game(other.game)
 {}
 
 Player& Player::operator =(const Player& other)
@@ -79,31 +79,32 @@ void Player::evaluate(Move& move) const
 
 	Direction banned = Direction::_LAST;
 
-	for(Cell::Transition trn : *move.target)
+	for(const Cell::Transition& dir : *move.target)
 	{
-		if(trn.entry == banned)
+		if(dir.entry == banned)
 			continue;
 
-		std::list<Cell*> line;
+		std::list<Cell*> line;		
+		const Cell::Transition* trn = &dir;
 
-		while(trn.to && trn.to->isCaptureable())
+		while(trn->to && trn->to->isCaptureable())
 		{
-			if(trn.to->type == move.player.color)
+			if(trn->to->type == move.player.color)
 			{
 				if(!line.empty())
 					move.captures.merge(line);
 				break;
 			}
 
-			if(*move.target == *trn.to) // we're in a loop!
+			if(*move.target == *trn->to) // we're in a loop!
 			{
 				 // do not try the same dir you came from while looping
-				banned = dir180(trn.entry);
+				banned = dir180(trn->entry);
 				break;
 			}
 
-			line.push_back(trn.to);
-			trn = trn.to->getNeighbor(trn.entry);
+			line.push_back(trn->to);
+			trn = &trn->to->getNeighbor(trn->entry);
 		}
 	}
 

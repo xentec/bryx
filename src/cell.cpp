@@ -26,9 +26,7 @@ inline vec dir2vec(Direction dir)
 //#######
 Cell::Cell(Map& map, vec pos, Type type):
 	pos(pos), type(type), map(map)
-{
-	trans.fill({nullptr, Direction::N});
-}
+{}
 
 Cell& Cell::operator =(const Cell &other)
 {
@@ -92,33 +90,21 @@ bool Cell::isSpecial() const
 	}
 }
 
-Cell* Cell::getDirectNeighbor(Direction dir) const
+Cell* Cell::getDirectNeighbor(Direction dir) const // TODO: null only
 {
 	vec dirPos = pos + dir2vec(dir);
 	return map.checkPos(dirPos) ? &map.at(dirPos) : nullptr;
 }
 
-
-Cell::Transition Cell::getNeighbor(Direction dir) const
+Cell::Transition& Cell::getNeighbor(Direction dir)
 {
-/*  // SC: 33 M, IC: 75 M
-	const Transition& t = transitions[dir];
-	if(t.target)
-	{
-		dir = t.entry;
-		return t.target;
-	}
-	Cell* c = getDirectNeighbor(dir);
-	return c && c->type != Cell::Type::VOID ? c : nullptr;
-*/
-	const Transition& t = trans[dir];
-	if(t.to)
-		return t;
-	else
-	{
-		Cell* c = getDirectNeighbor(dir);
-		return Transition { c && c->type != Type::VOID ? c : nullptr , dir, dir };
-	}
+	return trans[dir];	
+}
+
+
+const Cell::Transition& Cell::getNeighbor(Direction dir) const
+{
+	return trans[dir];
 }
 
 void Cell::addTransition(Direction exit, Direction entry, Cell* target)
