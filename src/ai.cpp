@@ -34,7 +34,7 @@ Move AI::move(const std::list<Move>& moves, u32 time, u32 depth)
 {
 	std::pair<Heuristic, Move> bestMove = { infMin, moves.front() };
 
-	Heuristic a = infMin, v = infMin, b = infMax;
+	Heuristic a = infMin, b = infMax;
 
 	for(Move m: moves)
 	{
@@ -47,11 +47,11 @@ Move AI::move(const std::list<Move>& moves, u32 time, u32 depth)
 		game.prevPlayer();
 		game.undo(m);
 
-		if(maxPrune(h, a, v, b))
-			break;
-
 		if(h > bestMove.first)
-			bestMove = {h, m};
+			bestMove = {bestMove.first, m};
+
+		if(maxPrune(h, a, bestMove.first, b))
+			break;
 	}
 
 	if(bestMove.second.target == nullptr)
