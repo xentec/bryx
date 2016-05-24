@@ -122,6 +122,7 @@ void Client::play()
 				}
 
 				move.print();
+				fmt::print("\n\n");
 				game.execute(move);
 			}
 			break;
@@ -143,6 +144,8 @@ void Client::play()
 		{
 			read<packet::BombPhase>(); // clear socket buffer
 			// TODO: Change phase
+			
+			fmt::print("Switching to BOMB phase!\n");
 		}
 			break;
 		case packet::GAME_END:

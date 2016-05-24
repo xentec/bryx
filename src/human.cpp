@@ -34,9 +34,6 @@ Move Human::move(const std::list<Move>&, u32, u32)
 {
 	Move move { *this, nullptr };
 
-	if(possibleMoves().empty()) // TODO Remove
-		return move;
-
 	do {
 		fmt::print("Place your stone (carefully) [x y OR 'pass']: ");
 

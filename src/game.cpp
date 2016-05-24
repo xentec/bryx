@@ -136,12 +136,8 @@ void Game::run()
 
 void Game::execute(Move &move, bool backup)
 {
-	if(!move.target || move.captures.empty())
-	{
-		moveless++;
-		return;
-	} else
-		moveless = 0;
+	if(!move.target)
+		throw std::runtime_error("empty target");
 
 	if(move.target->type == Cell::Type::VOID)
 		throw std::runtime_error("wrong target");
@@ -215,9 +211,6 @@ void Game::execute(Move &move, bool backup)
 
 void Game::undo(Move &move)
 {
-	if(move.backup.captures.empty())
-		throw std::runtime_error("move has no backup");
-
 	switch(move.backup.target) // ...then look at special cases
 	{
 	case Cell::Type::BONUS:
@@ -265,7 +258,7 @@ void Game::undo(Move &move)
 	for(auto c : move.backup.captures)
 		map->at(c.first).type = c.second;
 
-	if(move.target->isPlayer())
+	if(move.target->isCaptureable())
 		move.player.overrides++;
 }
 

@@ -108,7 +108,7 @@ void Player::evaluate(Move& move) const
 		}
 	}
 
-	if(move.captures.empty())
+	if(move.captures.empty() && move.target->type != Cell::Type::EXPANSION)
 		move.err =  Move::Error::NO_CONNECTIONS;
 	return;
 }
