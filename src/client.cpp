@@ -81,16 +81,21 @@ void Client::play()
 				fmt::print("Got move request: time {}, depth {}\n", packet.time, packet.depth);
 
 				game.currPly = type2ply(me->color);
-				Move move = me->move(me->possibleMoves(), packet.time, packet.depth);
+
+				auto moves = me->possibleMoves();
+				if(moves.empty())
+					throw std::runtime_error("no moves found");
+	
+				Move move = me->move(moves, packet.time, packet.depth);
 				packet::MoveResponse resp(move.target->pos, move.bonus);
 
 				if(move.choice != Cell::Type::VOID)
 					resp.extra = type2ply(move.choice)+1;
 
 				fmt::print("Sending move: {} -> {} ex: {}\n", move.player, move.target->pos, resp.extra);
-				move.print();
-
 				send(resp);
+				
+				move.print();
 			}
 			break;
 		case packet::MOVE:
@@ -109,7 +114,7 @@ void Client::play()
 
 				if(packet.extra)
 				{
-					if(packet.extra == 20 || packet.extra == 21)
+					if(packet.extra == Move::Bonus::BOMB || packet.extra == Move::Bonus::OVERRIDE)
 					{
 						 move.bonus = static_cast<Move::Bonus>(packet.extra);
 					} else
