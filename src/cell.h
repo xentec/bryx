@@ -54,9 +54,10 @@ struct Cell
 	bool isCaptureable() const;
 	bool isSpecial() const;
 
+	void addTransition(Direction exit, Direction entry, Cell* target);
+
 	Cell* getDirectNeighbor(Direction dir) const;
 	Transition getNeighbor(Direction dir) const;
-	void addTransistion(Direction exit, Direction entry, Cell* target);
 
 	console::Format getFormat() const;
 
@@ -66,7 +67,7 @@ struct Cell
 
 	const vec pos;
 	Cell::Type type;
-	std::array<Transition, 8> transitions;
+	std::array<Transition, 8> trans;
 
 	Map& map;
 

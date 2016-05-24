@@ -220,8 +220,8 @@ Map Map::load(std::istream& file)
 				 entry = static_cast<Direction>(stoi(tmp.at(6)));
 
 		try {
-			from.addTransistion(exit, dir180(entry), &to);
-			to.addTransistion(entry, dir180(exit), &from);
+			from.addTransition(exit, dir180(entry), &to);
+			to.addTransition(entry, dir180(exit), &from);
 		}
 		catch(std::out_of_range& e)
 		{

@@ -27,7 +27,7 @@ inline vec dir2vec(Direction dir)
 Cell::Cell(Map& map, vec pos, Type type):
 	pos(pos), type(type), map(map)
 {
-	transitions.fill({nullptr, Direction::N});
+	trans.fill({nullptr, Direction::N});
 }
 
 Cell& Cell::operator =(const Cell &other)
@@ -111,7 +111,7 @@ Cell::Transition Cell::getNeighbor(Direction dir) const
 	Cell* c = getDirectNeighbor(dir);
 	return c && c->type != Cell::Type::VOID ? c : nullptr;
 */
-	const Transition& t = transitions[dir];
+	const Transition& t = trans[dir];
 	if(t.to)
 		return t;
 	else
@@ -121,7 +121,7 @@ Cell::Transition Cell::getNeighbor(Direction dir) const
 	}
 }
 
-void Cell::addTransistion(Direction exit, Direction entry, Cell* target)
+void Cell::addTransition(Direction exit, Direction entry, Cell* target)
 {
 	if(type == Cell::Type::VOID)
 		throw std::runtime_error(fmt::format("adding transistion to void cell ({})", pos));
@@ -133,7 +133,7 @@ void Cell::addTransistion(Direction exit, Direction entry, Cell* target)
 	if(!target || target->type == Cell::Type::VOID)
 		throw std::runtime_error(fmt::format("transistion points to void cell ({})", target ? target->asString() : ""));
 
-	transitions[exit] = { target, exit, entry };
+	trans[exit] = { target, exit, entry };
 }
 
 console::Format Cell::getFormat() const
