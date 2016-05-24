@@ -27,7 +27,13 @@ Socket::~Socket()
 void Socket::connect(string host, u16 port)
 {
 	i32 err;
-	addrinfo hints, *res;
+	addrinfo hints, *res = nullptr;
+
+	// first, load up address structs with getaddrinfo():
+
+	std::memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
 
 #ifdef _WIN32
 	WSADATA wsaData;
@@ -36,17 +42,11 @@ void Socket::connect(string host, u16 port)
 		throw std::runtime_error("wsa init failed");
 #endif
 
-	// first, load up address structs with getaddrinfo():
-
-	std::memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-
 	// Try both IPv4 and v6 first and if it fails, try with IPv4 only
 	do
 	{
 		err = getaddrinfo(host.c_str(), fmt::FormatInt(port).c_str(), &hints, &res);
-		Scope cs([=](){ freeaddrinfo(res); });
+		Scope cs([=](){ if(res) freeaddrinfo(res); });
 
 		if(err)
 			throw std::runtime_error(fmt::format("failed to resolve address: {}", gai_strerror(err)));
