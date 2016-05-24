@@ -47,8 +47,8 @@ struct Options
 
 void usage(Options& opts, const string&, usz&, const string*)
 {
-	fmt::print("usage: {} [options] <spectator|pvp> <map path>\n", opts.progName);
-	fmt::print("       {} [options] <client>        <host>\n", opts.progName);
+	println("usage: {} [options] <spectator|pvp> <map path>", opts.progName);
+	println("       {} [options] <client>        <host>", opts.progName);
 	std::exit(0);
 }
 
@@ -71,6 +71,8 @@ void parseArgs(Options& opts, i32 argc, char* argv[])
 				if(arg)
 					opt.port = static_cast<u16>(std::stoi(*arg)), i++;
 			}},
+		
+		{"-q", [](Options&, const string&, usz& i, const string*){ console::quiet = true; }},
 		{"-nc", [](Options&, const string&, usz& i, const string*){ Map::printColored = false; }},
 		{"-na", [](Options&, const string&, usz& i, const string*){ Map::printAnsi = false; }},
 	};
@@ -145,31 +147,31 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	fmt::print("Bryx - a ReversiXT implementation\n");
-	fmt::print("Mode: {}\n", mode2str(opts.mode));
+	println("Bryx - a ReversiXT implementation");
+	println("Mode: {}", mode2str(opts.mode));
 	std::cout.flush();
 
 	if(opts.mode != Mode::CLIENT)
 	{
-		fmt::print("Loading map {} ... ", opts.mapPath);
+		print("Loading map {} ... ", opts.mapPath);
 
 		std::ifstream file( opts.mapPath);
 		if (!file)
 		{
-			fmt::print("FAILED!\n");
-			fmt::print("File '{}' cannot be read\n",  opts.mapPath);
+			println("FAILED!");
+			println("File '{}' cannot be read",  opts.mapPath);
 			return 0;
 		}
 
 		Game game;
 		game.load(file);
 
-		fmt::print("Done!\n");
+		println("Done!");
 
-		fmt::print("Players: {}\n", game.defaults.players);
-		fmt::print("Overrides: {}\n", game.defaults.overrides);
-		fmt::print("Bombs: {} ({})\n", game.defaults.bombs, game.defaults.bombsStrength);
-		fmt::print("Map: {}x{}\n", game.getMap().width, game.getMap().height);
+		println("Players: {}", game.defaults.players);
+		println("Overrides: {}", game.defaults.overrides);
+		println("Bombs: {} ({})", game.defaults.bombs, game.defaults.bombsStrength);
+		println("Map: {}x{}", game.getMap().width, game.getMap().height);
 		game.getMap().print();
 
 
@@ -180,17 +182,17 @@ int main(int argc, char* argv[])
 				game.addPlayer<AI>();
 			break;
 		case Mode::PVP:
-			fmt::print("\n");
+			print("\n");
 			for(u32 i = 0; i < game.defaults.players; i++)
 			{
-				fmt::print("Player {}: human (h) or computer (c)? ", i+1);
+				print("Player {}: human (h) or computer (c)? ", i+1);
 				string input;
 
 				std::cin >> input;
 				Player *ply = nullptr;
 				if(!input.empty() && toLower(input)[0] == 'h')
 				{
-					fmt::print("Player {}, enter your name: ", i+1);
+					print("Player {}, enter your name: ", i+1);
 					std::cin >> input;
 					ply = &game.addPlayer<Human>();
 					ply->name = input;
@@ -198,7 +200,7 @@ int main(int argc, char* argv[])
 				{
 					ply = &game.addPlayer<AI>();
 				}
-				fmt::print("Player name set: {}\n", *ply);
+				println("Player name set: {}", *ply);
 
 			}
 			break;
@@ -224,20 +226,21 @@ int main(int argc, char* argv[])
 			return a.second > b.second;
 		});
 
-		fmt::print("\n########\n");
-		fmt::print("GAME SET\n");
-		fmt::print("########\n\n");
+		print("\n");
+		println("########");
+		println("GAME SET");
+		println("########");
 		game.getMap().print();
 
-		fmt::print("Moves: {}\n", game.stats.moves);
-		fmt::print("Scores:\n");
+		println("Moves: {}", game.stats.moves);
+		println("Scores:");
 		for(usz i = 0; i < scores.size(); i++)
 		{
-			fmt::print("{}. Player {}: {}\n", i+1, (char) scores[i].first, scores[i].second);
+			println("{}. Player {}: {}", i+1, (char) scores[i].first, scores[i].second);
 		}
 
-		fmt::print("Longest move: {} ms\n", game.stats.time.moveMax.count() * 1000);
-		fmt::print("Average move: {} ms\n", game.stats.time.moveAvg.count() * 1000);
+		println("Longest move: {} ms", game.stats.time.moveMax.count() * 1000);
+		println("Average move: {} ms", game.stats.time.moveAvg.count() * 1000);
 	}
 	else
 	{
@@ -247,7 +250,7 @@ int main(int argc, char* argv[])
 			client.join(opts.host, opts.port);
 		}catch (const std::exception& ex)
 		{
-			fmt::print(stderr, "Failed to join the game: {}\n", ex.what());
+			print("Failed to join the game: {}", ex.what());
 		}
 		client.play();
 	}

@@ -93,6 +93,8 @@ void Map::print(bool colored, bool ansi) const
 void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored, bool ansi) const
 {
 	using namespace console;
+	if(quiet)
+		return;
 
 	string space = ansi ? "": " ";
 
@@ -108,7 +110,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 	fmt::print("\n");
 
 
-	for (i32 y = 0; y < height; y++)
+	for (u32 y = 0; y < height; y++)
 	{
 		if(y%5 == 0)
 			fmt::print("{:2} ", y);
@@ -117,7 +119,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 
 		Format color;
 
-		for (i32 x = 0; x < width; x++)
+		for (u32 x = 0; x < width; x++)
 		{
 			const Cell& c = at(x, y);
 			string ch = c.asString();

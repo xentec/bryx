@@ -107,7 +107,7 @@ struct BombPhase
 	Header hdr;
 	
 	BombPhase();
-	BombPhase(const Payload& data);
+	BombPhase(const Payload&);
 		
 	Payload dump();
 };
@@ -118,7 +118,7 @@ struct GameEnd
 	Header hdr;
 	
 	GameEnd();
-	GameEnd(const Payload& data);
+	GameEnd(const Payload&);
 		
 	Payload dump();
 };

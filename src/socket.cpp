@@ -74,7 +74,7 @@ void Socket::connect(string host, u16 port)
 	socklen_t len = sizeof(sin);
 	err = getsockname(fd, (sockaddr *)&sin, &len);
 	if(err != -1)
-		fmt::print("PORT: {}\n", ntohs(sin.sin_port));
+		println("PORT: {}", ntohs(sin.sin_port));
 #endif
 }
 
@@ -90,16 +90,16 @@ void Socket::close()
 void Socket::send(const std::vector<u8>& payload) const
 {
 #if DEBUG > 4
-	fmt::print("SENDING: [{}] ", payload.size());
+	println("SENDING: [{}] ", payload.size());
 	std::fflush(stdout);
 
-	fmt::print("{:02x} ", payload[0]);
-	fmt::print("{:08x} ", ntohl(*(u32*) &payload[1]));
+	println("{:02x} ", payload[0]);
+	println("{:08x} ", ntohl(*(u32*) &payload[1]));
 
 	for(auto iter = payload.cbegin()+5; iter != payload.cend(); iter++)
-		fmt::print("{:02x} ", *iter);
+		println("{:02x} ", *iter);
 
-	fmt::print("\n");
+	print("\n");
 	std::fflush(stdout);
 #endif
 
@@ -117,24 +117,24 @@ std::vector<u8> Socket::recv(usz size, bool peek, bool wait) const
 		throw std::runtime_error(strerror(errno));
 
 #if DEBUG > 4
-	fmt::print("RECEIVING: [{}] ", buffer.size());
+	println("RECEIVING: [{}] ", buffer.size());
 	std::fflush(stdout);
 
 	if(len > 0)
 	{
-		fmt::print("{:02x} ", buffer[0]);
+		println("{:02x} ", buffer[0]);
 		if(buffer.size() > 1)
 		{
-			fmt::print("{:08x} ", ntohl(*(u32*) &buffer[1]));
+			println("{:08x} ", ntohl(*(u32*) &buffer[1]));
 			if(buffer.size() > 5)
 			{
 				for(auto iter = buffer.begin()+5; iter != buffer.end(); iter++)
-					fmt::print("{:02x} ", *iter);
+					println("{:02x} ", *iter);
 			}
 		}
 	}
 
-	fmt::print("\n");
+	print("\n");
 	std::fflush(stdout);
 #endif
 

@@ -25,8 +25,7 @@ void Client::join(string host, u16 port)
 {
 	try
 	{
-		fmt::print("Connecting to {}:{} ...\n", host, port);
-		std::fflush(stdout);
+		println("Connecting to {}:{} ...", host, port);
 
 		socket.connect(host, port);
 		socket.send(packet::Join(YIMB_GROUP).dump());
@@ -38,7 +37,7 @@ void Client::join(string host, u16 port)
 
 	try
 	{
-		fmt::print("Waiting for Map...\n");
+		println("Waiting for Map...");
 		std::stringstream mapData(read<packet::Map>().map);
 		game.load(mapData);
 	}
@@ -57,14 +56,14 @@ void Client::join(string host, u16 port)
 			game.addPlayer<Dummy>();
 	}
 
-	fmt::print("\n");
-	fmt::print("My number: {}\n", *me);
-	fmt::print("\n");
+	print("\n");
+	println("My number: {}", *me);
+	print("\n");
 
-	fmt::print("Players: {}\n", game.defaults.players);
-	fmt::print("Overrides: {}\n", game.defaults.overrides);
-	fmt::print("Bombs: {} ({})\n", game.defaults.bombs, game.defaults.bombsStrength);
-	fmt::print("Map: {}x{}\n", game.getMap().width, game.getMap().height);
+	println("Players: {}", game.defaults.players);
+	println("Overrides: {}", game.defaults.overrides);
+	println("Bombs: {} ({})", game.defaults.bombs, game.defaults.bombsStrength);
+	println("Map: {}x{}", game.getMap().width, game.getMap().height);
 	game.getMap().print();
 }
 
@@ -78,7 +77,7 @@ void Client::play()
 			{
 				auto packet = read<packet::MoveRequest>(); // TODO: take time and depth into account
 
-				fmt::print("Got move request: time {}, depth {}\n", packet.time, packet.depth);
+				println("Got move request: time {}, depth {}", packet.time, packet.depth);
 
 				game.currPly = type2ply(me->color);
 
@@ -92,7 +91,7 @@ void Client::play()
 				if(move.choice != Cell::Type::VOID)
 					resp.extra = type2ply(move.choice)+1;
 
-				fmt::print("Sending move: {} -> {} ex: {}\n", move.player, move.target->pos, resp.extra);
+				println("Sending move: {} -> {} ex: {}", move.player, move.target->pos, resp.extra);
 				send(resp);
 				
 				move.print();
@@ -105,7 +104,7 @@ void Client::play()
 				game.currPly = packet.player - 1;
 				Player& ply = game.currPlayer();
 
-				fmt::print("Got player move: {} -> {} ex: {}\n", ply, vec{packet.x, packet.y}, packet.extra);
+				println("Got player move: {} -> {} ex: {}", ply, vec{packet.x, packet.y}, packet.extra);
 
 				Move move = { ply, nullptr };
 				move.target = &game.getMap().at(packet.x, packet.y);
@@ -122,7 +121,7 @@ void Client::play()
 				}
 
 				move.print();
-				fmt::print("\n\n");
+				print("\n\n");
 				game.execute(move);
 			}
 			break;
@@ -133,7 +132,7 @@ void Client::play()
 			auto dp = game.getPlayers().begin() + packet.player - 1;
 			if(*dp == me) // NOOOOOOOOOOOO!!!!!111111
 			{
-				fmt::print("It was nice while it lasted... ;_;\n");
+				println("It was nice while it lasted... ;_;");
 				return;
 			}
 			delete *dp;
@@ -145,13 +144,13 @@ void Client::play()
 			read<packet::BombPhase>(); // clear socket buffer
 			// TODO: Change phase
 			
-			fmt::print("Switching to BOMB phase!\n");
+			println("Switching to BOMB phase!");
 		}
 			break;
 		case packet::GAME_END:
 		{
 			read<packet::GameEnd>(); // clear socket buffer
-			fmt::print("gg kthxbye\n");
+			println("gg kthxbye");
 			return;
 		}
 		default:

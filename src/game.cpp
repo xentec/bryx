@@ -83,23 +83,23 @@ void Game::run()
 	do
 	{
 		Player& ply = nextPlayer();
-#if VERBOSE
-		fmt::print("\n");
-		fmt::print("Player {}\n", ply);
 
-		fmt::print("##########");
+		print("\n");
+		println("Player {}", ply);
+
+		println("##########");
 		for(usz i = 0; i < ply.name.size(); i++)
-			fmt::print("#");
-		fmt::print("\n");
+			println("#");
+		print("\n");
 
-		fmt::print("Overrides: {}\n", ply.overrides);
-		fmt::print("Bombs: {}\n", ply.bombs);
-		fmt::print("\n");
+		println("Overrides: {}", ply.overrides);
+		println("Bombs: {}", ply.bombs);
+		print("\n");
 
 		std::list<Move> moves = ply.possibleMoves();
 		if(moves.empty())
 		{
-			fmt::print("No move\n");
+			println("No moves");
 			moveless++;
 			continue;
 		}
@@ -110,9 +110,9 @@ void Game::run()
 				if(m.override)
 					ovr++;
 
-			fmt::print("Moves: {} ({})\n", num-ovr, num);
+			println("Moves: {} ({})", num-ovr, num);
 		}
-#endif
+
 		start = std::chrono::system_clock::now();
 		Move move = ply.move(moves,0,3);
 		end = std::chrono::system_clock::now();
@@ -124,11 +124,7 @@ void Game::run()
 		stats.time.moveAvg += elapsed/(num*(num+1));
 		num++;
 
-#if VERBOSE
-		fmt::print("\n\n", move.asString());
 		move.print();
-#endif
-
 		execute(move);
 	}
 	while(!hasEnded());

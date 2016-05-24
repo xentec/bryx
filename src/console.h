@@ -6,6 +6,8 @@
 namespace console
 {
 
+extern bool quiet;
+
 struct Format
 {
 	enum Attribute
@@ -62,4 +64,19 @@ namespace color
 	static const Format WHITE (Format::WHITE, Format::BOLD);
 }
 
+}
+
+
+template <typename... Args>
+void print(const char *format, const Args & ... args)
+{
+	if(!console::quiet) 
+		fmt::print(format, args...);
+}
+
+template <typename... Args>
+void println(const char *format, const Args & ... args)
+{
+	print(format, args...);
+	print("\n");
 }

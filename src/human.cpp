@@ -11,7 +11,7 @@
 
 static void error(string what)
 {
-	fmt::print("{}ERR: {}{}\n", console::color::GRAY, what, console::color::RESET);
+	println("{}ERR: {}{}\n", console::color::GRAY, what, console::color::RESET);
 }
 
 Human::Human(Game &game, Cell::Type color):
@@ -35,7 +35,7 @@ Move Human::move(const std::list<Move>&, u32, u32)
 	Move move { *this, nullptr };
 
 	do {
-		fmt::print("Place your stone (carefully) [x y OR 'pass']: ");
+		print("Place your stone (carefully) [x y OR 'pass']: ");
 
 		try {
 			string input;
@@ -52,12 +52,12 @@ Move Human::move(const std::list<Move>&, u32, u32)
 		} catch(std::out_of_range& ex)
 		{
 			error(ex.what());
-			fmt::print("Your start position is outside the map!\n");
+			println("Your start position is outside the map!");
 			continue;
 		} catch(std::exception& ex)
 		{
 			error(ex.what());
-			fmt::print("Something bad happened! Try again.\n");
+			println("Something bad happened! Try again.");
 			continue;
 		}
 
@@ -67,25 +67,25 @@ Move Human::move(const std::list<Move>&, u32, u32)
 
 		if(move.err != Move::Error::NONE)
 		{
-			fmt::print("You move is invalid: {}\n", Move::err2str(move.err));
+			println("You move is invalid: {}", Move::err2str(move.err));
 			continue;
 		}
 
 		if(move.override)
 		{
-			fmt::print("Your move needs an override stone");
+			println("Your move needs an override stone");
 			if(overrides == 0)
 			{
-				fmt::print(", but you don't have any! Try something else or pass.\n");
+				println(", but you don't have any! Try something else or pass.");
 				continue;
 			} else
 			{
-				fmt::print(". If you want to use one, type 'y': ");
+				print(". If you want to use one, type 'y': ");
 				string input;
 				std::cin >> input;
 				if(toLower(input) != "y")
 				{
-					fmt::print("Aborted!\n");
+					println("Aborted!");
 					continue;
 				}
 			}
@@ -98,38 +98,38 @@ Move Human::move(const std::list<Move>&, u32, u32)
 		switch(move.target->type)
 		{
 		case Cell::Type::BONUS:
-			fmt::print("You have hit a bonus stone!\n");
+			println("You have hit a bonus stone!");
 			do
 			{
-				fmt::print("Choose between an extra bomb (b) or override stone (o): ");
+				print("Choose between an extra bomb (b) or override stone (o): ");
 
 				string input;
 				std::cin >> input;
 				string choice = toLower(input);
 
 				if(choice == "b")
-					fmt::print("You have now {} bombs.", bombs+1);
+					println("You have now {} bombs.", bombs+1);
 				else if(choice == "o")
-					fmt::print("You have now {} override stones.", overrides+1);
+					println("You have now {} override stones.", overrides+1);
 				else
 				{
-					fmt::print("'{}' is not a valid choice!\n", input);
+					println("'{}' is not a valid choice!", input);
 					continue;
 				}
 				break;
 			} while(true);
 			break;
 		case Cell::Type::CHOICE:
-			fmt::print("You have hit a choice stone!\n");
+			println("You have hit a choice stone!");
 			do
 			{
-				fmt::print("Select another players (or yours) color by entering his number (1-{}): ", game.getPlayers().size());
+				print("Select another players (or yours) color by entering his number (1-{}): ", game.getPlayers().size());
 				u32 desired = 1;
 				std::cin >> desired;
 
 				if(desired < 1 || game.getPlayers().size() < desired)
 				{
-					fmt::print("Your choice '{}' is not valid player!", desired);
+					println("Your choice '{}' is not valid player!", desired);
 					continue;
 				}
 			} while(false);
