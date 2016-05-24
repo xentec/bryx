@@ -127,13 +127,11 @@ Heuristic AI::evalState(const Game& state) const
 
 			// Corners
 			u32 corner = 0;
-			for(u32 dir = Direction::N; dir < Direction::_LAST; dir++)
+			for(Cell::Transition nc : c)
 			{
-				Direction d = (Direction) dir;
-				Cell* nc = c.getNeighbor(d);
-				if(nc)
+				if(nc.to)
 				{
-					if(nc->isSpecial())
+					if(nc.to->isSpecial())
 						h -= 50;
 				} else
 					corner++;

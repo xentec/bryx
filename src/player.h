@@ -17,7 +17,7 @@ struct Player
 
 	Player& operator =(const Player& other);
 	virtual Player* clone() const = 0;
-	
+
 	string asString() const;
 
 	virtual Move move(const std::list<Move>& moves, u32 time, u32 depth) = 0;
@@ -34,7 +34,7 @@ struct Player
 	u32 bombs;
 
 	Game& game;
-	
+
 	friend std::ostream& operator<<(std::ostream &os, const Player &object)
 	{
 		return os << object.asString();

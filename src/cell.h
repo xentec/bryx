@@ -10,7 +10,6 @@ enum Direction : u8
 {
 	N, NE, E, SE, S, SW, W, NW, _LAST
 };
-vec dir2vec(Direction dir);
 string dir2str(Direction dir);
 inline string dir2str(u32 i) { return dir2str((Direction) i); }
 inline Direction dir180(Direction in) { return (Direction) ((in+Direction::_LAST/2) % (Direction::_LAST)); }
@@ -36,8 +35,8 @@ struct Cell
 	};
 	struct Transition
 	{
-		Cell* target;
-		Direction entry;
+		Cell *to;
+		Direction exit, entry;
 	};
 
 
@@ -56,7 +55,7 @@ struct Cell
 	bool isSpecial() const;
 
 	Cell* getDirectNeighbor(Direction dir) const;
-	Cell* getNeighbor(Direction& dir) const;
+	Transition getNeighbor(Direction dir) const;
 	void addTransistion(Direction exit, Direction entry, Cell* target);
 
 	console::Format getFormat() const;
@@ -70,6 +69,55 @@ struct Cell
 	std::array<Transition, 8> transitions;
 
 	Map& map;
+
+//##############################
+	template<class T, class C>
+	struct iterator : std::iterator<std::random_access_iterator_tag, T>
+	{
+		typedef T   value_type;
+		typedef T*  pointer;
+		typedef T&  reference;
+		typedef iterator<T,C> iter;
+
+		value_type operator*()  { return cell.getNeighbor((Direction)dir);  }
+
+		iter& operator++()
+		{
+			dir++;
+			return *this;
+		}
+		iter operator++(int)
+		{
+			iter pre = *this;
+			++(*this);
+			return pre;
+		}
+
+		iter& operator=(const iter& other)
+		{
+			dir = other.dir, cell = other.cell;
+			return *this;
+		}
+		bool operator==(const iter& other) const
+		{
+			return dir == other.dir && cell == other.cell;
+		}
+		bool operator!=(const iter& other) const
+		{
+			return !(*this == other);
+		}
+
+		iterator(C& cell, Direction dir): dir(dir), cell(cell) {}
+	private:
+		usz dir;
+		C& cell;
+	};
+
+	Cell::iterator<Transition, Cell> begin();
+	Cell::iterator<Transition, Cell> end();
+
+	Cell::iterator<const Transition, const Cell> begin() const;
+	Cell::iterator<const Transition, const Cell> end() const;
 };
 
 inline u8 type2ply(Cell::Type type) { return type - Cell::Type::P1; }

@@ -4,6 +4,24 @@
 
 #include <fmt/format.h>
 
+
+inline vec dir2vec(Direction dir)
+{
+	switch(dir)
+	{
+	case Direction::N:  return {0,-1};
+	case Direction::NE: return {1,-1};
+	case Direction::E:  return {1, 0};
+	case Direction::SE: return {1, 1};
+	case Direction::S:  return {0, 1};
+	case Direction::SW: return {-1,1};
+	case Direction::W:  return {-1,0};
+	case Direction::NW: return {-1,-1};
+	default:
+		return {0,0};
+	}
+}
+
 // Cell
 //#######
 Cell::Cell(Map& map, vec pos, Type type):
@@ -74,16 +92,17 @@ bool Cell::isSpecial() const
 	}
 }
 
-Cell*Cell::getDirectNeighbor(Direction dir) const
+Cell* Cell::getDirectNeighbor(Direction dir) const
 {
 	vec dirPos = pos + dir2vec(dir);
 	return map.checkPos(dirPos) ? &map.at(dirPos) : nullptr;
 }
 
 
-Cell* Cell::getNeighbor(Direction& dir) const
+Cell::Transition Cell::getNeighbor(Direction dir) const
 {
-	const Transition& t = transitions[(usz)dir];
+/*  // SC: 33 M, IC: 75 M
+	const Transition& t = transitions[dir];
 	if(t.target)
 	{
 		dir = t.entry;
@@ -91,6 +110,15 @@ Cell* Cell::getNeighbor(Direction& dir) const
 	}
 	Cell* c = getDirectNeighbor(dir);
 	return c && c->type != Cell::Type::VOID ? c : nullptr;
+*/
+	const Transition& t = transitions[dir];
+	if(t.to)
+		return t;
+	else
+	{
+		Cell* c = getDirectNeighbor(dir);
+		return Transition { c && c->type != Type::VOID ? c : nullptr , dir, dir };
+	}
 }
 
 void Cell::addTransistion(Direction exit, Direction entry, Cell* target)
@@ -105,7 +133,7 @@ void Cell::addTransistion(Direction exit, Direction entry, Cell* target)
 	if(!target || target->type == Cell::Type::VOID)
 		throw std::runtime_error(fmt::format("transistion points to void cell ({})", target ? target->asString() : ""));
 
-	transitions[exit] = { target, entry };
+	transitions[exit] = { target, exit, entry };
 }
 
 console::Format Cell::getFormat() const
@@ -136,45 +164,50 @@ console::Format Cell::getTypeFormat(Cell::Type type)
 	using namespace console;
 	switch (type)
 	{
-		case Type::VOID:      return color::GRAY;       
-		case Type::EMPTY:     return color::GRAY_LIGHT; 
-	
-		case Type::BONUS:     return color::YELLOW;     
+		case Type::VOID:      return color::GRAY;
+		case Type::EMPTY:     return color::GRAY_LIGHT;
+
+		case Type::BONUS:     return color::YELLOW;
 		case Type::CHOICE:    return color::GREEN_LIGHT;
-		case Type::INVERSION: return color::RED_LIGHT;  
-	
-		case Type::EXPANSION: return color::WHITE;      
-	
-		case Type::P1:        return color::RED;        
-		case Type::P2:        return color::BLUE;       
-		case Type::P3:        return color::GREEN;      
-		case Type::P4:        return color::BROWN;      
-		case Type::P5:        return color::MAGENTA;    
-		case Type::P6:        return color::YELLOW;     
-		case Type::P7:        return color::GRAY;       
-		case Type::P8:        return color::CYAN;       
+		case Type::INVERSION: return color::RED_LIGHT;
+
+		case Type::EXPANSION: return color::WHITE;
+
+		case Type::P1:        return color::RED;
+		case Type::P2:        return color::BLUE;
+		case Type::P3:        return color::GREEN;
+		case Type::P4:        return color::BROWN;
+		case Type::P5:        return color::MAGENTA;
+		case Type::P6:        return color::YELLOW;
+		case Type::P7:        return color::GRAY;
+		case Type::P8:        return color::CYAN;
 	}
+}
+
+Cell::iterator<Cell::Transition, Cell> Cell::begin()
+{
+	return iterator<Transition, Cell>(*this, Direction::N);
+}
+
+Cell::iterator<Cell::Transition, Cell> Cell::end()
+{
+	return iterator<Transition, Cell>(*this, Direction::_LAST);
+}
+
+Cell::iterator<const Cell::Transition, const Cell> Cell::begin() const
+{
+	return iterator<const Transition, const Cell>(*this, Direction::N);
+}
+
+Cell::iterator<const Cell::Transition, const Cell> Cell::end() const
+{
+	return iterator<const Transition, const Cell>(*this, Direction::_LAST);
 }
 
 
 // Direction
 //############
-vec dir2vec(Direction dir)
-{
-	switch(dir)
-	{
-	case Direction::N:  return {0,-1};
-	case Direction::NE: return {1,-1};
-	case Direction::E:  return {1, 0};
-	case Direction::SE: return {1, 1};
-	case Direction::S:  return {0, 1};
-	case Direction::SW: return {-1,1};
-	case Direction::W:  return {-1,0};
-	case Direction::NW: return {-1,-1};
-	default:
-		return {0,0};
-	}
-}
+
 
 string dir2str(Direction dir)
 {

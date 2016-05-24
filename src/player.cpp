@@ -78,34 +78,32 @@ void Player::evaluate(Move& move) const
 	}
 
 	Direction banned = Direction::_LAST;
-	Cell* cp = move.target;
 
-	for(u32 dir = Direction::N; dir < Direction::_LAST; dir++)
+	for(Cell::Transition trn : *move.target)
 	{
-		Direction moveDir = (Direction) dir;
-		if(dir == banned)
+		if(trn.entry == banned)
 			continue;
 
 		std::list<Cell*> line;
-		Cell* cur = move.target->getNeighbor(moveDir);
-		while(cur && cur->isCaptureable())
+
+		while(trn.to && trn.to->isCaptureable())
 		{
-			if(cur->type == move.player.color)
+			if(trn.to->type == move.player.color)
 			{
 				if(!line.empty())
 					move.captures.merge(line);
 				break;
 			}
 
-			if(*cp == *cur) // we're in a loop!
+			if(*move.target == *trn.to) // we're in a loop!
 			{
 				 // do not try the same dir you came from while looping
-				banned = dir180(moveDir);
+				banned = dir180(trn.entry);
 				break;
 			}
 
-			line.push_back(cur);
-			cur = cur->getNeighbor(moveDir);
+			line.push_back(trn.to);
+			trn = trn.to->getNeighbor(trn.entry);
 		}
 	}
 

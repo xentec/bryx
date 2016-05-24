@@ -43,11 +43,11 @@ Map::Map(const Map& other):
 		c.type = o.type;
 		for(u32 dir = Direction::N; dir < Direction::_LAST; dir++)
 		{
-			const Cell::Transition& trn = o.transitions[dir];
-			if(!trn.target)
+			const Cell::Transition& trn = o.trans[dir];
+			if(!trn.to)
 				continue;
 
-			c.transitions[dir] = Cell::Transition{ &at(trn.target->pos), trn.entry };
+			c.trans[dir] = Cell::Transition{ &at(trn.to->pos), trn.entry };
 		}
 	}
 }
