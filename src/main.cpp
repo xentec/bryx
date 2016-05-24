@@ -90,23 +90,24 @@ void parseArgs(Options& opts, i32 argc, char* argv[])
 			opts.progName = opts.progName.substr(pos+1);
 	}
 
-	for(usz i = 1; i < argc; i++)
+	usz i = 1;
+	for(; i < argc; i++)
 	{
 		string arg = argv[i];
 		auto h = handlers.find(arg);
-		if(h != handlers.end())
-		{
-			string val, *p = nullptr;
-			if(i+1 < argc)
-				p = &(val = argv[i+1]);
+		if(h == handlers.end())
+			break;
 
-			h->second(opts, arg, i, p);
-		}
+		string val, *p = nullptr;
+		if(i+1 < argc)
+			p = &(val = argv[i+1]);
+
+		h->second(opts, arg, i, p);
 	}
 
 	if(opts.mode == Mode::UNKNOWN)
 	{
-		auto mode = modes.find(argv[1]);
+		auto mode = modes.find(argv[i++]);
 		if(mode != modes.end())
 			opts.mode = mode->second;
 		else
@@ -117,17 +118,17 @@ void parseArgs(Options& opts, i32 argc, char* argv[])
 	{
 	case Mode::SPECTATE:
 	case Mode::PVP:
-		if(argc < 3)
+		if(i >= argc)
 			throw std::runtime_error("no map path specified");
-		opts.mapPath = argv[2];
+		opts.mapPath = argv[i];
 		break;
 	case Mode::CLIENT:
-		if(argc < 3)
+		if(i >= argc)
 			throw std::runtime_error("no host or IP specified");
-		opts.host = argv[2];
+		opts.host = argv[i];
 		break;
 	default:
-		throw std::runtime_error("invalid mode: " + string(argv[1]));
+		throw std::runtime_error("invalid mode: " + string(argv[i-1]));
 	}
 }
 
