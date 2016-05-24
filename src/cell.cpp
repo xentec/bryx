@@ -157,24 +157,6 @@ console::Format Cell::getTypeFormat(Cell::Type type)
 }
 
 
-bool Cell::isValid(char ch)
-{
-	Cell::Type ct = static_cast<Cell::Type>(ch);
-	switch(ct)
-	{
-	case Cell::Type::BONUS:
-	case Cell::Type::CHOICE:
-	case Cell::Type::EMPTY:
-	case Cell::Type::EXPANSION:
-	case Cell::Type::INVERSION:
-	case Cell::Type::VOID:
-		return true;
-	default:
-		return Cell::Type::P1 <= ct && ct <= Cell::Type::P8;
-	}
-}
-
-
 // Direction
 //############
 vec dir2vec(Direction dir)
