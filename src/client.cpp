@@ -137,8 +137,6 @@ void Client::play()
 		case packet::BOMB_PHASE:
 		{
 			read<packet::BombPhase>(); // clear socket buffer
-			throw std::runtime_error("bomb phase not implemented");
-
 			// TODO: Change phase
 		}
 			break;
@@ -148,11 +146,8 @@ void Client::play()
 			fmt::print("gg kthxbye\n");
 			return;
 		}
-			break;
 		default:
 			throw std::runtime_error(fmt::format("unknown packet received: {}", peek().type));
-
-			break;
 		}
 	}
 }
