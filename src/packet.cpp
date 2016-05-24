@@ -17,11 +17,9 @@ Header::Header(Type type):
 {}
 
 Header::Header(const Payload& data):
-	size(0)
-{
-	type = static_cast<Type>(data[0]);
-	size = ntohl(to<u32>(data[1]));
-}
+	type(static_cast<Type>(data[0])),
+	size(ntohl(to<u32>(data[1])))
+{}
 
 Payload Header::dump()
 {
@@ -46,18 +44,15 @@ Map::Map(const string& map):
 Map::Map(const Payload& data):
 	hdr(data),
 	map(data.begin()+5, data.end())
-{
-	fmt::print("MAP: {}", map);
-	std::fflush(stdout);
-}
+{}
 
 Payload Map::dump()
 {
 	hdr.size = map.size();
 	Payload data = hdr.dump();
 
-	//data.insert(data.begin()+5, map.begin(), map.end());
-	std::copy(map.begin(), map.end(), data.begin()+5);
+	data.insert(data.begin()+5, map.begin(), map.end());
+
 	return data;
 }
 
@@ -99,7 +94,6 @@ MoveRequest::MoveRequest(u32 time, u8 depth):
 
 MoveRequest::MoveRequest(const Payload &data):
 	hdr(data),
-//	time(ntohl(*(u32*)&data[5])),
 	time(ntohl(to<u32>(data[5]))),
 	depth(data[9])
 {}
@@ -108,7 +102,6 @@ Payload MoveRequest::dump()
 {
 	Payload data = hdr.dump();
 
-//	*(u32*) &data[5] = htonl(time); // set 4 fields from [1] as u32
 	to<u32>(data[5]) = htonl(time);
 	data[9] = depth;
 
@@ -228,7 +221,7 @@ BombPhase::BombPhase():
 	hdr(BOMB_PHASE)
 {}
 
-BombPhase::BombPhase(const Payload& data):
+BombPhase::BombPhase(const Payload&):
 	BombPhase()
 {}
 
@@ -241,7 +234,7 @@ GameEnd::GameEnd():
 	hdr(GAME_END)
 {}
 
-GameEnd::GameEnd(const Payload& data):
+GameEnd::GameEnd(const Payload&):
 	GameEnd()
 {}
 
