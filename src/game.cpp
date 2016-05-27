@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include "clock.h"
 #include "map.h"
 #include "util.h"
 
@@ -76,8 +77,8 @@ void Game::run()
 	if(players.size() < defaults.players)
 		throw std::runtime_error("not enough players");
 
-	std::chrono::time_point<std::chrono::system_clock> start, end;
-	std::chrono::duration<double> elapsed;
+	TimePoint start, end;
+	Duration elapsed;
 	u32 num = 1;
 
 	do
@@ -89,7 +90,7 @@ void Game::run()
 
 		println("##########");
 		for(usz i = 0; i < ply.name.size(); i++)
-			println("#");
+			print("#");
 		print("\n");
 
 		println("Overrides: {}", ply.overrides);
@@ -113,9 +114,9 @@ void Game::run()
 			println("Moves: {} ({})", num-ovr, num);
 		}
 
-		start = std::chrono::system_clock::now();
+		start = Clock::now();
 		Move move = ply.move(moves,0,3);
-		end = std::chrono::system_clock::now();
+		end = Clock::now();
 
 		elapsed = end-start;
 		if(elapsed > stats.time.moveMax)
