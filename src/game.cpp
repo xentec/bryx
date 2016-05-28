@@ -67,6 +67,11 @@ std::vector<Player*>& Game::getPlayers()
 	return players;
 }
 
+std::vector<Player*> Game::getPlayers() const
+{
+	return players;
+}
+
 bool Game::hasEnded()
 {
 	return moveless == players.size();

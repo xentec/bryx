@@ -44,6 +44,7 @@ struct Game
 
 	Map& getMap() const;
 	std::vector<Player*>& getPlayers();
+	std::vector<Player*> getPlayers() const;
 
 	bool hasEnded();
 	void run();

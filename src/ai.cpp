@@ -119,6 +119,11 @@ Heuristic AI::evalState(const Game& state) const
 {
 	Heuristic h = 0;
 
+	Player& futureMe = *state.getPlayers()[type2ply(color)];
+
+	h += 20 * futureMe.overrides;
+	h += futureMe.bombs * state.defaults.bombsStrength;
+
 	for(Cell& c: state.getMap())
 	{
 		if(c.type == color)
