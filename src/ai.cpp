@@ -27,31 +27,45 @@ static Heuristic
 	infMin = std::numeric_limits<Heuristic>::min(),
 	infMax = std::numeric_limits<Heuristic>::max();
 
-static auto	minPrune = [](Heuristic& h, Heuristic& a, Heuristic& v, Heuristic& b){ if(h < v) { v = h; if(v < b) b = v; } return v <= a; }; // min
-static auto	maxPrune = [](Heuristic& h, Heuristic& a, Heuristic& v, Heuristic& b){ if(h > v) { v = h; if(v > a) a = v; } return v >= b; }; // max
+inline bool minPrune (Heuristic h, Heuristic& a, Heuristic& v, Heuristic& b){ if(h < v) { v = h; if(v < b) b = v; } return v <= a; }; // min
+inline bool maxPrune (Heuristic h, Heuristic& a, Heuristic& v, Heuristic& b){ if(h > v) { v = h; if(v > a) a = v; } return v >= b; }; // max
 
-Move AI::move(const std::list<Move>& moves, u32 time, u32 depth)
+Move AI::move(std::list<Move>& posMoves, u32 time, u32 depth)
 {
-	std::pair<Heuristic, Move> bestMove = { infMin, moves.front() };
-
-	Heuristic a = infMin, b = infMax;
-
-	for(Move m: moves)
+	// sorting
+	std::map<Heuristic, Move> moves;
+	for(Move& m: posMoves)
 	{
-		if(m.override && overrides == 0)
+		if(m.override && overrides == 0) // TODO: Remove condition
 			continue;
 
 		game.execute(m, true);
+		moves.emplace(evalState(game), m);
+		game.undo(m);
+	}
+
+	std::pair<Heuristic, Move> bestMove = { infMin, moves.rbegin()->second };
+	Heuristic a = infMin, v = infMin, b = infMax;
+
+	bool run = true;
+	for(auto iter = moves.rbegin(); iter != moves.rend(); iter++)
+	{
+		Move& m = iter->second;
+
+		game.execute(m, true);
 		game.nextPlayer();
+
 		Heuristic h = bestState(game, depth-1, a, b);
+
 		game.prevPlayer();
 		game.undo(m);
 
-		if(h > bestMove.first)
-			bestMove = {bestMove.first, m};
+		run = !maxPrune(h, a, v, b);
 
-		if(maxPrune(h, a, bestMove.first, b))
-			break;
+		if(v > bestMove.first)
+			bestMove = {v, m};
+
+		if(!run) break;
 	}
 
 	if(bestMove.second.target == nullptr)
@@ -85,31 +99,75 @@ Move AI::move(const std::list<Move>& moves, u32 time, u32 depth)
 	return move;
 }
 
+#include "clock.h"
+
 Heuristic AI::bestState(Game& state, u32 depth, Heuristic& a, Heuristic& b)
 {
-	if(depth == 0)
-		return evalState(state);
-
 	Player& ply = state.currPlayer();
-	bool min = ply.color != color;
 
-	Heuristic v = min ? infMax : infMin;
-
-	auto prune = min ? minPrune : maxPrune;
-
+	// sorting
+	std::map<Heuristic, Move> moves;
 	for(Move& m: ply.possibleMoves())
 	{
-		if(m.override && ply.overrides == 0)
+		if(m.override && ply.overrides == 0) // TODO: Remove condition
 			continue;
 
 		state.execute(m, true);
-		state.nextPlayer();
-		Heuristic h = bestState(state, depth-1, a, b);
-		state.prevPlayer();
+		moves.emplace(evalState(state), m);
 		state.undo(m);
+	}
 
-		if(prune(h, a, v, b))
-			break;
+	u32 d = depth - 1;
+	Heuristic v;
+
+	if(ply.color != color) // min
+	{
+		v = infMax;
+		if(d == 0)
+			// reuse evalution in map key
+			for(auto& pair: moves)
+			{
+				if(minPrune(pair.first, a, v, b)) break;
+			}
+		else
+			for(auto& pair: moves)
+			{
+				Move& m = pair.second;
+
+				state.execute(m, true);
+				state.nextPlayer();
+
+				Heuristic h = bestState(state, d, a, b);
+
+				state.prevPlayer();
+				state.undo(m);
+
+				if(minPrune(h, a, v, b)) break;
+			}
+	} else
+	{
+		v = infMin;
+		if(d == 0)
+			// reuse evalution in map key
+			for(auto iter = moves.rbegin(); iter != moves.rend(); iter++)
+			{
+				if(minPrune(iter->first, a, v, b)) break;
+			}
+		else
+			for(auto iter = moves.rbegin(); iter != moves.rend(); iter++)
+			{
+				Move& m = iter->second;
+
+				state.execute(m, true);
+				state.nextPlayer();
+
+				Heuristic h = bestState(state, d, a, b);
+
+				state.prevPlayer();
+				state.undo(m);
+
+				if(minPrune(h, a, v, b)) break;
+			}
 	}
 
 	return v;
