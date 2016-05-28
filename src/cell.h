@@ -6,13 +6,13 @@
 
 #include <array>
 
-enum Direction : u8
+enum Direction
 {
 	N, NE, E, SE, S, SW, W, NW, _LAST
 };
 string dir2str(Direction dir);
-inline string dir2str(u32 i) { return dir2str((Direction) i); }
-inline Direction dir180(Direction in) { return (Direction) ((in+Direction::_LAST/2) % (Direction::_LAST)); }
+inline string dir2str(u32 i) { return dir2str(Direction(i)); }
+inline Direction dir180(Direction in) { return Direction((in+Direction::_LAST/2) % (Direction::_LAST)); }
 
 struct Map;
 
