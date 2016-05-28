@@ -13,7 +13,7 @@ struct Dummy : Player
 	Dummy(const Dummy& other): Player(other) {}
 	virtual ~Dummy() {}
 	virtual Player* clone() const { return new Dummy(*this); }
-	virtual Move move(const std::list<Move>&, u32, u32) { return Move(*this, nullptr); }
+	virtual Move move(std::list<Move>&, u32, u32) { return Move(*this, nullptr); }
 };
 
 
