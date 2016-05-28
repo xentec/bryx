@@ -26,16 +26,16 @@ Map::Map(u32 width, u32 height):
 {
 	data.reserve(width*height); // valgrind hates this
 
-	for(i32 x = 0; x < width; x++)
-	for(i32 y = 0; y < height; y++)
-		data.emplace_back(*this, vec{x, y}, Cell::Type::VOID);
+	for(u32 x = 0; x < width; x++)
+	for(u32 y = 0; y < height; y++)
+		data.emplace_back(*this, vec{i32(x), i32(y)}, Cell::Type::VOID);
 }
 
 Map::Map(const Map& other):
 	Map(other.width, other.height)
 {
-	for(i32 x = 0; x < width; x++)
-	for(i32 y = 0; y < height; y++)
+	for(u32 x = 0; x < width; x++)
+	for(u32 y = 0; y < height; y++)
 	{
 		const Cell& o = other.at(x,y);
 		Cell& c = at(x, y);
@@ -47,7 +47,7 @@ Map::Map(const Map& other):
 			if(!trn.to)
 				continue;
 
-			c.trans[dir] = Cell::Transition{ &at(trn.to->pos), trn.entry };
+			c.trans[dir] = Cell::Transition{ &at(trn.to->pos), trn.exit, trn.entry };
 		}
 	}
 }
@@ -85,7 +85,7 @@ string Map::asString(bool transistions)
 
 void Map::print(bool colored, bool ansi) const
 {
-	print({}, colored, ansi);
+	print(std::unordered_map<vec, console::Format>(), colored, ansi);
 }
 
 
@@ -155,7 +155,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 
 bool Map::checkPos(const vec& pos) const
 {
-	return inBox(pos, {0,0}, {(i32)width-1, (i32)height-1});
+	return inBox(pos, {0,0}, {i32(width-1), i32(height-1)});
 }
 
 Map::iterator<Cell, Map> Map::begin()

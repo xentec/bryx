@@ -18,7 +18,7 @@ struct Map;
 
 struct Cell
 {
-	enum Type : u8
+	enum Type : char
 	{
 		// standard fields
 		VOID = '-',
@@ -83,7 +83,7 @@ struct Cell
 		typedef T&  reference;
 		typedef iterator<T,C> iter;
 
-		reference operator*()  { return cell.getNeighbor((Direction)dir);  }
+		reference operator*()  { return cell.getNeighbor(Direction(dir));  }
 		pointer operator->()  { return &*this;  }
 
 		iter& operator++()

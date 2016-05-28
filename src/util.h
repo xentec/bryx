@@ -16,11 +16,11 @@ string toLower(string str);
 struct Scope
 {
 	using Callback = std::function<void()>;
-	
+
 	Scope() = default;
 	Scope(Callback cb);
 	~Scope();
-	
+
 	Scope& operator += (Callback cb);
 	Callback operator --();
 	Scope operator -- (int);
