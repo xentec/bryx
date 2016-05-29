@@ -221,11 +221,12 @@ int main(int argc, char* argv[])
 				e.second++;
 			}
 		}
-		std::sort(scores.begin(), scores.end(), [=](std::pair<Cell::Type, u32>& a, std::pair<Cell::Type, u32>& b)
+#if 0
+        std::sort(scores.begin(), scores.end(), [](std::pair<Cell::Type, u32>& a, std::pair<Cell::Type, u32>& b)
 		{
 			return a.second > b.second;
 		});
-
+#endif
 		print("\n");
 		println("########");
 		println("GAME SET");
