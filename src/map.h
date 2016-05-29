@@ -78,6 +78,12 @@ public:
 		{
 			return !(*this == other);
 		}
+		bool operator<(const iter& other) const
+		{
+			return x < other.x || (x == other.x && y < other.y);
+		}
+
+		inline M& getMap() { return map; }
 
 		iterator(M &map, u32 x, u32 y): x(x), y(y), map(map) {}
 	private:

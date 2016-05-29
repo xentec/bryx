@@ -27,10 +27,13 @@ struct Move
 	};
 
 	Move(Player& player, Cell* target);
+	Move(const Move& other);
 	Move& operator =(const Move& other);
 
 	string asString() const;
 	void print() const;
+
+	void clear();
 
 	Player& player;
 

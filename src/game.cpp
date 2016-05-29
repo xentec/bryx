@@ -88,7 +88,7 @@ void Game::run()
 
 	do
 	{
-		Player& ply = nextPlayer();
+		Player& ply = currPlayer();
 
 		print("\n");
 		println("Player {}", ply);
@@ -102,7 +102,11 @@ void Game::run()
 		println("Bombs: {}", ply.bombs);
 		print("\n");
 
+#if MOVES_ITERATOR
+		std::list<Move> moves = ply.possibleMoves().all();
+#else
 		std::list<Move> moves = ply.possibleMoves();
+#endif
 		if(moves.empty())
 		{
 			println("No moves");
@@ -117,6 +121,15 @@ void Game::run()
 					ovr++;
 
 			println("Moves: {} ({})", num-ovr, num);
+			print("\n");
+
+#if 0
+			for(Move m: moves)
+			{
+				m.print();
+				print("\n");
+			}
+#endif
 		}
 
 		start = Clock::now();
@@ -132,6 +145,9 @@ void Game::run()
 
 		move.print();
 		execute(move);
+
+		nextPlayer();
+
 	}
 	while(!hasEnded());
 }

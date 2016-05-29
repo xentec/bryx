@@ -109,7 +109,7 @@ Heuristic AI::bestState(Game& state, u32 depth, Heuristic& a, Heuristic& b)
 	std::map<Heuristic, Move> moves;
 	for(Move& m: ply.possibleMoves())
 	{
-		if(m.override && ply.overrides == 0) // TODO: Remove condition
+		if(m.override) // TODO: Remove condition
 			continue;
 
 		state.execute(m, true);
@@ -186,21 +186,21 @@ Heuristic AI::evalState(const Game& state) const
 	{
 		if(c.type == color)
 		{
-            h = c.staticValue + 5;
+			h = c.staticValue + 5;
 
-            for(Cell::Transition nc : c)
+			for(Cell::Transition& nc : c)
 			{
 				if(nc.to)
 				{
 					if(nc.to->isSpecial())
 						h -= 50;
-                }
+				}
 			}
 			// #################
 
 		} else if(c.isPlayer())
 		{
-            h = -c.staticValue - 5;
+			h = -c.staticValue - 5;
 		}
 	}
 

@@ -7,8 +7,15 @@
 Move::Move(Player& player, Cell* target):
 	player(player),
 	target(target), override(false),
-	bonus(NONE), choice(Cell::Type::VOID),
+	bonus(Bonus::NONE), choice(Cell::Type::VOID),
 	err(Error::NONE), captures()
+{}
+
+Move::Move(const Move& other):
+	player(other.player),
+	target(other.target), override(other.override),
+	bonus(other.bonus), choice(other.choice),
+	err(other.err), captures(other.captures)
 {}
 
 Move& Move::operator =(const Move& other)
@@ -46,6 +53,17 @@ void Move::print() const
 	hl.emplace(target->pos, cf);
 
 	target->map.print(hl);
+}
+
+void Move::clear()
+{
+	captures.clear();
+	backup.captures.clear();
+
+	target = nullptr;
+	err = Error::NONE;
+	choice = Cell::Type::VOID;
+	bonus = Bonus::NONE;
 }
 
 string Move::err2str(Move::Error err)

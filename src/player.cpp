@@ -4,15 +4,15 @@
 #include "game.h"
 
 Player::Player(Game &game, Cell::Type color, const string& name):
-    name(name),
-    color(color), overrides(0), bombs(0),
-    game(game)
+	name(name),
+	color(color), overrides(0), bombs(0),
+	game(game)
 {}
 
 Player::Player(const Player &other):
-    name(other.name),
-    color(other.color), overrides(other.overrides), bombs(other.bombs),
-    game(other.game)
+	name(other.name),
+	color(other.color), overrides(other.overrides), bombs(other.bombs),
+	game(other.game)
 {}
 
 Player& Player::operator =(const Player& other)
@@ -46,24 +46,30 @@ std::list<Cell*> Player::stones()
 	return s;
 }
 
-std::list<Move> Player::possibleMoves()
+PossibleMoves Player::possibleMoves()
 {
+#if MOVES_ITERATOR
+	return PossibleMoves { *this, game.getMap() };
+#else
 	std::list<Move> moves;
+	Move move { *this, nullptr };
+
 	for(Cell& c: game.getMap())
 	{
-		Move move { *this, &c };
+		move.target = &c;
 		evaluate(move);
 
 		if(move.err == Move::Error::NONE)
-			moves.push_back(std::move(move));
-	}
+			moves.push_back(move);
 
+		move.clear();
+	}
 	return moves;
+#endif
 }
 
 void Player::evaluate(Move& move) const
 {
-	move.err = Move::Error::NONE;
 	if(move.target->type == Cell::Type::VOID)
 	{
 		move.err = Move::Error::WRONG_START;
@@ -84,7 +90,7 @@ void Player::evaluate(Move& move) const
 		if(dir.entry == banned)
 			continue;
 
-		std::list<Cell*> line;		
+		std::list<Cell*> line;
 		const Cell::Transition* trn = &dir;
 
 		while(trn->to && trn->to->isCaptureable())
@@ -112,3 +118,39 @@ void Player::evaluate(Move& move) const
 		move.err =  Move::Error::NO_CONNECTIONS;
 	return;
 }
+
+#if MOVES_ITERATOR
+
+usz PossibleMoves::size()
+{
+	usz i = 0;
+	for(Move& m: *this)
+		i++;
+
+	return i;
+}
+
+bool PossibleMoves::empty()
+{
+	return size() == 0;
+}
+
+std::list<Move> PossibleMoves::all()
+{
+	std::list<Move> all;
+	for(Move& m: *this)
+		all.push_back(m);
+
+	return all;
+}
+
+PossibleMoves::iterator<Move> PossibleMoves::begin()
+{
+	return iterator<Move>(player, map.begin());
+}
+
+PossibleMoves::iterator<Move> PossibleMoves::end()
+{
+	return iterator<Move>(player, map.end());
+}
+#endif

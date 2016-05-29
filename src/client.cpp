@@ -81,10 +81,14 @@ void Client::play()
 
 				game.currPly = type2ply(me->color);
 
-				auto moves = me->possibleMoves();
+#if MOVES_ITERATOR
+				std::list<Move> moves = me->possibleMoves().all();
+#else
+				std::list<Move> moves = me->possibleMoves();
+#endif
 				if(moves.empty())
 					throw std::runtime_error("no moves found");
-	
+
 				Move move = me->move(moves, packet.time, packet.depth);
 				packet::MoveResponse resp(move.target->pos, move.bonus);
 
@@ -93,7 +97,7 @@ void Client::play()
 
 				println("Sending move: {} -> {} ex: {}", move.player, move.target->pos, resp.extra);
 				send(resp);
-				
+
 				move.print();
 			}
 			break;
@@ -143,7 +147,7 @@ void Client::play()
 		{
 			read<packet::BombPhase>(); // clear socket buffer
 			// TODO: Change phase
-			
+
 			println("Switching to BOMB phase!");
 		}
 			break;
