@@ -2,7 +2,7 @@
 
 // Config
 
-#define DEBUG 0
+#define DEBUG 5
 #define YIMB_GROUP 01
 
 // #######

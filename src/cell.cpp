@@ -25,7 +25,7 @@ inline vec dir2vec(Direction dir)
 // Cell
 //#######
 Cell::Cell(Map& map, vec pos, Type type):
-	pos(pos), type(type), map(map)
+	pos(pos), type(type), map(map), staticValue(0)
 {}
 
 Cell& Cell::operator =(const Cell &other)
@@ -34,6 +34,7 @@ Cell& Cell::operator =(const Cell &other)
 		throw std::runtime_error("pos must be same");
 
 	type = other.type;
+	staticValue = other.staticValue; //TODO: reevaluate
 	return *this;
 }
 
@@ -98,7 +99,7 @@ Cell* Cell::getDirectNeighbor(Direction dir) const // TODO: null only
 
 Cell::Transition& Cell::getNeighbor(Direction dir)
 {
-	return trans[dir];	
+	return trans[dir];
 }
 
 
