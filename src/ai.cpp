@@ -123,26 +123,21 @@ Heuristic AI::evalState(const Game& state) const
 	{
 		if(c.type == color)
 		{
-			h += 5;
+            h = c.staticValue + 5;
 
-			// Corners
-			u32 corner = 0;
-			for(Cell::Transition nc : c)
+            for(Cell::Transition nc : c)
 			{
 				if(nc.to)
 				{
 					if(nc.to->isSpecial())
 						h -= 50;
-				} else
-					corner++;
+                }
 			}
-			if(corner > 4 && corner < 7)
-				h *= corner;
 			// #################
 
 		} else if(c.isPlayer())
 		{
-			h -= 5;
+            h = -c.staticValue - 5;
 		}
 	}
 
