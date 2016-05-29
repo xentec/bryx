@@ -70,6 +70,8 @@ struct Cell
 	Cell::Type type;
 	std::array<Transition, 8> trans;
 
+	i32 staticValue;
+
 	Map& map;
 
 //##############################

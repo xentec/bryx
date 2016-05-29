@@ -249,5 +249,55 @@ Map Map::load(std::istream& file)
 		}
 	}
 
+	//evaluate cells
+	for(Cell& c: map)
+	{
+		if(c.type == Cell::Type::VOID)
+			continue;
+
+		u32 totalCounter = 0, maxCounter = 0, counter = 0;
+		for(usz j = 0; j < 16; j++){
+            if(c.trans[j % 8].to == nullptr){
+				counter++;
+			}else{
+				if(counter > maxCounter){
+					maxCounter = counter;
+				}
+				totalCounter += counter;
+				counter = 0;
+			}
+		}
+		switch(maxCounter){
+			case 0:
+				c.staticValue = 1;
+				break;
+			case 1:
+				c.staticValue = 2;
+				break;
+			case 2:
+				c.staticValue = 3;
+				break;
+			case 3:
+				c.staticValue = 5;
+				break;
+			case 4:
+				c.staticValue = 10;
+				break;
+			case 5:
+				c.staticValue = 7;
+				break;
+			case 6:
+				c.staticValue = 5;
+				break;
+			case 7:
+				c.staticValue = 3;
+				break;
+			default:
+				c.staticValue = 1;
+				break;
+
+		}
+	}
+
 	return map;
 }
