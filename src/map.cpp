@@ -5,6 +5,8 @@
 #include <fmt/format.h>
 #include <unordered_map>
 
+#define TRANSITION_AMOUNT 8
+
 // Map
 //########
 
@@ -250,14 +252,13 @@ Map Map::load(std::istream& file)
 	}
 
 	//evaluate cells
-	for(Cell& c: map)
-	{
+	for(Cell& c: map){
 		if(c.type == Cell::Type::VOID)
 			continue;
 
 		u32 totalCounter = 0, maxCounter = 0, counter = 0;
-		for(usz j = 0; j < 16; j++){
-            if(c.trans[j % 8].to == nullptr){
+        for(usz j = 0; j < (2 * TRANSITION_AMOUNT); j++){       //checks for walls twice, to get the length of the wall
+            if(c.trans[j % TRANSITION_AMOUNT].to == nullptr){   //which is contained in maxCount
 				counter++;
 			}else{
 				if(counter > maxCounter){
@@ -268,7 +269,9 @@ Map Map::load(std::istream& file)
 			}
 		}
         totalCounter /= 2;
-		switch(maxCounter){
+        //maxCounter decides the maximum length of the wall
+        //totalCounter decides the total amount of walls
+        switch(maxCounter){
 			case 0:
 				c.staticValue = 1;
 				break;
@@ -352,9 +355,8 @@ Map Map::load(std::istream& file)
 			default:
 				c.staticValue = 1;
 				break;
-
 		}
-	}
+    }
 
 	return map;
 }
