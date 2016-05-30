@@ -267,30 +267,87 @@ Map Map::load(std::istream& file)
 				counter = 0;
 			}
 		}
+        totalCounter /= 2;
 		switch(maxCounter){
 			case 0:
 				c.staticValue = 1;
 				break;
 			case 1:
-				c.staticValue = 2;
-				break;
-			case 2:
-				c.staticValue = 3;
-				break;
+                switch(totalCounter){
+                    case 2:
+                        c.staticValue = 3;
+                        break;
+                    case 3:
+                        c.staticValue = 4;
+                        break;
+                    case 4:
+                        c.staticValue = 3;
+                        break;
+                    default:
+                        c.staticValue = 2;
+                        break;
+                }
+                break;
+			case 2:        
+                switch(totalCounter){
+                    case 3:
+                        c.staticValue = 4;
+                        break;
+                    case 4:
+                        c.staticValue = 5;
+                        break;
+                    default:
+                        c.staticValue = 3;
+                        break;
+                }
+                break;
 			case 3:
-				c.staticValue = 5;
-				break;
+                switch(totalCounter){
+                    case 4:
+                        c.staticValue = 6;
+                        break;
+                    case 5:
+                        c.staticValue = 4;
+                        break;
+                    case 6:
+                        c.staticValue = 3;
+                        break;
+                    default:
+                        c.staticValue = 5;
+                        break;
+                }
+                break;
 			case 4:
-				c.staticValue = 10;
-				break;
-			case 5:
-				c.staticValue = 7;
-				break;
+                switch(totalCounter){
+                    case 5:
+                        c.staticValue = 8;
+                        break;
+                    case 6:
+                        c.staticValue = 6;
+                        break;
+                    case 7:
+                        c.staticValue = 4;
+                        break;
+                    default:
+                        c.staticValue = 10;
+                        break;
+                }
+                break;
+            case 5:
+                switch(totalCounter){
+                    case 6:
+                        c.staticValue = 6;
+                        break;
+                    default:
+                        c.staticValue = 7;
+                        break;
+                }
+                break;
 			case 6:
 				c.staticValue = 5;
 				break;
 			case 7:
-				c.staticValue = 3;
+                c.staticValue = 4;
 				break;
 			default:
 				c.staticValue = 1;
