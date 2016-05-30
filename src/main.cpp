@@ -53,10 +53,10 @@ void usage(Options& opts, const string&, usz&, const string*)
 }
 
 
-void parseArgs(Options& opts, i32 argc, char* argv[])
+void parseArgs(Options& opts, usz argc, char* argv[])
 {
 
-	using Handler = std::function<void(Options&, const string&, usz& i, const string*)>;
+	using Handler = std::function<void(Options&, const string&, usz&, const string*)>;
 	//Handler map = [](Options& opts, const string& arg, const string& param){ return true; };
 	static std::unordered_map<string, Handler> handlers =
 	{
@@ -71,10 +71,10 @@ void parseArgs(Options& opts, i32 argc, char* argv[])
 				if(arg)
 					opt.port = static_cast<u16>(std::stoi(*arg)), i++;
 			}},
-		
-		{"-q", [](Options&, const string&, usz& i, const string*){ console::quiet = true; }},
-		{"-nc", [](Options&, const string&, usz& i, const string*){ Map::printColored = false; }},
-		{"-na", [](Options&, const string&, usz& i, const string*){ Map::printAnsi = false; }},
+
+		{"-q", [](Options&, const string&, usz&, const string*){ console::quiet = true; }},
+		{"-nc", [](Options&, const string&, usz&, const string*){ Map::printColored = false; }},
+		{"-na", [](Options&, const string&, usz&, const string*){ Map::printAnsi = false; }},
 	};
 
 	static std::unordered_map<string, Mode> modes =
@@ -107,14 +107,15 @@ void parseArgs(Options& opts, i32 argc, char* argv[])
 		h->second(opts, arg, i, p);
 	}
 
-	if(opts.mode == Mode::UNKNOWN)
+	if(opts.mode == Mode::UNKNOWN && i != argc)
 	{
 		auto mode = modes.find(argv[i++]);
 		if(mode != modes.end())
 			opts.mode = mode->second;
-		else
-			throw std::runtime_error("no mode selected");
 	}
+
+	if(opts.mode == Mode::UNKNOWN)
+		throw std::runtime_error("no mode selected");
 
 	switch(opts.mode)
 	{
@@ -205,7 +206,7 @@ int main(int argc, char* argv[])
 			}
 			break;
 		default:
-			return 0;
+			return 5;
 		}
 
 		game.run();
@@ -222,7 +223,7 @@ int main(int argc, char* argv[])
 			}
 		}
 #if 0
-        std::sort(scores.begin(), scores.end(), [](std::pair<Cell::Type, u32>& a, std::pair<Cell::Type, u32>& b)
+		std::sort(scores.begin(), scores.end(), [](std::pair<Cell::Type, u32>& a, std::pair<Cell::Type, u32>& b)
 		{
 			return a.second > b.second;
 		});
@@ -251,7 +252,8 @@ int main(int argc, char* argv[])
 			client.join(opts.host, opts.port);
 		}catch (const std::exception& ex)
 		{
-			print("Failed to join the game: {}", ex.what());
+			println("Failed to join the game: {}", ex.what());
+			return 10;
 		}
 		client.play();
 	}
