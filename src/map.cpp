@@ -6,6 +6,8 @@
 #include <unordered_map>
 
 #define TRANSITION_AMOUNT 8
+#define BONUS_VALUE 11
+#define CHOICE_VALUE 5
 
 // Map
 //########
@@ -356,6 +358,10 @@ Map Map::load(std::istream& file)
 				c.staticValue = 1;
 				break;
 		}
+        if(c.type == Cell::Type::BONUS)
+            c.staticValue += BONUS_VALUE;
+        if(c.type == Cell::Type::CHOICE)
+            c.staticValue += CHOICE_VALUE;
     }
 
 	return map;
