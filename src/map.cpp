@@ -272,28 +272,28 @@ Map Map::load(std::istream& file)
         //maxCounter decides the maximum length of the wall
         //totalCounter decides the total amount of walls
         switch(maxCounter){
-			case 0:
+            case 0:                             //no attached walls
 				c.staticValue = 1;
 				break;
-			case 1:
+            case 1:                             //at least 1 wall with no neighbour-walls
                 switch(totalCounter){
-                    case 2:
+                    case 2:                     //-||- with a total of 2 attached walls
                         c.staticValue = 3;
                         break;
-                    case 3:
+                    case 3:                     //-||- with a total of 3 attached walls
                         c.staticValue = 4;
                         break;
-                    case 4:
+                    case 4:                     //-||- with a total of 4 attached walls
                         c.staticValue = 3;
                         break;
-                    default:
+                    default:                    //exact 1 wall or unexpected amount of attached walls
                         c.staticValue = 2;
                         break;
                 }
                 break;
-			case 2:        
+            case 2:                             //at least 2 neighbour-walls
                 switch(totalCounter){
-                    case 3:
+                    case 3:                     //...
                         c.staticValue = 4;
                         break;
                     case 4:
