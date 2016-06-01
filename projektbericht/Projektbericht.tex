@@ -56,9 +56,6 @@ Wir haben YIMB als Y-Fach gewählt, da es -wie bereits erwähnt- mehrere wichtig
 
 
 In Reversi geht es darum die Spielsteine des Gegenspielers zu übernehmen. Spielsteine werden übernommen, wenn sie durch die Steine des Gegners eingekesselt sind. Im ursprünglichen Reversi spielen zwei Spieler gegeneinander, in der Erweiterung hingegen sind bis zu acht Spieler beteiligt. Auch das quadratische Spielfeld ist in der Erweiterung stark modifiziert in Form als auch in Funktion. Zum einen werden neue Sonderfelder und Sondersteine eingeführt, zum anderen werden an Spielfeldrändern Transitionen eingebaut.\newline Zu diesen Bonusfeldern gehören Choice-, Inversions-, Expansions- und Bonusfelder. Diese Sonderfelder werden zunächst wie normale Felder behandelt, das heißt es wird zuerst ganz normal umgefärbt, und dann treten die jeweiligen Sondereffekte auf. Bei Choice-Feldern darf man die Steine mit einem beliebigen Spieler tauschen. Inversionsfelder färben die Spielsteine aller Spieler in die Farbe des jeweiligen nachfolgenden Spielers. Expansionsfelder sind Felder die durch einen übernehmbaren Nicht-Spieler Spielstein besetzt sind. Bonusfelder geben je nach Wahl eine zusätzliche Bombe oder einen Überschreibstein.\newline Die Sondersteine setzen sich aus Überschreibsteinen und Bomben -welche in der Bombenphase Verwendung finden- zusammen. Überschreibsteine können direkt auf besetzte Felder gesetzt werden. Dabei müssen sie, sofern es sich nicht um einen Expansionsstein handelt, weitere besetzte Felder umfärben.Die Bombenphase findet statt, sobald kein Spieler mehr Steine oder Überschreib-Steine setzen kann. In dieser Phase werden Bombensteine auf besetzte oder unbesetzte Spielfelder, dabei werden alle Felder in einem vorgegebenen Radius gelöscht. Jeder Spieler hat am Anfang eine Vorgegebene Anzahl an Bomben und Überschreibsteinen.
-
-% TODO ggf neuschreiben
-
 \newpage
 % ----------------------------------------------------------------------------------
 % Kapitel: Allgemeine Informationen
@@ -67,7 +64,6 @@ In Reversi geht es darum die Spielsteine des Gegenspielers zu übernehmen. Spiel
 
 \subsection{Projektname}
 Um dem Projekt eine persönliche Note zu verleihen wurde das Programm \glqq \textbf{Bryx}\grqq{} getauft.
-
 
 \subsection{Team und Kommunikation}
 %Beschreiben Sie in diesem Abschnitt Ihr Team. Welche Person hat welche Aufgaben wahrgenommen, wie wurden Aufgaben aufgeteilt und wie wurde kommuniziert, etc.
@@ -78,9 +74,9 @@ Das Team und die Aufgabenverteilung sehen wie folgt aus:
 
 Ursprünglich bestand das Team aus einer weiteren Person: Georg Fichtl. Weil die von ihm erhoffte Anrechnung des YIMB-Faches an das dritte Studienabschnitt durch formale Einschränkungen scheiterte, ließ er seine Motivation fallen und verließ das Team.
 
-Am 10.05.2016 wurde Goldmann Simon im \glqq Bryx-Projekt\grqq aufgenommen, da sich seine vorherige Gruppe aufgelöste hatte.
+Am 10.05.2016 wurde Goldmann Simon ins Projekt aufgenommen, da sich seine vorherige Gruppe aufgelöste hatte.
 
-Zur Kommunikation wurde Discord (\url{https://discordapp.com}) benutzt, welches sich am Besten als eine Kombination eines IRC- und TeamSpeak-Clients
+Zur Kommunikation wird Discord (\url{https://discordapp.com}) benutzt, welches sich am Besten als eine Kombination eines IRC- und TeamSpeak-Clients
 beschreiben lässt:
 
 % TODO Besseres Bild
@@ -94,7 +90,7 @@ beschreiben lässt:
 Das persistente Chatprotokoll erlaubt Austausch und Festhaltung der Ideen und für längere Diskussionen kann man auch Sprachkommunikation nutzen.
 
 % todo begründen
-Programmversionen wurden mithilfe von Git ausgetauscht und zum Teil auch verwaltet.
+Programmversionen wurden mithilfe von Git ausgetauscht und verwaltet.
 
 Die Bearbeitung der Aufgaben wurde wie folgt aufgeteilt:\newline
 \begin{tabular}{|c|l|l|}
@@ -117,7 +113,10 @@ Die Bearbeitung der Aufgaben wurde wie folgt aufgeteilt:\newline
 	5.1 & Implementierung des Paranoidsuchverfahrens & Utz Andrej\\
 	\hline
 	6.1 & Implementierung des $\alpha$-$\beta$-Pruning's & \\
-	6.2 & Erstellen von Statistiken zum $\alpha$-$\beta$-Pruning& \\
+	6.2 & Erstellen von Statistiken zum $\alpha$-$\beta$-Pruning & \\
+	\hline
+	7.1 & Einbauen der Client-Parameter & Utz Andrej\\
+	7.2 & Implementierung des Iterative-Deepening-Verfahrens & \\
 	\hline
 \end{tabular}
 \newpage
@@ -152,7 +151,7 @@ Asynchrone Netzwerkbibliothek für C. Sorgt für bessere Abstraktion der Sockets
 \newpage
 
 \subsection{Datenstruktur}
-Als Grundlange für die Speicherung des Spielfeldes wurde der STL-Container \texttt{std::vector} aus der Standardbibliothek benutzt. Dieser ist unter der Haube nichts weiter als ein eindimensionaler, heapallokierter Array mit Verfolgung der Größe und Zugriffschecks. Der Zugriff auf Felder erfolgt über ihre X,Y-Koordinaten.
+Als Grundlange für die Speicherung des Spielfeldes wurde der STL-Container \texttt{std::vector} aus der Standardbibliothek benutzt. Dieser ist nichts weiter als ein eindimensionaler, heapallokierter Array mit Verfolgung der Größe und Zugriffschecks. Der Zugriff auf Felder erfolgt über ihre X,Y-Koordinaten.
 Ein Feld sieht wie folgt aus:
 
 \begin{lstlisting}[caption=\texttt{Cell} Struktur, label=lst:cell-struct]
@@ -161,7 +160,7 @@ struct Cell
 	struct Transition
 	{
 		Cell *target;
-		Direction out;
+		Direction entry;
 	};
 	
 	Map &map;
@@ -171,6 +170,7 @@ struct Cell
 	std::array<Transition, 8> transitions;
 };
 \end{lstlisting}
+
 
 \texttt{Cell} speichert - neben dem eigentlichem Feldtyp - noch ihre Position als Vektor, eine Referenz zum Spielfeld und einen festen Array mit 8 Transitionen, welche den ihren Ausgangsrichtungen entsprechen.
 Eine \texttt{Transition} beinhaltet einen Zeiger auf eine andere Zelle und die Ausrichtung, die ein Zug bekommt, nachdem er die Transition passiert hat.
@@ -196,13 +196,14 @@ Nachteilhaft ist die Implementierung dieser Bewertungsmethode, da sie sehr aufwe
 \subsection{Spielfeldbewertung: 2. Vorschlag}
 Bewertung nach Position:\newline
 Hierbei wird geprüft, ob der gesetzte Stein durch normale Spielzüge übernehmbar ist oder nicht. Optional wäre es zu testen, wie viele normale Züge notwendig wären um einen übernehmbaren Stein zu drehen.\newline 
-Diese Bewertungsweise ist relativ leicht umsetzbar, is aber nur mäßig gut um das Spielfeld zu bewerten.
+Diese Bewertungsweise ist relativ leicht umsetzbar, aber nur mäßig gut um das Spielfeld zu bewerten.
 
 \subsection{Final implementierte Spielfeldbewertung}
-% todo 
-Beschreiben Sie abschließend, welche Heuristik final in Ihrem Client umgesetzt ist. Beschreiben Sie dazu auch Werte von Parametern (Kriterien und Gewichtungen), die Sie in den einzelnen Implementierungen nutzen. Welche statischen Vorberechnungen Sie machen, um z.B.\ das Spielfeld zu analysieren, etc.
-
-
+Nachdem das Spielfeld eingelesen wurde, erhält jedes Feld einen Wert, der davon abhängt, wie vielen Wand-Feldern angrenzen und ob diese nebeneinander liegen. Zudem wird zu bei jedem Feld geprüft, ob es sich um ein Bonus- oder Choice-Feld handelt. Sofern es sich um eines dieser Sonderfelder handelt wird ein vordefinierter Wert zum vorher ermittelten Feldwert hinzugefügt. Die Feldwerterhöhung verfällt sobald das Sonderfeld zum ersten Mal von einem Spieler besetzt wird.\newline % todo: tabelle mit wertorientierung für menge an wänden und bonusfelbewertung
+Die Bewertung von Expansionssteinen und Inversionsfeldern wird durch das Paranoid-Verfahren bewältigt, da sie einen vordefinierten Einfluss auf das Spielfeld haben. Dieser Einfluss ist aus den, durch das Sonderfeld ausgelösten Umfärbungen ersichtlich.
+% todo
+ 
+%Beschreiben Sie abschließend, welche Heuristik final in Ihrem Client umgesetzt ist. Beschreiben Sie dazu auch Werte von Parametern (Kriterien und Gewichtungen), die Sie in den einzelnen Implementierungen nutzen. Welche statischen Vorberechnungen Sie machen, um z.B.\ das Spielfeld zu analysieren, etc.
 \newpage
 % ----------------------------------------------------------------------------------
 % Kapitel: Statistiken
@@ -217,174 +218,168 @@ Integrieren Sie in diesen Abschnitt alle Ergebnisse von Projektaufgaben, die mit
 % Kapitel: Bombenphase
 % ----------------------------------------------------------------------------------
 \section{Bombenphase}
-Beschreiben Sie, wie Sie Bomben werfen (z.\,B.\ die eingesetzte Bewertungsheuristik und, ob Sie in die Tiefe rechnen und falls ja, wie tief Sie rechnen)
 
-
+%Beschreiben Sie, wie Sie Bomben werfen (z.\,B.\ die eingesetzte Bewertungsheuristik und, ob Sie in die Tiefe rechnen und falls ja, wie tief Sie rechnen)
 \newpage
 % ----------------------------------------------------------------------------------
 % Kapitel: Eigene Spielfelder
 % ----------------------------------------------------------------------------------
 \section{Wettbewerbs-Spielfelder}
-Beschreiben Sie in diesem Abschnitt die Spielfelder, die Sie für den Wettbewerb eingereicht haben/einreichen wollen. Fügen Sie in diesen Abschnitt auch die entsprechenden Bilder der Karten ein, geben Sie Zusatzinformationen wie Spieleranzahl, Bombenanzahl und -stärke, Anzahl Überschreibsteine etc.\ an.
 
-Beschreiben Sie außerdem, warum sie die jeweiligen Karten eingereicht haben: in welcher Hinsicht versprechen Sie sich von den eingereichten Karten Vorteile; in wie weit sind diese Karten auf Ihren Client und die darin implementierte Heuristik zugeschnitten, etc.
-
-
+%Beschreiben Sie in diesem Abschnitt die Spielfelder, die Sie für den Wettbewerb eingereicht haben/einreichen wollen. Fügen Sie in diesen Abschnitt auch die entsprechenden Bilder der Karten ein, geben Sie Zusatzinformationen wie Spieleranzahl, Bombenanzahl und -stärke, Anzahl Überschreibsteine etc.\ an.
+%Beschreiben Sie außerdem, warum sie die jeweiligen Karten eingereicht haben: in welcher Hinsicht versprechen Sie sich von den eingereichten Karten Vorteile; in wie weit sind diese Karten auf Ihren Client und die darin implementierte Heuristik zugeschnitten, etc.
 \newpage
 % ----------------------------------------------------------------------------------
 % Kapitel: Fazit
 % ----------------------------------------------------------------------------------
 \section{Fazit}
-Beschreiben Sie in diesem Abschnitt u.a.\ was Ihnen an diesem Fach gefallen hat und welche Verbesserungsvorschläge Sie für künftige Veranstaltungen haben. Was konnten Sie dazulernen, in welchen Bereichen haben Sie sich verbessert. Welche Problemsituationen gab es während der Projekterstellung, wie sind Sie diese angegangen und wie haben Sie diese gelöst. Was haben Sie evtl.\ vermisst.
 
-
+%Beschreiben Sie in diesem Abschnitt u.a.\ was Ihnen an diesem Fach gefallen hat und welche Verbesserungsvorschläge Sie für künftige Veranstaltungen haben. Was konnten Sie dazulernen, in welchen Bereichen haben Sie sich verbessert. Welche Problemsituationen gab es während der Projekterstellung, wie sind Sie diese angegangen und wie haben Sie diese gelöst. Was haben Sie evtl.\ vermisst.
 \newpage
 % ----------------------------------------------------------------------------------
 % Kleine Einführung in LaTeX-Elemente
 % ----------------------------------------------------------------------------------
-\section{\LaTeX-Elemente}
-Dieser Abschnitt soll nicht Bestandteil des Projektberichtes sein, sondern beinhaltet lediglich einige Informationen über \LaTeX-Distributionen, Editoren und \LaTeX-Elemente, die Ihnen beim Einstieg in das \LaTeX-Textsatzsystem helfen sollen.
-
-\subsection{\LaTeX-Distributionen nach Betriebssystemen}
-
-\subsubsection{\LaTeX-Distributionen}
-Folgende Haupt-\LaTeX-Distributionen stehen Ihnen zur Verfügung:
-\begin{itemize}
-  \item Windows:\quad \texttt{MiKTeX}\quad Webseite:\quad\url{http://www.miktex.org}
-  \item Linux/Unix:\quad \texttt{TeX Live}\quad Webseite:\quad\url{http://tug.org/texlive/}
-  \item Mac OS:\quad \texttt{MacTeX}\quad Webseite:\quad\url{http://www.tug.org/mactex/}
-\end{itemize}
-
-\subsubsection{\LaTeX-Editoren}
-Auf folgenden Webseiten können Sie einige hilfreiche \LaTeX-Editoren finden:
-\begin{itemize}
-  \item Windows/Linux/Mac OS: \url{http://www.xm1math.net/texmaker/}
-  \item Windiws: \url{http://www.texniccenter.org/}
-  \item Mac OS: \url{http://pages.uoregon.edu/koch/texshop/}
-\end{itemize}
-
-Falls bei den oben genannten Editoren kein passender vorhanden war, findet sich auf Wikipedia eine Zusammenstellung vieler weiterer \LaTeX-Editoren:\\[1em]
-\hspace*{3cm}\url{https://en.wikipedia.org/wiki/Comparison_of_TeX_editors}
-
-
-\subsection{Unterabschnitt}
-Zum Einfügen eines Bildes, siehe Abbildung \ref{fig:reversi01}, wird die \textit{minipage}-Umgebung genutzt, da die Bilder so gut positioniert werden können.
-
-\vspace{1em}
-\begin{minipage}{\linewidth}
-	\centering
-	\includegraphics[width=0.6\linewidth]{pics/gamefield01.png}
-	\captionof{figure}[Spielfeld 01]{Unbespieltes Spielfeld\footnotemark }
-	\label{fig:reversi01}
-\end{minipage}
-\footnotetext{Diesem Spielfeld wurden noch keine Spieler zugewiesen (daher die dunklen Spielsteine)}
-
-Nachdem das Spielt gestartet wurde und beiden Spielphasen durchlaufen wurden, siegt schließlich der Spieler mit der Farbe rot.
-
-\vspace{1em}
-\begin{minipage}{\linewidth}
-	\centering
-	\includegraphics[width=0.6\linewidth]{pics/gamefield02.png}
-	\captionof{figure}[Spielfeld 02]{Finales Spielfeld\footnotemark }
-	\label{fig:reversi2}
-\end{minipage}
-\footnotetext{Das Spielfeld nach der Zug- und Bombenphase. Spieler rot gewinnt eindeutig.}
-
-\subsection{Tabellen}
-In diesem Abschnitt wird eine Tabelle (siehe Tabelle \ref{tab:beispiel}) dargestellt.
-
-\vspace{1em}
-\begin{table}[!h]
-	\centering
-	\begin{tabular}{|l|l|l|}
-		\hline
-		\textbf{Name} & \textbf{Name} & \textbf{Name}\\
-		\hline
-		1 & 2 & 3\\
-		\hline
-		4 & 5 & 6\\
-		\hline
-		7 & 8 & 9\\
-		\hline
-	\end{tabular}
-	\caption{Beispieltabelle}
-	\label{tab:beispiel}
-\end{table}
-
-
-\subsection{Auflistung}
-Für Auflistungen wird die \textit{enumerate}- oder \textit{itemize}-Umgebung genutzt.
-
-\begin{itemize}
-	\item Nur
-	\item ein
-	\item Beispiel.
-\end{itemize}
-
-\subsection{Listings}
-Zuletzt ein Beispiel für ein Listing, in dem Quellcode eingebunden werden kann, siehe Listing \ref{lst:arduino}.
-
-\vspace{1em}
-\begin{lstlisting}[caption=Arduino Beispielprogramm, label=lst:arduino]
-int ledPin = 13;
-void setup() {
-    pinMode(ledPin, OUTPUT);
-}
-void loop() {
-    digitalWrite(ledPin, HIGH);
-    delay(500);
-    digitalWrite(ledPin, LOW);
-    delay(500);
-}
-\end{lstlisting}
-
-\subsection{Tipps}
-Die Quellen befinden sich in der Datei \textit{quellen.bib}. Eine Buch- und eine Online-Quelle sind beispielhaft eingefügt. [Vgl. \cite{buch}, \cite{online}]
-
-\pagebreak
-
-% ----------------------------------------------------------------------------------------------------------
-% Kapitel
-% ----------------------------------------------------------------------------------------------------------
-\section{Kapitel}
-Lorem ipsum dolor sit amet.
-
-\subsection{Unterkapitel}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-
-\subsection{Unterkapitel}
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-\pagebreak
-
-% ----------------------------------------------------------------------------------------------------------
-% Literatur
-% ----------------------------------------------------------------------------------------------------------
-\renewcommand\refname{Quellenverzeichnis}
-\bibliographystyle{alpha}
-\bibliography{quellen}
-\pagebreak
-
-% ----------------------------------------------------------------------------------------------------------
-% Anhang
-% ----------------------------------------------------------------------------------------------------------
-\pagenumbering{Roman}
-\setcounter{page}{1}
-\lhead{Anhang \thesection}
-
-\begin{appendix}
-\section*{Anhang}
-\phantomsection
-\addcontentsline{toc}{section}{Anhang}
-\addtocontents{toc}{\vspace{-0.5em}}
-
-\section{GUI}
-Ein toller Anhang.
-
-\subsection*{Screenshot}
-\label{app:screenshot}
-Unterkategorie, die nicht im Inhaltsverzeichnis auftaucht.
-
-\end{appendix}
-
-
+%\section{\LaTeX-Elemente}
+%Dieser Abschnitt soll nicht Bestandteil des Projektberichtes sein, sondern beinhaltet lediglich einige Informationen über \LaTeX-Distributionen, Editoren und \LaTeX-Elemente, die Ihnen beim Einstieg in das \LaTeX-Textsatzsystem helfen sollen.
+%
+%\subsection{\LaTeX-Distributionen nach Betriebssystemen}
+%
+%\subsubsection{\LaTeX-Distributionen}
+%Folgende Haupt-\LaTeX-Distributionen stehen Ihnen zur Verfügung:
+%\begin{itemize}
+%  \item Windows:\quad \texttt{MiKTeX}\quad Webseite:\quad\url{http://www.miktex.org}
+%  \item Linux/Unix:\quad \texttt{TeX Live}\quad Webseite:\quad\url{http://tug.org/texlive/}
+%  \item Mac OS:\quad \texttt{MacTeX}\quad Webseite:\quad\url{http://www.tug.org/mactex/}
+%\end{itemize}
+%
+%\subsubsection{\LaTeX-Editoren}
+%Auf folgenden Webseiten können Sie einige hilfreiche \LaTeX-Editoren finden:
+%\begin{itemize}
+%  \item Windows/Linux/Mac OS: \url{http://www.xm1math.net/texmaker/}
+%  \item Windiws: \url{http://www.texniccenter.org/}
+%  \item Mac OS: \url{http://pages.uoregon.edu/koch/texshop/}
+%\end{itemize}
+%
+%Falls bei den oben genannten Editoren kein passender vorhanden war, findet sich auf Wikipedia eine Zusammenstellung vieler weiterer \LaTeX-Editoren:\\[1em]
+%\hspace*{3cm}\url{https://en.wikipedia.org/wiki/Comparison_of_TeX_editors}
+%
+%
+%\subsection{Unterabschnitt}
+%Zum Einfügen eines Bildes, siehe Abbildung \ref{fig:reversi01}, wird die \textit{minipage}-Umgebung genutzt, da die Bilder so gut positioniert werden können.
+%
+%\vspace{1em}
+%\begin{minipage}{\linewidth}
+%	\centering
+%	\includegraphics[width=0.6\linewidth]{pics/gamefield01.png}
+%	\captionof{figure}[Spielfeld 01]{Unbespieltes Spielfeld\footnotemark }
+%	\label{fig:reversi01}
+%\end{minipage}
+%\footnotetext{Diesem Spielfeld wurden noch keine Spieler zugewiesen (daher die dunklen Spielsteine)}
+%
+%Nachdem das Spielt gestartet wurde und beiden Spielphasen durchlaufen wurden, siegt schließlich der Spieler mit der Farbe rot.
+%
+%\vspace{1em}
+%\begin{minipage}{\linewidth}
+%	\centering
+%	\includegraphics[width=0.6\linewidth]{pics/gamefield02.png}
+%	\captionof{figure}[Spielfeld 02]{Finales Spielfeld\footnotemark }
+%	\label{fig:reversi2}
+%\end{minipage}
+%\footnotetext{Das Spielfeld nach der Zug- und Bombenphase. Spieler rot gewinnt eindeutig.}
+%
+%\subsection{Tabellen}
+%In diesem Abschnitt wird eine Tabelle (siehe Tabelle \ref{tab:beispiel}) dargestellt.
+%
+%\vspace{1em}
+%\begin{table}[!h]
+%	\centering
+%	\begin{tabular}{|l|l|l|}
+%		\hline
+%		\textbf{Name} & \textbf{Name} & \textbf{Name}\\
+%		\hline
+%		1 & 2 & 3\\
+%		\hline
+%		4 & 5 & 6\\
+%		\hline
+%		7 & 8 & 9\\
+%		\hline
+%	\end{tabular}
+%	\caption{Beispieltabelle}
+%	\label{tab:beispiel}
+%\end{table}
+%
+%
+%\subsection{Auflistung}
+%Für Auflistungen wird die \textit{enumerate}- oder \textit{itemize}-Umgebung genutzt.
+%
+%\begin{itemize}
+%	\item Nur
+%	\item ein
+%	\item Beispiel.
+%\end{itemize}
+%
+%\subsection{Listings}
+%Zuletzt ein Beispiel für ein Listing, in dem Quellcode eingebunden werden kann, siehe Listing \ref{lst:arduino}.
+%
+%\vspace{1em}
+%\begin{lstlisting}[caption=Arduino Beispielprogramm, label=lst:arduino]
+%int ledPin = 13;
+%void setup() {
+%    pinMode(ledPin, OUTPUT);
+%}
+%void loop() {
+%    digitalWrite(ledPin, HIGH);
+%    delay(500);
+%    digitalWrite(ledPin, LOW);
+%    delay(500);
+%}
+%\end{lstlisting}
+%
+%\subsection{Tipps}
+%Die Quellen befinden sich in der Datei \textit{quellen.bib}. Eine Buch- und eine Online-Quelle sind beispielhaft eingefügt. [Vgl. \cite{buch}, \cite{online}]
+%
+%\pagebreak
+%
+%% ----------------------------------------------------------------------------------------------------------
+%% Kapitel
+%% ----------------------------------------------------------------------------------------------------------
+%\section{Kapitel}
+%Lorem ipsum dolor sit amet.
+%
+%\subsection{Unterkapitel}
+%Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+%
+%\subsection{Unterkapitel}
+%Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+%\pagebreak
+%
+%% ----------------------------------------------------------------------------------------------------------
+%% Literatur
+%% ----------------------------------------------------------------------------------------------------------
+%\renewcommand\refname{Quellenverzeichnis}
+%\bibliographystyle{alpha}
+%\bibliography{quellen}
+%\pagebreak
+%
+%% ----------------------------------------------------------------------------------------------------------
+%% Anhang
+%% ----------------------------------------------------------------------------------------------------------
+%\pagenumbering{Roman}
+%\setcounter{page}{1}
+%\lhead{Anhang \thesection}
+%
+%\begin{appendix}
+%\section*{Anhang}
+%\phantomsection
+%\addcontentsline{toc}{section}{Anhang}
+%\addtocontents{toc}{\vspace{-0.5em}}
+%
+%\section{GUI}
+%Ein toller Anhang.
+%
+%\subsection*{Screenshot}
+%\label{app:screenshot}
+%Unterkategorie, die nicht im Inhaltsverzeichnis auftaucht.
+%
+%\end{appendix}
 \end{document}
