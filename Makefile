@@ -3,9 +3,10 @@ export CXX=clang++
 
 MODE=Release
 
-all: checkout create	build copy
+all: checkout create build copy
 
 checkout:
+	git submodule update --init
 	git checkout working
 
 create:
@@ -14,8 +15,8 @@ create:
 .PHONY: build
 build:
 	cd build && \
-		cmake -DCMAKE_BUILD_TYPE=$(MODE) .. && \
-		cmake --build . --target all
+	cmake -DCMAKE_BUILD_TYPE=$(MODE) .. && \
+	cmake --build . --target all
 
 copy:
 	mkdir -p bin && cp -v build/bryx bin/client_01
