@@ -9,7 +9,7 @@
 #include <list>
 
 
-#define MOVES_ITERATOR 1
+#define MOVES_ITERATOR 0
 
 
 struct Game;
