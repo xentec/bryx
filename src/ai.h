@@ -2,6 +2,9 @@
 
 #include "vector.h"
 #include "player.h"
+#include "clock.h"
+
+#include <deque>
 
 using Heuristic = i32;
 
@@ -16,4 +19,12 @@ struct AI : Player
 
 	Heuristic evalState(const Game &state) const;
 	Heuristic bestState(Game& state, u32 depth, Heuristic &a, Heuristic &b);
+	Heuristic bestState2(Game &game, u32 depth, Heuristic &a, Heuristic &b);
+private:
+	u32 maxDepth;
+	TimePoint endTime;
+
+	std::deque<Move> stateTree;
+
+	Duration evaltime;
 };
