@@ -11,6 +11,9 @@
 #include <vector>
 #include <unordered_map>
 
+#define BONUS_VALUE 11
+#define CHOICE_VALUE 5
+
 struct Map
 {
 	Map();

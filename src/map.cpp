@@ -5,10 +5,6 @@
 #include <fmt/format.h>
 #include <unordered_map>
 
-#define TRANSITION_AMOUNT 8
-#define BONUS_VALUE 11
-#define CHOICE_VALUE 5
-
 // Map
 //########
 
@@ -259,8 +255,8 @@ Map Map::load(std::istream& file)
 			continue;
 
 		u32 totalCounter = 0, maxCounter = 0, counter = 0;
-        for(usz j = 0; j < (2 * TRANSITION_AMOUNT); j++){       //checks for walls twice, to get the length of the wall
-            if(c.trans[j % TRANSITION_AMOUNT].to == nullptr){   //which is contained in maxCount
+        for(usz j = 0; j < (2 * Direction::_LAST); j++){       //checks for walls twice, to get the length of the wall
+            if(c.trans[j % Direction::_LAST].to == nullptr){   //which is contained in maxCount
 				counter++;
 			}else{
 				if(counter > maxCounter){
