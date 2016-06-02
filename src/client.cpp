@@ -124,8 +124,11 @@ void Client::play()
 						move.choice = ply2type(packet.extra-1);
 				}
 
-				move.print();
-				print("\n\n");
+				if(ply.color != me->color)
+				{
+					move.print();
+					print("\n\n");
+				}
 				game.execute(move);
 			}
 			break;
