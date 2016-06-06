@@ -323,4 +323,14 @@ void Game::load(std::istream& file)
 	}
 
 	players.clear();
+
+	println("Map: {}x{}", getMap().width, getMap().height);
+	getMap().print();
+	println();
+	println("Players: {}", defaults.players);
+	println("Overrides: {}", defaults.overrides);
+	println("Bombs: {} ({})", defaults.bombs, defaults.bombsStrength);
+	println();
+	println("Avg Eval time: {} ms", aiData.evalTime.count());
+
 }

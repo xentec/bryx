@@ -18,7 +18,8 @@ struct Dummy : Player
 
 
 
-Client::Client()
+Client::Client(Game& game):
+	game(game)
 {}
 
 void Client::join(string host, u16 port)
@@ -56,18 +57,8 @@ void Client::join(string host, u16 port)
 			game.addPlayer<Dummy>();
 	}
 
-	print("\n");
-	println("My number: {}", *me);
-	print("\n");
-
-	println("Players: {}", game.defaults.players);
-	println("Overrides: {}", game.defaults.overrides);
-	println("Bombs: {} ({})", game.defaults.bombs, game.defaults.bombsStrength);
-	println("Map: {}x{}", game.getMap().width, game.getMap().height);
-	game.getMap().print();
-	print("\n");
-
-	println("Avg Eval time: {} ms", game.aiData.evalTime.count());
+	println();
+	println("My number: {}\n", *me);
 }
 
 void Client::play()

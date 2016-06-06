@@ -9,7 +9,7 @@
 
 struct Client
 {
-	Client();
+	Client(Game& game);
 
 	void join(string host, u16 port = 7777);
 
@@ -25,7 +25,7 @@ private:
 	void send(Packet packet) const;
 
 	Socket socket;
-	Game game;
+	Game& game;
 	Player* me;
 };
 

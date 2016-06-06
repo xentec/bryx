@@ -159,9 +159,11 @@ int main(int argc, char* argv[])
 	println("Mode: {}", mode2str(opts.mode));
 	std::cout.flush();
 
+	Game game;
+
 	if(opts.mode != Mode::CLIENT)
 	{
-		print("Loading map {} ... ", opts.mapPath);
+		println("Loading map {} ... ", opts.mapPath);
 
 		std::ifstream file( opts.mapPath);
 		if (!file)
@@ -171,17 +173,7 @@ int main(int argc, char* argv[])
 			return 0;
 		}
 
-		Game game;
 		game.load(file);
-
-		println("Done!");
-
-		println("Players: {}", game.defaults.players);
-		println("Overrides: {}", game.defaults.overrides);
-		println("Bombs: {} ({})", game.defaults.bombs, game.defaults.bombsStrength);
-		println("Map: {}x{}", game.getMap().width, game.getMap().height);
-		game.getMap().print();
-
 
 		switch(opts.mode)
 		{
@@ -217,43 +209,10 @@ int main(int argc, char* argv[])
 		}
 
 		game.run();
-
-		std::vector<std::pair<Cell::Type, u32>> scores(game.getPlayers().size(), {Cell::Type::VOID,0});
-
-		for(Cell& c: game.getMap())
-		{
-			if(c.isPlayer())
-			{
-				auto& e = scores[(usz)c.type - (usz)Cell::Type::P1];
-				e.first = c.type;
-				e.second++;
-			}
-		}
-#if 0
-		std::sort(scores.begin(), scores.end(), [](std::pair<Cell::Type, u32>& a, std::pair<Cell::Type, u32>& b)
-		{
-			return a.second > b.second;
-		});
-#endif
-		print("\n");
-		println("########");
-		println("GAME SET");
-		println("########");
-		game.getMap().print();
-
-		println("Moves: {}", game.stats.moves);
-		println("Scores:");
-		for(usz i = 0; i < scores.size(); i++)
-		{
-			println("{}. Player {}: {}", i+1, (char) scores[i].first, scores[i].second);
-		}
-
-		println("Longest move: {} ms", game.stats.time.moveMax.count());
-		println("Average move: {} ms", game.stats.time.moveAvg.count());
 	}
 	else
 	{
-		Client client;
+		Client client(game);
 		try
 		{
 			client.join(opts.host, opts.port);
@@ -264,5 +223,39 @@ int main(int argc, char* argv[])
 		}
 		client.play();
 	}
+
+	std::vector<std::pair<Cell::Type, u32>> scores(game.getPlayers().size(), {Cell::Type::VOID,0});
+
+	for(Cell& c: game.getMap())
+	{
+		if(c.isPlayer())
+		{
+			auto& e = scores[(usz)c.type - (usz)Cell::Type::P1];
+			e.first = c.type;
+			e.second++;
+		}
+	}
+#if 0
+	std::sort(scores.begin(), scores.end(), [](std::pair<Cell::Type, u32>& a, std::pair<Cell::Type, u32>& b)
+	{
+		return a.second > b.second;
+	});
+#endif
+	println();
+	println("########");
+	println("GAME SET");
+	println("########");
+	game.getMap().print();
+
+	println("Moves: {}", game.stats.moves);
+	println("Scores:");
+	for(usz i = 0; i < scores.size(); i++)
+	{
+		println("{}. Player {}: {}", i+1, (char) scores[i].first, scores[i].second);
+	}
+
+	println("Longest move: {} ms", game.stats.time.moveMax.count());
+	println("Average move: {} ms", game.stats.time.moveAvg.count());
+
 	return 0;
 }
