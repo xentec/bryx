@@ -5,7 +5,7 @@
 #include "move.h"
 #include "player.h"
 
-#include <chrono>
+#include "clock.h"
 
 struct Player;
 struct Client;
@@ -25,7 +25,7 @@ struct Game
 		u32 inversions;
 
 		struct {
-			std::chrono::duration<double> moveAvg, moveMax;
+			Duration moveAvg, moveMax;
 		} time;
 	} stats;
 

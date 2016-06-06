@@ -248,8 +248,8 @@ int main(int argc, char* argv[])
 			println("{}. Player {}: {}", i+1, (char) scores[i].first, scores[i].second);
 		}
 
-		println("Longest move: {} ms", game.stats.time.moveMax.count() * 1000);
-		println("Average move: {} ms", game.stats.time.moveAvg.count() * 1000);
+		println("Longest move: {} ms", game.stats.time.moveMax.count());
+		println("Average move: {} ms", game.stats.time.moveAvg.count());
 	}
 	else
 	{

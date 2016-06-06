@@ -5,7 +5,7 @@
 #include "global.h"
 
 
-using Duration = std::chrono::milliseconds;
+using Duration = std::chrono::duration<f64, std::milli>;
 
 struct Clock
 {
