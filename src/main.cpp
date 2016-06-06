@@ -47,8 +47,9 @@ struct Options
 
 void usage(Options& opts, const string&, usz&, const string*)
 {
-	println("usage: {} [options] <spectator|pvp> <map path>", opts.progName);
-	println("       {} [options] <client>        <host>", opts.progName);
+	println("usage: {} [options] <spec|pvp> <map path>", opts.progName);
+	println("       {} [options] <client>   <host>", opts.progName);
+	println("       {} -i <host> [-p <port>]", opts.progName);
 	std::exit(0);
 }
 
@@ -141,6 +142,12 @@ int main(int argc, char* argv[])
 	Options opts;
 
 	try {
+		if(argc == 1)
+		{
+			usz _;
+			usage(opts, "", _, nullptr); //exits
+		}
+
 		parseArgs(opts, argc, argv);
 	} catch(std::exception& ex)
 	{
