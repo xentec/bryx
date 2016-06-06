@@ -186,7 +186,7 @@ void Game::execute(Move &move, bool backup)
 	switch(targetCell) // ...then look at special cases
 	{
 	case Cell::Type::BONUS:
-        targetCell.staticValue -= BONUS_VALUE;
+        move.target.staticValue -= BONUS_VALUE;
 		switch(move.bonus)
 		{
 		case Move::BOMB:
@@ -201,7 +201,7 @@ void Game::execute(Move &move, bool backup)
 		break;
 	case Cell::Type::CHOICE:
 	{
-        targetCell.staticValue -= CHOICE_VALUE;
+        move.target.staticValue -= CHOICE_VALUE;
 		if(move.player.color == move.choice)
 			break;
 
@@ -234,7 +234,7 @@ void Game::undo(Move &move)
 	switch(move.backup.target) // ...then look at special cases
 	{
 	case Cell::Type::BONUS:
-        move.backup.target.staticValue += BONUS_VALUE;
+        move.target.staticValue += BONUS_VALUE;
 		switch(move.bonus)
 		{
 		case Move::BOMB:
