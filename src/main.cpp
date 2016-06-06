@@ -190,7 +190,7 @@ int main(int argc, char* argv[])
 				game.addPlayer<AI>();
 			break;
 		case Mode::PVP:
-			print("\n");
+			println();
 			for(u32 i = 0; i < game.defaults.players; i++)
 			{
 				print("Player {}: human (h) or computer (c)? ", i+1);

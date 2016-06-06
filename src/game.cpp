@@ -91,17 +91,17 @@ void Game::run()
 	{
 		Player& ply = currPlayer();
 
-		print("\n");
+		println();
 		println("Player {}", ply);
 
 		println("##########");
 		for(usz i = 0; i < ply.name.size(); i++)
 			print("#");
-		print("\n");
+		println();
 
 		println("Overrides: {}", ply.overrides);
 		println("Bombs: {}", ply.bombs);
-		print("\n");
+		println();
 
 #if MOVES_ITERATOR
 		std::deque<Move> moves = ply.possibleMoves().all();
@@ -122,13 +122,13 @@ void Game::run()
 					ovr++;
 
 			println("Moves: {} ({})", num-ovr, num);
-			print("\n");
+			println();
 
 #if 0
 			for(Move m: moves)
 			{
 				m.print();
-				print("\n");
+				println();
 			}
 #endif
 		}

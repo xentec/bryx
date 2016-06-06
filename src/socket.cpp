@@ -100,7 +100,7 @@ void Socket::send(const std::vector<u8>& payload) const
 	for(auto iter = payload.cbegin()+5; iter != payload.cend(); iter++)
 		println("{:02x} ", *iter);
 
-	print("\n");
+	println();
 	std::fflush(stdout);
 #endif
 
@@ -135,7 +135,7 @@ std::vector<u8> Socket::recv(usz size, bool peek, bool wait) const
 		}
 	}
 
-	print("\n");
+	println();
 	std::fflush(stdout);
 #endif
 
