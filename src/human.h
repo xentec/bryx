@@ -10,5 +10,5 @@ struct Human : Player
 	virtual ~Human();
 
 	virtual Player* clone() const;
-	virtual Move move(std::list<Move>&, u32, u32);
+	virtual Move move(std::deque<Move>&, u32, u32);
 };

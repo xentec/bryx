@@ -51,7 +51,7 @@ PossibleMoves Player::possibleMoves()
 #if MOVES_ITERATOR
 	return PossibleMoves { *this, game.getMap() };
 #else
-	std::list<Move> moves;
+	std::deque<Move> moves;
 	Move move { *this, nullptr };
 
 	for(Cell& c: game.getMap())
@@ -137,7 +137,7 @@ bool PossibleMoves::empty()
 
 std::list<Move> PossibleMoves::all()
 {
-	std::list<Move> all;
+	std::deque<Move> all;
 	for(Move& m: *this)
 		all.push_back(m);
 

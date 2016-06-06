@@ -12,7 +12,7 @@ struct Client
 	Client();
 
 	void join(string host, u16 port = 7777);
-	
+
 	void play();
 
 private:

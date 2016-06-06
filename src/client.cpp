@@ -13,7 +13,7 @@ struct Dummy : Player
 	Dummy(const Dummy& other): Player(other) {}
 	virtual ~Dummy() {}
 	virtual Player* clone() const { return new Dummy(*this); }
-	virtual Move move(std::list<Move>&, u32, u32) { return Move(*this, nullptr); }
+	virtual Move move(std::deque<Move>&, u32, u32) { return Move(*this, nullptr); }
 };
 
 
@@ -82,9 +82,9 @@ void Client::play()
 				game.currPly = type2ply(me->color);
 
 #if MOVES_ITERATOR
-				std::list<Move> moves = me->possibleMoves().all();
+				std::deque<Move> moves = me->possibleMoves().all();
 #else
-				std::list<Move> moves = me->possibleMoves();
+				std::deque<Move> moves = me->possibleMoves();
 #endif
 				if(moves.empty())
 					throw std::runtime_error("no moves found");

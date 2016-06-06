@@ -103,9 +103,9 @@ void Game::run()
 		print("\n");
 
 #if MOVES_ITERATOR
-		std::list<Move> moves = ply.possibleMoves().all();
+		std::deque<Move> moves = ply.possibleMoves().all();
 #else
-		std::list<Move> moves = ply.possibleMoves();
+		std::deque<Move> moves = ply.possibleMoves();
 #endif
 		if(moves.empty())
 		{

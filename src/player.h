@@ -6,7 +6,7 @@
 #include "move.h"
 
 #include <fmt/ostream.h>
-#include <list>
+#include <deque>
 
 
 #define MOVES_ITERATOR 0
@@ -16,7 +16,7 @@ struct Game;
 #if MOVES_ITERATOR
 struct PossibleMoves;
 #else
-using PossibleMoves = std::list<Move>;
+using PossibleMoves = std::deque<Move>;
 #endif
 
 
@@ -31,7 +31,7 @@ struct Player
 
 	string asString() const;
 
-	virtual Move move(std::list<Move>& moves, u32 time, u32 depth) = 0;
+	virtual Move move(std::deque<Move>& moves, u32 time, u32 depth) = 0;
 
 	std::list<Cell*> stones();
 	PossibleMoves possibleMoves();
@@ -64,7 +64,7 @@ struct PossibleMoves
 	usz size();
 	bool empty();
 
-	std::list<Move> all();
+	std::deque<Move> all();
 
 
 	template<class T>
