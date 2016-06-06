@@ -3,6 +3,7 @@
 #include "clock.h"
 #include "map.h"
 #include "util.h"
+#include "ai.h"
 
 #include <fmt/format.h>
 
@@ -302,4 +303,24 @@ void Game::load(std::istream& file)
 	defaults.bombsStrength = stoi(tmp[1]);
 
 	map = new Map(Map::load(file));
+
+	// Make some meassurements
+	AI tester(*this, Cell::Type::P1);
+	players.push_back(&tester);
+
+	// calc average eval time
+	TimePoint start, end;
+	u32 num = 1;
+
+	for(usz i = 0; i < 10; ++i)
+	{
+		start = Clock::now();
+		tester.evalState(*this);
+		end = Clock::now();
+
+		aiData.evalTime += (end-start)/(num*(num+1));
+		num++;
+	}
+
+	players.clear();
 }

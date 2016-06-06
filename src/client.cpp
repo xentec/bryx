@@ -65,6 +65,9 @@ void Client::join(string host, u16 port)
 	println("Bombs: {} ({})", game.defaults.bombs, game.defaults.bombsStrength);
 	println("Map: {}x{}", game.getMap().width, game.getMap().height);
 	game.getMap().print();
+	print("\n");
+
+	println("Avg Eval time: {} ms", game.aiData.evalTime.count());
 }
 
 void Client::play()

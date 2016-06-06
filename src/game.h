@@ -29,6 +29,10 @@ struct Game
 		} time;
 	} stats;
 
+	struct {
+		Duration evalTime;
+	} aiData;
+
 	Game();
 	Game(const Game& game);
 	~Game();
