@@ -2,7 +2,7 @@
 
 #include "vector.h"
 #include "player.h"
-#include "clock.h"
+#include "util/clock.h"
 
 #include <deque>
 

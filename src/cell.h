@@ -1,8 +1,8 @@
 #pragma once
 
 #include "global.h"
-#include "console.h"
 #include "vector.h"
+#include "util/console.h"
 
 #include <array>
 

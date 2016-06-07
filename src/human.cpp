@@ -3,9 +3,8 @@
 #include "map.h"
 #include "move.h"
 #include "game.h"
-#include "util.h"
 
-#include "console.h"
+#include "util/console.h"
 
 #include <iostream>
 

@@ -1,7 +1,6 @@
 #include "map.h"
 #include "game.h"
 #include "client.h"
-#include "util.h"
 
 #include "ai.h"
 #include "human.h"

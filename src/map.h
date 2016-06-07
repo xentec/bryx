@@ -3,9 +3,9 @@
 #include "global.h"
 
 #include "cell.h"
-#include "console.h"
 #include "vector.h"
-#include "util.h"
+#include "util/console.h"
+#include "util/misc.h"
 
 #include <iterator>
 #include <vector>

@@ -1,7 +1,7 @@
 #include "socket.h"
 
-#include "util.h"
-#include "console.h"
+#include "util/console.h"
+#include "util/scope.h"
 
 #include <cstring> // memset
 

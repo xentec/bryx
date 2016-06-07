@@ -5,7 +5,7 @@
 #include "move.h"
 #include "player.h"
 
-#include "clock.h"
+#include "util/clock.h"
 
 struct Player;
 struct Client;

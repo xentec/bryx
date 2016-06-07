@@ -1,12 +1,10 @@
 #include "game.h"
 
-#include "clock.h"
 #include "map.h"
-#include "util.h"
 #include "ai.h"
+#include "util/clock.h"
 
 #include <fmt/format.h>
-
 #include <list>
 
 #define VERBOSE 1

@@ -1,6 +1,5 @@
 #include "ai.h"
 
-#include "clock.h"
 #include "game.h"
 #include "map.h"
 

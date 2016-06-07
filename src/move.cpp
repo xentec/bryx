@@ -2,7 +2,7 @@
 
 #include "game.h"
 #include "map.h"
-#include "console.h"
+#include "util/console.h"
 
 Move::Move(Player& player, Cell* target):
 	player(player),

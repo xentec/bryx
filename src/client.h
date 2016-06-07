@@ -1,8 +1,8 @@
 #pragma once
 
 #include "global.h"
-#include "socket.h"
-#include "packet.h"
+#include "net/socket.h"
+#include "net/packet.h"
 
 #include "ai.h"
 #include "game.h"
