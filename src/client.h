@@ -19,7 +19,7 @@ private:
 	packet::Header peek() const;
 
 	template<class Packet>
-	Packet read() const;
+	Packet recv() const;
 
 	template<class Packet>
 	void send(Packet packet) const;
@@ -32,17 +32,21 @@ private:
 template<class Packet>
 void Client::send(Packet packet) const
 {
-	socket.send(packet.dump());
+	socket.send(reinterpret_cast<u8*>(&packet), packet.hdr.size()+5);
 }
 
 template<class Packet>
-Packet Client::read() const
+Packet Client::recv() const
 {
-	packet::Header hdr = peek();
+	packet::Header hdr;
+	socket.recv(reinterpret_cast<u8*>(&hdr), 5, true);
+
 	Packet def;
 	if(def.hdr.type != hdr.type)
 		throw std::runtime_error(fmt::format("wrong packet! expected: {}, got {}", def.hdr.type, hdr.type));
 
-	return Packet(socket.recv(5+hdr.size));
+	socket.recv(reinterpret_cast<u8*>(&def), 5+hdr.size());
+
+	return def;
 }
 

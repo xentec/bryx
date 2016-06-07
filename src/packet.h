@@ -3,13 +3,20 @@
 #include "global.h"
 #include "vector.h"
 
+#ifdef _WIN32
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#endif
+
+
 #include <vector>
+
+#pragma pack(push)
+#pragma pack(push,1)
 
 namespace packet
 {
-
-using Payload = std::vector<u8>;
-
 enum Type : u8
 {
 	JOIN = 1,
@@ -23,16 +30,15 @@ enum Type : u8
 	GAME_END = 9
 };
 
-
 struct Header
 {
 	Type type;
-	u32 size;
+	u32 size_net;
 
-	Header(Type type);
-	Header(const Payload& data);
+	Header();
+	Header(Type type, u32 size = 0);
 
-	Payload dump();
+	inline u32 size() const { return ntohl(size_net); }
 };
 
 // Server
@@ -41,13 +47,12 @@ struct Header
 struct Map
 {
 	Header hdr;
-	string map;
+	const char* map_net;
 
 	Map();
 	Map(const string& map);
-	Map(const Payload& data);
 
-	Payload dump();
+	inline string map() const { return string(map_net, hdr.size()); }
 };
 
 struct PlayerID
@@ -57,22 +62,18 @@ struct PlayerID
 
 	PlayerID();
 	PlayerID(u8 player);
-	PlayerID(const Payload& data);
-
-	Payload dump();
 };
 
 struct MoveRequest
 {
 	Header hdr;
-	u32 time;
+	u32 time_net;
 	u8 depth;
 
 	MoveRequest();
 	MoveRequest(u32 time, u8 depth);
-	MoveRequest(const Payload& data);
 
-	Payload dump();
+	inline u32 time() const { return ntohl(time_net); }
 };
 
 struct Move
@@ -84,9 +85,8 @@ struct Move
 
 	Move();
 	Move(const vec& pos, u8 selection, u8 player);
-	Move(const Payload& data);
 
-	Payload dump();
+	inline vec pos() const { return vec{ ntohs(x), ntohs(y) }; }
 };
 
 struct Disq
@@ -96,31 +96,22 @@ struct Disq
 
 	Disq();
 	Disq(u8 player);
-	Disq(const Payload& data);
-
-	Payload dump();
 };
 
 
 struct BombPhase
 {
 	Header hdr;
-	
+
 	BombPhase();
-	BombPhase(const Payload&);
-		
-	Payload dump();
 };
 
 
 struct GameEnd
 {
 	Header hdr;
-	
+
 	GameEnd();
-	GameEnd(const Payload&);
-		
-	Payload dump();
 };
 
 
@@ -135,9 +126,6 @@ struct Join
 
 	Join();
 	Join(u8 group);
-	Join(const Payload& data);
-
-	Payload dump();
 };
 
 struct MoveResponse
@@ -148,9 +136,10 @@ struct MoveResponse
 
 	MoveResponse();
 	MoveResponse(const vec& pos, u8 selection);
-	MoveResponse(const Payload& data);
 
-	Payload dump();
+	inline vec pos() const { return vec{ ntohs(x), ntohs(y) }; }
 };
 
 }
+
+#pragma pack(pop)

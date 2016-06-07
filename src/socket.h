@@ -11,8 +11,8 @@ struct Socket
 	void connect(string host, u16 port);
 	void close();
 
-	void send(const std::vector<u8>& payload) const;
-	std::vector<u8> recv(usz size, bool peek = false, bool wait = true) const;
+	usz send(const u8* buffer, usz size) const;
+	usz recv(u8* buffer, usz size, bool peek = false, bool wait = true) const;
 private:
 	int fd;
 };

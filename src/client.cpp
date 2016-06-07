@@ -29,7 +29,7 @@ void Client::join(string host, u16 port)
 		println("Connecting to {}:{} ...", host, port);
 
 		socket.connect(host, port);
-		socket.send(packet::Join(YIMB_GROUP).dump());
+		send(packet::Join(YIMB_GROUP));
 	}
 	catch(const std::exception& ex)
 	{
@@ -39,15 +39,27 @@ void Client::join(string host, u16 port)
 	try
 	{
 		println("Waiting for Map...");
-		std::stringstream mapData(read<packet::Map>().map);
-		game.load(mapData);
+
+		packet::Header hdr;
+		socket.recv(reinterpret_cast<u8*>(&hdr), 5);
+
+		packet::Map exp;
+		if(exp.hdr.type != hdr.type)
+			throw std::runtime_error(fmt::format("wrong packet! expected: {}, got {}", exp.hdr.type, hdr.type));
+
+		string mapData(hdr.size(), ' ');
+
+		socket.recv(reinterpret_cast<u8*>(&mapData[0]), hdr.size());
+
+		std::stringstream stream(mapData);
+		game.load(stream);
 	}
 	catch(const std::exception& ex)
 	{
 		throw std::runtime_error(fmt::format("failed to load map: {}", ex.what()));
 	}
 
-	u32 plyID = read<packet::PlayerID>().player - 1;
+	u32 plyID = recv<packet::PlayerID>().player - 1;
 
 	for(u32 i = 0; i < game.defaults.players; i++)
 	{
@@ -69,9 +81,9 @@ void Client::play()
 		{
 		case packet::MOVE_REQUEST:
 			{
-				auto packet = read<packet::MoveRequest>(); // TODO: take time and depth into account
+				auto packet = recv<packet::MoveRequest>(); // TODO: take time and depth into account
 
-				println("Got move request: time {}, depth {}", packet.time, packet.depth);
+				println("Got move request: time {}, depth {}", packet.time(), packet.depth);
 
 				game.currPly = type2ply(me->color);
 
@@ -83,7 +95,7 @@ void Client::play()
 				if(moves.empty())
 					throw std::runtime_error("no moves found");
 
-				Move move = me->move(moves, packet.time, packet.depth);
+				Move move = me->move(moves, packet.time(), packet.depth);
 				packet::MoveResponse resp(move.target->pos, move.bonus);
 
 				if(move.choice != Cell::Type::VOID)
@@ -97,7 +109,7 @@ void Client::play()
 			break;
 		case packet::MOVE:
 			{
-				auto packet = read<packet::Move>();
+				auto packet = recv<packet::Move>();
 
 				game.currPly = packet.player - 1;
 				Player& ply = game.currPlayer();
@@ -105,7 +117,7 @@ void Client::play()
 				println("Got player move: {} -> {} ex: {}", ply, vec{packet.x, packet.y}, packet.extra);
 
 				Move move = { ply, nullptr };
-				move.target = &game.getMap().at(packet.x, packet.y);
+				move.target = &game.getMap().at(packet.pos());
 
 				ply.evaluate(move);
 
@@ -128,7 +140,7 @@ void Client::play()
 			break;
 		case packet::DISQ:
 		{
-			auto packet = read<packet::Disq>();
+			auto packet = recv<packet::Disq>();
 
 			auto dp = game.getPlayers().begin() + packet.player - 1;
 			if(*dp == me) // NOOOOOOOOOOOO!!!!!111111
@@ -142,7 +154,7 @@ void Client::play()
 			break;
 		case packet::BOMB_PHASE:
 		{
-			read<packet::BombPhase>(); // clear socket buffer
+			recv<packet::BombPhase>(); // clear socket buffer
 			// TODO: Change phase
 
 			println("Switching to BOMB phase!");
@@ -150,7 +162,7 @@ void Client::play()
 			break;
 		case packet::GAME_END:
 		{
-			read<packet::GameEnd>(); // clear socket buffer
+			recv<packet::GameEnd>(); // clear socket buffer
 			println("gg kthxbye");
 			return;
 		}
@@ -162,5 +174,7 @@ void Client::play()
 
 packet::Header Client::peek() const
 {
-	return packet::Header(socket.recv(5, true));
+	packet::Header hdr;
+	socket.recv(reinterpret_cast<u8*>(&hdr), 5, true);
+	return hdr;
 }

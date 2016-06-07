@@ -88,49 +88,49 @@ void Socket::close()
 #endif
 }
 
-void Socket::send(const std::vector<u8>& payload) const
+usz Socket::send(const u8* buffer, usz size) const
 {
 #if DEBUG > 4
-	println("SENDING: [{}] ", payload.size());
+	println("SENDING: [{}] ", size);
 	std::fflush(stdout);
 
-	println("{:02x} ", payload[0]);
-	println("{:08x} ", ntohl(*(u32*) &payload[1]));
+	print("{:02x} ", buffer[0]);
+	print("{:08x} ", ntohl(*(u32*) &buffer[1]));
 
-	for(auto iter = payload.cbegin()+5; iter != payload.cend(); iter++)
-		println("{:02x} ", *iter);
+	for(usz i = 5; i < size; ++i)
+		print("{:02x} ", buffer[i]);
 
 	println();
 	std::fflush(stdout);
 #endif
 
-	isz len = ::send(fd, reinterpret_cast<const char*>(payload.data()), payload.size(), 0);
+	isz len = ::send(fd, buffer, size, 0);
 	if(len < 0)
 		throw std::runtime_error(strerror(errno));
+
+	return len;
 }
 
-std::vector<u8> Socket::recv(usz size, bool peek, bool wait) const
+usz Socket::recv(u8* buffer, usz size, bool peek, bool wait) const
 {
-	std::vector<u8> buffer(size);
-
-	isz len = ::recv(fd, reinterpret_cast<char*>(&buffer[0]), buffer.size(), peek*MSG_PEEK | MSG_WAITALL);
+	isz len = ::recv(fd, buffer, size, peek*MSG_PEEK | wait*MSG_WAITALL);
 	if(len < 0)
 		throw std::runtime_error(strerror(errno));
 
 #if DEBUG > 4
-	println("RECEIVING: [{}] ", buffer.size());
+	println("RECEIVING: [{}] ", size);
 	std::fflush(stdout);
 
 	if(len > 0)
 	{
-		println("{:02x} ", buffer[0]);
-		if(buffer.size() > 1)
+		print("{:02x} ", buffer[0]);
+		if(len > 1)
 		{
-			println("{:08x} ", ntohl(*(u32*) &buffer[1]));
-			if(buffer.size() > 5)
+			print("{:08x} ", ntohl(*(u32*) &buffer[1]));
+			if(len > 5)
 			{
-				for(auto iter = buffer.begin()+5; iter != buffer.end(); iter++)
-					println("{:02x} ", *iter);
+				for(usz i = 5; i < size; ++i)
+					print("{:02x} ", buffer[i]);
 			}
 		}
 	}
@@ -139,5 +139,6 @@ std::vector<u8> Socket::recv(usz size, bool peek, bool wait) const
 	std::fflush(stdout);
 #endif
 
-	return buffer;
+
+	return len;
 }
