@@ -43,9 +43,7 @@ Move AI::move(std::list<Move>& posMoves, u32 time, u32 depth)
 		if(m.override && overrides == 0) // TODO: Remove condition
 			continue;
 
-		game.execute(m, true);
-		moves.emplace(evalState(game), m);
-		game.undo(m);
+		moves.emplace(evalState(game, m), m);
 	}
 
 	std::pair<Heuristic, Move> bestMove = { infMin, moves.rbegin()->second };
@@ -115,9 +113,9 @@ Heuristic AI::bestState(Game& state, u32 depth, Heuristic& a, Heuristic& b)
 	std::map<Heuristic, Move> moves;
 	for(Move& m: ply.possibleMoves())
 	{
-		state.execute(m, true);
-		moves.emplace(evalState(state), m);
-		state.undo(m);
+//		auto h = evalState(state, m);
+//		moves.emplace(h, m);
+		moves.emplace(evalState(state, m), m);
 	}
 
 	u32 d = depth+1;
@@ -185,14 +183,14 @@ Heuristic AI::bestState2(Game& state, u32 depth, Heuristic& a, Heuristic &b)
 	{
 		// TODO: manange somehow overrides
 
-		state.execute(m, true);
-		moves.emplace(evalState(state), m);
-		state.undo(m);
+		moves.emplace(evalState(state, m), m);
 	}
 }
 
-Heuristic AI::evalState(const Game& state) const
+Heuristic AI::evalState(Game &state, Move& move) const
 {
+	state.execute(move, true);
+
 	Heuristic h = 0;
 
 	Player& futureMe = *state.getPlayers()[type2ply(color)];
@@ -221,6 +219,8 @@ Heuristic AI::evalState(const Game& state) const
 			h = -c.staticValue - 5;
 		}
 	}
+
+	state.undo(move);
 
 	return h;
 }
