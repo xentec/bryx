@@ -12,7 +12,11 @@ AI::AI(Game &game, Cell::Type color):
 {}
 
 AI::AI(const AI &other):
-	Player(other)
+	Player(other),
+	maxDepth(other.maxDepth),
+	endTime(other.endTime),
+	stateTree(other.stateTree),
+	evaltime(other.evaltime)
 {}
 
 AI::~AI()
