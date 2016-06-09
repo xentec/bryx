@@ -104,7 +104,7 @@ usz Socket::send(const u8* buffer, usz size) const
 	std::fflush(stdout);
 #endif
 
-	isz len = ::send(fd, buffer, size, 0);
+	isz len = ::send(fd, reinterpret_cast<const char*>(buffer), size, 0);
 	if(len < 0)
 		throw std::runtime_error(strerror(errno));
 
@@ -113,7 +113,7 @@ usz Socket::send(const u8* buffer, usz size) const
 
 usz Socket::recv(u8* buffer, usz size, bool peek, bool wait) const
 {
-	isz len = ::recv(fd, buffer, size, peek*MSG_PEEK | wait*MSG_WAITALL);
+	isz len = ::recv(fd, reinterpret_cast<char*>(buffer), size, peek*MSG_PEEK | wait*MSG_WAITALL);
 	if(len < 0)
 		throw std::runtime_error(strerror(errno));
 
