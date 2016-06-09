@@ -5,6 +5,7 @@
 
 #ifdef _WIN32
 #include <winsock2.h>
+#undef VOID
 #else
 #include <arpa/inet.h>
 #endif
