@@ -30,7 +30,7 @@ static Heuristic
 inline bool minPrune (Heuristic h, Heuristic& a, Heuristic& v, Heuristic& b){ if(h < v) { v = h; if(v < b) b = v; } return v <= a; }; // min
 inline bool maxPrune (Heuristic h, Heuristic& a, Heuristic& v, Heuristic& b){ if(h > v) { v = h; if(v > a) a = v; } return v >= b; }; // max
 
-Move AI::move(std::list<Move>& posMoves, u32 time, u32 depth)
+Move AI::move(std::deque<Move> &posMoves, u32 time, u32 depth)
 {
 	maxDepth = depth;
 	if(time)
@@ -103,7 +103,7 @@ Move AI::move(std::list<Move>& posMoves, u32 time, u32 depth)
 	return move;
 }
 
-#include "clock.h"
+#include "util/clock.h"
 
 Heuristic AI::bestState(Game& state, u32 depth, Heuristic& a, Heuristic& b)
 {
@@ -194,7 +194,8 @@ Heuristic AI::evalState(Game &state, Move& move) const
 	Heuristic h = 0;
 
 	Player& futureMe = *state.getPlayers()[type2ply(color)];
-
+//remove comment below if displeased with "new heuristik"
+    /*
 	h += 20 * futureMe.overrides;
 	h += futureMe.bombs * state.defaults.bombsStrength;
 
@@ -219,6 +220,17 @@ Heuristic AI::evalState(Game &state, Move& move) const
 			h = -c.staticValue - 5;
 		}
 	}
+	*/
+	//new heuristik
+	for(Cell &c: state.getMap()){
+		if(c.type == color)
+			h += c.staticValue;
+	}
+
+//    h *= 1 + ((futureMe.possibleMoves() - possibleMoves()) / 100); //todo: (futureMe-currentMe)/100
+
+	h += futureMe.overrides * game.aiData.expectedOverriteValue;
+	h += futureMe.bombs * game.aiData.bombValue;
 
 	state.undo(move);
 

@@ -29,9 +29,11 @@ struct Game
 		} time;
 	} stats;
 
-	struct {
+    struct {
+        u32 bombValue;
+        u32 expectedOverriteValue;
 		Duration evalTime;
-	} aiData;
+    } aiData;
 
 	Game();
 	Game(const Game& game);

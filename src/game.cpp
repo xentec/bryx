@@ -12,7 +12,8 @@
 Game::Game():
 	defaults{ 0, 0, 0, 0 }, stats { 0, 0, 0, {} },
 	map(nullptr),
-	currPly(0), moveless(0)
+    currPly(0), moveless(0),
+    aiData{ 0, 15 }
 {}
 
 Game::Game(const Game &other):
@@ -302,6 +303,11 @@ void Game::load(std::istream& file)
 
 	map = new Map(Map::load(file));
 
+	// AI static values
+
+	aiData.bombValue = (((defaults.bombsStrength * 2 + 1) * (defaults.bombsStrength * 2 + 1))
+						/ (map->width * map->height)) * 100;
+
 	// Make some meassurements
 	AI tester(*this, Cell::Type::P1);
 	players.push_back(&tester);
@@ -330,5 +336,4 @@ void Game::load(std::istream& file)
 	println("Bombs: {} ({})", defaults.bombs, defaults.bombsStrength);
 	println();
 	println("Avg Eval time: {} ms", aiData.evalTime.count());
-
 }
