@@ -13,7 +13,6 @@
 
 #include <vector>
 
-#pragma pack(push)
 #pragma pack(push,1)
 
 namespace packet
@@ -142,5 +141,4 @@ struct MoveResponse
 };
 
 }
-
 #pragma pack(pop)
