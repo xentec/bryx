@@ -152,7 +152,7 @@ void Game::run()
 	while(!hasEnded());
 }
 
-void Game::execute(Move &move, bool backup)
+void Game::execute(Move &move)
 {
 	if(!move.target)
 		throw std::runtime_error("empty target");
@@ -169,19 +169,17 @@ void Game::execute(Move &move, bool backup)
 		stats.overrides++;
 	}
 
-	if(backup)
-	{
-		move.backup.target = move.target->type;
-		for(Cell* c: move.captures)
-			move.backup.captures.emplace_back(c->pos, c->type);
-	}
+	MoveBackup backup { move, move.target->type, {} };
+	backup.captures.resize(move.captures.size());
 
 	Cell::Type targetCell = move.target->type; // first make a complete move...
-
 	move.target->type = move.player.color;
 
 	for(Cell* c: move.captures)
+	{
+		backup.captures.emplace_back(c->pos, c->type);
 		c->type = move.player.color;
+	}
 
 	switch(targetCell) // ...then look at special cases
 	{
@@ -226,12 +224,17 @@ void Game::execute(Move &move, bool backup)
 	default:
 		break;
 	}
+
+	moveLog.push(backup);
 	stats.moves++;
 }
 
-void Game::undo(Move &move)
+void Game::undo()
 {
-	switch(move.backup.target) // ...then look at special cases
+	MoveBackup& backup = moveLog.top();
+	Move& move = backup.move;
+
+	switch(backup.targetType) // ...then look at special cases
 	{
 	case Cell::Type::BONUS:
 		move.target->staticValue += BONUS_VALUE;
@@ -276,12 +279,14 @@ void Game::undo(Move &move)
 	}
 	stats.moves--;
 
-	move.target->type = move.backup.target;
-	for(auto c : move.backup.captures)
+	move.target->type = backup.targetType;
+	for(auto c : backup.captures)
 		map->at(c.first).type = c.second;
 
 	if(move.target->isCaptureable())
 		move.player.overrides++;
+
+	moveLog.pop();
 }
 
 void Game::load(std::istream& file)

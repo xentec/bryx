@@ -55,8 +55,8 @@ struct Game
 	bool hasEnded();
 	void run();
 
-	void execute(Move& move, bool backup = false);
-	void undo(Move& move);
+	void execute(Move& move);
+	void undo();
 
 protected:
 	Map* map;
@@ -64,6 +64,16 @@ protected:
 
 	u32 currPly;
 	u32 moveless;
+
+	struct MoveBackup
+	{
+		Move move;
+
+		Cell::Type targetType;
+		std::deque<std::pair<vec, Cell::Type> > captures;
+	};
+
+	std::stack<MoveBackup> moveLog;
 
 	friend struct Client;
 };

@@ -58,7 +58,6 @@ void Move::print() const
 void Move::clear()
 {
 	captures.clear();
-	backup.captures.clear();
 
 	target = nullptr;
 	err = Error::NONE;
