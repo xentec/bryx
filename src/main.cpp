@@ -112,7 +112,8 @@ void parseArgs(Options& opts, usz argc, char* argv[])
 		auto mode = modes.find(argv[i++]);
 		if(mode != modes.end())
 			opts.mode = mode->second;
-	}
+	} else
+		return;
 
 	if(opts.mode == Mode::UNKNOWN)
 		throw std::runtime_error("no mode selected");
