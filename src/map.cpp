@@ -345,10 +345,10 @@ Map Map::load(std::istream& file)
 				}
 				break;
 			case 6:
-				c.staticValue = 5;
+				c.staticValue = 4;
 				break;
 			case 7:
-				c.staticValue = 4;
+				c.staticValue = 2;
 				break;
 			default:
 				c.staticValue = 1;
