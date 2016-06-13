@@ -40,7 +40,7 @@ Map::Map(const Map& other):
 		const Cell& o = other.at(x,y);
 		Cell& c = at(x, y);
 
-		c.type = o.type;
+		c = o;
 		for(u32 dir = Direction::N; dir < Direction::_LAST; dir++)
 		{
 			const Cell::Transition& trn = o.trans[dir];
@@ -134,7 +134,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 				case Cell::Type::BONUS:
 				case Cell::Type::CHOICE:
 				case Cell::Type::INVERSION: ch = "░"; break;
-				case Cell::Type::EMPTY:     ch = " "; break;
+				case Cell::Type::EMPTY:     ch = "."; break;
 				case Cell::Type::VOID:      ch = "█"; break;
 
 				case Cell::Type::EXPANSION: ch = "x"; break;

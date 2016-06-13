@@ -151,8 +151,8 @@ console::Format Cell::getTypeFormat(Cell::Type type)
 	using namespace console;
 	switch (type)
 	{
-		case Type::VOID:      return color::GRAY;
-		case Type::EMPTY:     return color::GRAY_LIGHT;
+		case Type::VOID:
+		case Type::EMPTY:     return color::GRAY;
 
 		case Type::BONUS:     return color::YELLOW;
 		case Type::CHOICE:    return color::GREEN_LIGHT;
@@ -169,6 +169,8 @@ console::Format Cell::getTypeFormat(Cell::Type type)
 		case Type::P7:        return color::GRAY;
 		case Type::P8:        return color::CYAN;
 	}
+
+	throw std::runtime_error(fmt::format("unknown cell type {}", type));
 }
 
 Cell::iterator<Cell::Transition, Cell> Cell::begin()
