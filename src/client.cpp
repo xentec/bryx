@@ -114,10 +114,9 @@ void Client::play()
 				game.currPly = packet.player - 1;
 				Player& ply = game.currPlayer();
 
-				println("Got player move: {} -> {} ex: {}", ply, vec{packet.x, packet.y}, packet.extra);
+				println("Got player move: {} -> {} ex: {}", ply, packet.pos(), packet.extra);
 
-				Move move = { ply, nullptr };
-				move.target = &game.getMap().at(packet.pos());
+				Move move = { ply, &game.getMap().at(packet.pos()) };
 
 				ply.evaluate(move);
 
