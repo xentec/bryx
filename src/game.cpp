@@ -170,7 +170,6 @@ void Game::execute(Move &move)
 	}
 
 	MoveBackup backup { move, move.target->type, {} };
-	backup.captures.resize(move.captures.size());
 
 	Cell::Type targetCell = move.target->type; // first make a complete move...
 	move.target->type = move.player.color;
@@ -277,7 +276,6 @@ void Game::undo()
 	default:
 		break;
 	}
-	stats.moves--;
 
 	move.target->type = backup.targetType;
 	for(auto c : backup.captures)
@@ -286,6 +284,7 @@ void Game::undo()
 	if(move.target->isCaptureable())
 		move.player.overrides++;
 
+	stats.moves--;
 	moveLog.pop();
 }
 
