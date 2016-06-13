@@ -11,7 +11,7 @@
 
 Game::Game():
 	defaults{ 0, 0, 0, 0 }, stats { 0, 0, 0, {} },
-	aiData{ 0, 15 },
+	aiData{ 0, 15, {} },
 	map(nullptr),
 	currPly(0), moveless(0)
 {}
@@ -154,12 +154,13 @@ void Game::run()
 
 void Game::execute(Move &move)
 {
+#if SAFE_GUARDS
 	if(!move.target)
 		throw std::runtime_error("empty target");
 
 	if(move.target->type == Cell::Type::VOID)
 		throw std::runtime_error("wrong target");
-
+#endif
 	if(move.override)
 	{
 		if(move.player.overrides == 0)

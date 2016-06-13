@@ -5,6 +5,8 @@
 #define DEBUG 4
 #define YIMB_GROUP 01
 
+#define SAFE_GUARDS 1 //
+
 // #######
 
 #include <string>
