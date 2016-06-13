@@ -105,18 +105,24 @@ Die Bearbeitung der Aufgaben wurde wie folgt aufgeteilt:\newline
 	2.2 & Ausformulieren von zwei Heuristiken & Goldmann Simon\\
 	2.3 & Erweiterung der Überprüfung auf Gültigkeit & Utz Andrej\\
 	\hline
-	3.1 & Ausarbeiten einer Heuristik & Utz Andrej\\
-	3.2 & Implementieren der Ausgearbeiteten Heuristik & Utz Andrej\\
+	3.1 & Ausarbeiten einer Heuristik & Goldmann Simon, Utz Andrej\\
+	3.2 & Implementieren der Ausgearbeiteten Heuristik & Utz Andrej, Goldmann Simon\\
 	\hline
 	4.1 & Implementierung der Netzwerkfunktionalität & Utz Andrej\\
 	\hline
 	5.1 & Implementierung des Paranoidsuchverfahrens & Utz Andrej\\
 	\hline
-	6.1 & Implementierung des $\alpha$-$\beta$-Pruning's & \\
+	6.1 & Implementierung des $\alpha$-$\beta$-Pruning's & Utz Andrej\\
 	6.2 & Erstellen von Statistiken zum $\alpha$-$\beta$-Pruning & \\
 	\hline
 	7.1 & Einbauen der Client-Parameter & Utz Andrej\\
-	7.2 & Implementierung des Iterative-Deepening-Verfahrens & \\
+	7.2 & Implementierung des Iterative-Deepening-Verfahrens & Utz Andrej\\
+	\hline
+	8.1 & Implementieren des Aspiration-Windows-Verfahren & Utz Andrej\\
+	\hline
+	9.1 & Implementierung der Bombenphase & Utz Andrej\\
+	\hline
+	10.1 & Schreiben des Projektberichts & Goldmann Simon, Utz Andrej\\
 	\hline
 \end{tabular}
 \newpage
@@ -197,12 +203,60 @@ Nachteilhaft ist die Implementierung dieser Bewertungsmethode, da sie sehr aufwe
 Bewertung nach Position:\newline
 Hierbei wird geprüft, ob der gesetzte Stein durch normale Spielzüge übernehmbar ist oder nicht. Optional wäre es zu testen, wie viele normale Züge notwendig wären um einen übernehmbaren Stein zu drehen.\newline 
 Diese Bewertungsweise ist relativ leicht umsetzbar, aber nur mäßig gut um das Spielfeld zu bewerten.
+\newpage
 
 \subsection{Final implementierte Spielfeldbewertung}
-Nachdem das Spielfeld eingelesen wurde, erhält jedes Feld einen Wert, der davon abhängt, wie vielen Wand-Feldern angrenzen und ob diese nebeneinander liegen. Zudem wird zu bei jedem Feld geprüft, ob es sich um ein Bonus- oder Choice-Feld handelt. Sofern es sich um eines dieser Sonderfelder handelt wird ein vordefinierter Wert zum vorher ermittelten Feldwert hinzugefügt. Die Feldwerterhöhung verfällt sobald das Sonderfeld zum ersten Mal von einem Spieler besetzt wird.\newline % todo: tabelle mit wertorientierung für menge an wänden und bonusfelbewertung
+Nachdem das Spielfeld eingelesen wurde, erhält jedes Feld einen Wert, der davon abhängt, wie vielen Void-Felder angrenzen und ob diese nebeneinander liegen.\newline
+\begin{tabular}{|l|c|}
+	\hline
+	Beschreibung & Bewertung\\
+	\hline
+	Es liegen keine Void-Felder am zu bewertenden Feld an & 1\\
+	\hline
+	Keine Void-Felder liegen nebeneinander und & 2\\
+	es grenzen eins bis vier Void-Felder am zu bewertenden Feld an &\\
+	\hline
+	Zwei Void-Felder liegen nebeneinander und & 3\\
+	es grenzen zwei bis fünf Void-Felder am zu bewertenden Feld an &\\
+	\hline
+	Drei Void-Felder liegen nebeneinander und & 5\\
+	es grenzen drei bis sechs Void-Felder am zu bewertenden Feld an &\\
+	\hline
+	Vier Void-Felder liegen nebeneinander und & 10\\
+	es grenzen vier bis sechs Void-Felder am zu bewertenden Feld an &\\
+	\hline
+	Fünf Void-Felder liegen nebeneinander und & 7\\
+	es grenzen fünf bis sechs Void-Felder am zu bewertenden Feld an &\\
+	\hline
+	Sechs Void-Felder liegen nebeneinander und & 4\\
+	es grenzen sechs Void-Felder am zu bewertenden Feld an &\\
+	\hline
+	Sieben Void-Felder liegen nebeneinander und & 2\\
+	es grenzen sieben Void-Felder am zu bewertenden Feld an &\\
+	\hline
+	Das zu bewertende Feld ist nur von Void-Feldern umgeben & 1\\
+	\hline
+\end{tabular}
+
+Bei den angegebenen Bewertungen handelt es sich um Richtwerte, die sich in Abhängigkeit der Anzahl der angrenzenden Void-Felder ändert.\newline
+Zudem wird zu bei jedem Nicht-Void-Feld geprüft, ob es sich um ein Bonus- oder Choice-Feld handelt. Sofern es sich um eines dieser Sonderfelder handelt wird ein vordefinierter Wert zum vorher ermittelten Feldwert hinzugefügt. Die Feldwerterhöhung verfällt sobald das Sonderfeld zum ersten Mal von einem Spieler besetzt wird.\newline
+\begin{tabular}{|l|c|}
+	\hline
+	Feldart & Bewertung\\
+	\hline
+	Choice-Feld & 5\\
+	\hline
+	Bonusfeld & 11\\
+	\hline
+\end{tabular}
+
 Die Bewertung von Expansionssteinen und Inversionsfeldern wird durch das Paranoid-Verfahren bewältigt, da sie einen vordefinierten Einfluss auf das Spielfeld haben. Dieser Einfluss ist aus den, durch das Sonderfeld ausgelösten Umfärbungen ersichtlich.
-% todo
- 
+\newpage
+Sobald die Bewertung der Zellen durchgeführt ist, kann das Spiel -und somit die Bewertung der einzelnen Züge- beginnen. Die Zugbewertung erfolgt zunächst ähnlich wie die triviale Heuristik, die einfach nur Steine zählt. Es werden die Werte der eigenen Steine zusammenaddiert. Zusätzlich fließt die Anzahl der Überschreibsteine und Bomben mit ein. Somit wird es deutlicher, ob es sich lohnt Überschreibsteine zu einem bestimmten Zeitpunkt einzusetzen, da der \glqq Verlust\grqq eines Überschreibsteins eine konstante Wertabnahme bewirkt, die durch übernommene Steine ausgeglichen werden muss.\newline Bei Bonusfeldern wird der -zu Beginn bestimmte- Wert für Bomben mit dem konstanten Wert für Überschreibsteine verglichen und der höherwertige Bonusstein ausgewählt. Der Wert für Bomben wird wie folgt bestimmt:\newline
+\begin{equation*}
+	\frac{100 \cdot (\text{Bombenstärke} \cdot 2 + 1)^2}{\text{Spielfeldbreite} \cdot \text{Spielfeldhöhe}}
+\end{equation*}
+\newline
 %Beschreiben Sie abschließend, welche Heuristik final in Ihrem Client umgesetzt ist. Beschreiben Sie dazu auch Werte von Parametern (Kriterien und Gewichtungen), die Sie in den einzelnen Implementierungen nutzen. Welche statischen Vorberechnungen Sie machen, um z.B.\ das Spielfeld zu analysieren, etc.
 \newpage
 % ----------------------------------------------------------------------------------
