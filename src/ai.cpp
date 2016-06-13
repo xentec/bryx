@@ -88,7 +88,7 @@ AIMove AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& a
 	{
 //		auto h = evalState(state, m);
 //		moves.emplace(h, m);
-		sortedMoves.emplace(evalState(state, m), m);
+		sortedMoves.emplace(evalMove(state, m), m);
 	}
 
 	u32 d = depth+1;
@@ -149,7 +149,7 @@ AIMove AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& a
 			PossibleMoves nextPosMoves = nextPly.possibleMoves();
 			if(nextPosMoves.empty())
 			{
-				next = { evalState(state, m), m };
+				next = { evalState(state), m };
 			}
 			else
 			{
@@ -236,41 +236,29 @@ Move AI::bestState2(Game &state)
 #endif
 
 
-Quality AI::evalState(Game &state, Move& move) const
+Quality AI::evalState(Game &state) const
 {
-	state.execute(move);
-
 	Quality h = 0;
 
 	Player& futureMe = *state.getPlayers()[type2ply(color)];
-//remove comment below if displeased with "new heuristik"
-	/*
-	h += 20 * futureMe.overrides;
-	h += futureMe.bombs * state.defaults.bombsStrength;
-
-	for(Cell& c: state.getMap())
-	{
-		if(c.type == color)
-		{
-			h = c.staticValue + 5;
-			// #################
-
-		} else if(c.isPlayer())
-		{
-			h = -c.staticValue - 5;
-		}
-	}
-	*/
-	//new heuristik
 	for(Cell &c: state.getMap()){
 		if(c.type == color)
 			h += c.staticValue;
 	}
 
-//    h *= 1 + ((futureMe.possibleMoves() - possibleMoves()) / 100); //todo: (futureMe-currentMe)/100
-
 	h += futureMe.overrides * game.aiData.expectedOverriteValue;
 	h += futureMe.bombs * game.aiData.bombValue;
+
+
+	return h;
+}
+
+Quality AI::evalMove(Game &state, Move &move) const
+{
+	state.execute(move);
+
+	Quality h = evalState(state);
+	//    h *= 1 + ((futureMe.possibleMoves() - possibleMoves()) / 100); //todo: (futureMe-currentMe)/100
 
 	state.undo();
 

@@ -23,7 +23,8 @@ struct AI : Player
 	virtual Player* clone() const;
 	virtual Move move(PossibleMoves &moves, u32 time, u32 depth);
 
-	Quality evalState(Game &state, Move& m) const;
+	Quality evalState(Game &state) const;
+	Quality evalMove(Game &state, Move& move) const;
 	AIMove bestState(Game& state, PossibleMoves &posMoves, u32 depth, Quality& a, Quality& b);
 	Move bestState2(Game &game);
 private:
