@@ -6,7 +6,13 @@
 
 #include <deque>
 
-using Heuristic = i32;
+using Quality = isz;
+
+struct AIMove
+{
+	Quality score;
+	Move move;
+};
 
 struct AI : Player
 {
@@ -15,16 +21,16 @@ struct AI : Player
 	virtual ~AI();
 
 	virtual Player* clone() const;
-	virtual Move move(std::deque<Move>& moves, u32 time, u32 depth);
+	virtual Move move(PossibleMoves &moves, u32 time, u32 depth);
 
-	Heuristic evalState(Game &state, Move& m) const;
-	Heuristic bestState(Game& state, u32 depth, Heuristic &a, Heuristic &b);
-	Heuristic bestState2(Game &game, u32 depth, Heuristic &a, Heuristic &b);
+	Quality evalState(Game &state, Move& m) const;
+	AIMove bestState(Game& state, PossibleMoves &posMoves, u32 depth, Quality& a, Quality& b);
+	Move bestState2(Game &game);
 private:
 	u32 maxDepth;
 	TimePoint endTime;
 
-	std::deque<Move> stateTree;
+	std::deque<Move> moveChain;
 
 	Duration evaltime;
 };

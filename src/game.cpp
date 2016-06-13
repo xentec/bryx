@@ -11,9 +11,9 @@
 
 Game::Game():
 	defaults{ 0, 0, 0, 0 }, stats { 0, 0, 0, {} },
+	aiData{ 0, 15 },
 	map(nullptr),
-    currPly(0), moveless(0),
-    aiData{ 0, 15 }
+	currPly(0), moveless(0)
 {}
 
 Game::Game(const Game &other):
