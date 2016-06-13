@@ -25,7 +25,7 @@ inline vec dir2vec(Direction dir)
 // Cell
 //#######
 Cell::Cell(Map& map, vec pos, Type type):
-	pos(pos), type(type), map(map), staticValue(0)
+	pos(pos), type(type), staticValue(0), map(map)
 {}
 
 Cell& Cell::operator =(const Cell &other)
