@@ -34,14 +34,12 @@ Move Human::move(std::deque<Move>&, u32, u32)
 	Move move { *this, nullptr };
 
 	do {
-		print("Place your stone (carefully) [x y OR 'pass']: ");
+		print("Place your stone (carefully) [x y]: ");
+		move.clear();
 
 		try {
 			string input;
 			std::cin >> input;
-			if(toLower(input) == "pass")
-				return move;
-
 			vec target;
 			target.x = std::stoi(input);
 			std::cin >> input;
@@ -75,7 +73,7 @@ Move Human::move(std::deque<Move>&, u32, u32)
 			println("Your move needs an override stone");
 			if(overrides == 0)
 			{
-				println(", but you don't have any! Try something else or pass.");
+				println(", but you don't have any! Try something else.");
 				continue;
 			} else
 			{
