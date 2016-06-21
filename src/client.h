@@ -26,7 +26,7 @@ private:
 
 	Socket socket;
 	Game& game;
-	Player* me;
+	AI* me;
 };
 
 template<class Packet>

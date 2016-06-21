@@ -30,6 +30,9 @@ struct Move
 	Move(const Move& other);
 	Move& operator =(const Move& other);
 
+	bool operator ==(const Move& other);
+	bool operator !=(const Move& other);
+
 	string asString() const;
 	void print() const;
 
@@ -44,6 +47,11 @@ struct Move
 
 	Error err;
 	std::list<Cell*> captures;
+
+	friend std::ostream& operator<<(std::ostream &os, const Move &object)
+	{
+		return os << object.asString();
+	}
 
 	static string err2str(Move::Error err);
 };

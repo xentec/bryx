@@ -91,10 +91,20 @@ bool Cell::isSpecial() const
 	}
 }
 
+Map &Cell::getMap() const
+{
+	return map;
+}
+
 Cell* Cell::getDirectNeighbor(Direction dir) const // TODO: null only
 {
 	vec dirPos = pos + dir2vec(dir);
-	return map.checkPos(dirPos) ? &map.at(dirPos) : nullptr;
+	if(!map.checkPos(dirPos))
+		return nullptr;
+
+	Cell& c = map.at(dirPos);
+	return &c;
+//	return c.type != Type::VOID ? &c : nullptr;
 }
 
 Cell::Transition& Cell::getNeighbor(Direction dir)

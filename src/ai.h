@@ -27,11 +27,14 @@ struct AI : Player
 	Quality evalMove(Game &state, Move& move) const;
 	AIMove bestState(Game& state, PossibleMoves &posMoves, u32 depth, Quality& a, Quality& b);
 	Move bestState2(Game &game);
+
+	bool playerMoved(Move& move);
 private:
 	u32 maxDepth;
 	TimePoint endTime;
 
-	std::deque<Move> moveChain;
+	std::deque<AIMove> moveChain;
+	std::deque<AIMove> movePlan;
 
 	Duration evaltime;
 };

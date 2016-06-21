@@ -17,8 +17,13 @@ Player::Player(const Player &other):
 
 Player& Player::operator =(const Player& other)
 {
-	color = other.color;
+#if SAFE_GUARDS
+	if(color != other.color)
+		throw std::runtime_error("player color changed");
+#endif
 	name = other.name;
+
+	color = other.color;
 	overrides = other.overrides;
 	bombs = other.bombs;
 	return *this;
@@ -35,7 +40,9 @@ string Player::asString() const
 }
 
 Player::~Player()
-{}
+{
+
+}
 
 std::list<Cell*> Player::stones()
 {

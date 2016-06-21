@@ -33,12 +33,12 @@ struct Cell
 		// players
 		P1 = '1', P2, P3, P4, P5, P6, P7, P8,
 	};
+
 	struct Transition
 	{
 		Cell *to;
 		Direction exit, entry;
 	};
-
 
 	Cell(Map &map, vec pos, Type type);
 	Cell(Cell&& other) = default;
@@ -54,6 +54,8 @@ struct Cell
 	bool isCaptureable() const;
 	bool isSpecial() const;
 
+	Map& getMap() const;
+
 	void addTransition(Direction exit, Direction entry, Cell* target);
 
 	Cell* getDirectNeighbor(Direction dir) const;
@@ -68,12 +70,16 @@ struct Cell
 
 	const vec pos;
 	Cell::Type type;
-	std::array<Transition, 8> trans;
 
 	i32 staticValue;
 
+protected:
+	std::array<Transition, 8> trans;
 	Map& map;
 
+	friend struct Map;
+
+public:
 //##############################
 	template<class T, class C>
 	struct iterator : std::iterator<std::random_access_iterator_tag, T>

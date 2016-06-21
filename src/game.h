@@ -29,11 +29,16 @@ struct Game
 		} time;
 	} stats;
 
-    struct {
-        u32 bombValue;
-        u32 expectedOverriteValue;
+	struct {
+		u32 bombValue;
+		u32 expectedOverriteValue;
 		Duration evalTime;
-    } aiData;
+	} aiData;
+
+	enum class Phase
+	{
+		REVERSI, BOMB
+	} phase;
 
 	Game();
 	Game(const Game& game);
@@ -58,6 +63,8 @@ struct Game
 	void execute(Move& move);
 	void undo();
 
+	Move& getLastMove();
+
 protected:
 	Map* map;
 	std::vector<Player*> players;
@@ -74,6 +81,7 @@ protected:
 	};
 
 	std::stack<MoveBackup> moveLog;
+	std::stack<MoveBackup> bombLog;
 
 	friend struct Client;
 };

@@ -2,6 +2,7 @@
 
 #include "game.h"
 #include "player.h"
+#include "human.h"
 #include "vector.h"
 
 #include <cstdio>
@@ -64,7 +65,7 @@ void Client::join(string host, u16 port)
 	for(u32 i = 0; i < game.defaults.players; i++)
 	{
 		if(plyID == i)
-			me = &game.addPlayer<AI>();
+			me = (AI*) &game.addPlayer<AI>();
 		else
 			game.addPlayer<Dummy>();
 	}
@@ -129,12 +130,17 @@ void Client::play()
 						move.choice = ply2type(packet.extra-1);
 				}
 
+				bool exp = me->playerMoved(move);
+
 				if(ply.color != me->color)
 				{
 					move.print();
-					print("\n\n");
+					println("{}", exp ? "ANTICIPATED" : "SURPRISED!");
 				}
+
 				game.execute(move);
+				game.getMap().print();
+				print("\n\n");
 			}
 			break;
 		case packet::DISQ:

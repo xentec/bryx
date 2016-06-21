@@ -5,10 +5,13 @@ project(Bryx)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 
+find_package(Threads REQUIRED)
+
 add_subdirectory(extern/fmt)
 
 list(APPEND LIBS
 	fmt
+	${CMAKE_THREAD_LIBS_INIT}
 )
 
 if(WIN32)

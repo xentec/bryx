@@ -8,6 +8,8 @@
 // Map
 //########
 
+#define HARD_CORNERS 0
+
 #ifdef _WIN32
 bool Map::printColored = false;
 bool Map::printAnsi = false;
@@ -216,8 +218,20 @@ Map Map::load(std::istream& file)
 		for(u32 d = Direction::N; d < Direction::_LAST; d++)
 		{
 			Direction dir = Direction(d);
-			Cell* nc = c.getDirectNeighbor(dir);
-			c.trans[d] = { nc && nc->type != Cell::Type::VOID ? nc : nullptr, dir, dir };
+#if HARD_CORNERS
+			Cell *pre = c.getDirectNeighbor(Direction((d-1) % Direction::_LAST)),
+				 *post = c.getDirectNeighbor(Direction((d+1) % Direction::_LAST));
+			if(d % 2 && (!pre || !post || pre->type == Cell::Type::VOID || post->type == Cell::Type::VOID))
+			{
+				c.trans[d] = { nullptr, dir, dir };
+			} else
+			{
+#endif
+				Cell* nc = c.getDirectNeighbor(dir);
+				c.trans[d] = { nc && nc->type != Cell::Type::VOID ? nc : nullptr, dir, dir };
+#if HARD_CORNERS
+			}
+#endif
 		}
 	}
 
@@ -250,15 +264,19 @@ Map Map::load(std::istream& file)
 	}
 
 	//evaluate cells
-	for(Cell& c: map){
+	for(Cell& c: map)
+	{
 		if(c.type == Cell::Type::VOID)
 			continue;
 
 		u32 totalCounter = 0, maxCounter = 0, counter = 0;
-		for(usz j = 0; j < (2 * Direction::_LAST); j++){       //checks for walls twice, to get the length of the wall
-			if(c.trans[j % Direction::_LAST].to == nullptr){   //which is contained in maxCount
+		for(usz j = 0; j < (2 * Direction::_LAST); j++)       //checks for walls twice, to get the length of the wall
+		{
+			if(c.trans[j % Direction::_LAST].to == nullptr)   //which is contained in maxCount
+			{
 				counter++;
-			}else{
+			}else
+			{
 				if(counter > maxCounter){
 					maxCounter = counter;
 				}

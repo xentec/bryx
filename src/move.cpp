@@ -28,9 +28,24 @@ Move& Move::operator =(const Move& other)
 	return *this;
 }
 
+bool Move::operator ==(const Move& other)
+{
+	if(!target || !other.target)
+		return false;
+
+	return player.color == other.player.color && *target == *other.target;
+}
+
+bool Move::operator !=(const Move& other)
+{
+	return !(*this == other);
+}
+
 string Move::asString() const
 {
-	return target->asString();
+	return target ?
+				fmt::format("P{} -> {}{}", player, target->pos, override ? "!":"") :
+				fmt::format("P{} -> {}", player, "NULL");
 }
 
 void Move::print() const
@@ -49,10 +64,11 @@ void Move::print() const
 	for(Cell* c: captures)
 		hl.emplace(c->pos, cf);
 
-	cf.attr = Format::Attribute::BOLD;
+//	cf.attr = Format::Attribute::BOLD;
+	cf.setBG(Format::WHITE);
 	hl.emplace(target->pos, cf);
 
-	target->map.print(hl);
+	target->getMap().print(hl);
 }
 
 void Move::clear()

@@ -12,6 +12,7 @@
 Game::Game():
 	defaults{ 0, 0, 0, 0 }, stats { 0, 0, 0, {} },
 	aiData{ 0, 15, {} },
+	phase(Phase::REVERSI),
 	map(nullptr),
 	currPly(0), moveless(0)
 {}
@@ -133,7 +134,7 @@ void Game::run()
 		}
 
 		start = Clock::now();
-		Move move = ply.move(moves,0,3);
+		Move move = ply.move(moves,0,5);
 		end = Clock::now();
 
 		elapsed = end-start;
@@ -287,6 +288,11 @@ void Game::undo()
 
 	stats.moves--;
 	moveLog.pop();
+}
+
+Move& Game::getLastMove()
+{
+	return phase == Phase::REVERSI ? moveLog.top().move : moveLog.top().move;
 }
 
 void Game::load(std::istream& file)

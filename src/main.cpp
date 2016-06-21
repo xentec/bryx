@@ -224,23 +224,16 @@ int main(int argc, char* argv[])
 		client.play();
 	}
 
-	std::vector<std::pair<Cell::Type, u32>> scores(game.getPlayers().size(), {Cell::Type::VOID,0});
+	std::vector<u32> scores(game.defaults.players, 0);
 
 	for(Cell& c: game.getMap())
 	{
 		if(c.isPlayer())
 		{
-			auto& e = scores[(usz)c.type - (usz)Cell::Type::P1];
-			e.first = c.type;
-			e.second++;
+			++scores[type2ply(c.type)];
 		}
 	}
-#if 0
-	std::sort(scores.begin(), scores.end(), [](std::pair<Cell::Type, u32>& a, std::pair<Cell::Type, u32>& b)
-	{
-		return a.second > b.second;
-	});
-#endif
+
 	println();
 	println("########");
 	println("GAME SET");
@@ -251,7 +244,7 @@ int main(int argc, char* argv[])
 	println("Scores:");
 	for(usz i = 0; i < scores.size(); i++)
 	{
-		println("{}. Player {}: {}", i+1, (char) scores[i].first, scores[i].second);
+		println("  Player {}: {}", i+1, scores[i]);
 	}
 
 	println("Longest move: {} ms", game.stats.time.moveMax.count());
