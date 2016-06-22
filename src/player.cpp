@@ -29,6 +29,16 @@ Player& Player::operator =(const Player& other)
 	return *this;
 }
 
+bool Player::operator ==(const Player& other)
+{
+	return color == other.color;
+}
+
+bool Player::operator !=(const Player& other)
+{
+	return !(*this == other);
+}
+
 string Player::asString() const
 {
 	fmt::MemoryWriter w;

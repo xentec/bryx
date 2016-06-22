@@ -29,6 +29,9 @@ struct Player
 	Player& operator =(const Player& other);
 	virtual Player* clone() const = 0;
 
+	bool operator ==(const Player& other);
+	bool operator !=(const Player& other);
+
 	string asString() const;
 
 	virtual Move move(std::deque<Move>& moves, u32 time, u32 depth) = 0;
