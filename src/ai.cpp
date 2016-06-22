@@ -47,6 +47,7 @@ inline bool maxPrune (const AIMove& q, Quality& a, AIMove& v, Quality& b){ if(q.
 Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 {
 	maxDepth = 1;
+	states = 0;
 
 	Quality a = infMin, b = infMax;
 
@@ -62,13 +63,14 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 
 	if(!movePlan.empty())
 	{
+#if SAFE_GUARDS
 		if(movePlan.front().move.player.color != color)
 			throw std::runtime_error("me != last player of the move plan");
-
+#endif
 		println("PREVIOUS MOVE PLAN:");
 		for(AIMove& am: movePlan)
 		{
-			println("{} :: {}", am.score, am.move);
+			println("{} :: ", am.score);
 			am.move.print();
 			println();
 			game.execute(am.move);
@@ -78,52 +80,37 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 
 		if(posMoves.empty())
 			move = movePlan.front().move;
-
-		if(game.currPlayer().color != color)
-			a = infMax, b = infMin;
 	}
+
+
+	auto reset = (game.currPlayer().color == color) ?
+				[](Quality& a, Quality& b) { a = infMin, b = infMax;}:
+				[](Quality& a, Quality& b) { a = infMax, b = infMin;};
 
 	if(!move.target)
 	{
 		if(time)
 		{
 			endTime = Clock::now() + Duration(time - time/200);
-			std::map<Quality, Move> cps;
-
-#if 0
-			{
-				std::atomic<bool> done(false);
-				std::thread tree(
-					[&](){
-					do
-					{
-						println("DEEPENING {}", maxDepth);
-						AIMove am = bestState(game, posMoves, 0, a, b);
-						cps.emplace(am.score, am.move);
-						++maxDepth;
-					} while(1);
-					done = true;
-				});
-
-				while(Clock::now() < endTime)
-				{
-					std::this_thread::sleep_for(std::chrono::milliseconds(1));
-					println("TIMEOUT");
-				}
-			}
-
-			//pthread_cancel(tree.native_handle());
-#endif
 			TimePoint start, end;
+
+			println();
 			do
 			{
-				println("Deepening: {}", maxDepth);
+				print("\rDeepening: {: <3} ", maxDepth);
+				fflush(stdout);
 
 				start = Clock::now();
 
 				moveChain.clear();
-				AIMove am = bestState(game, posMoves, 0, a, b);
-				cps.emplace(am.score, am.move);
+
+				reset(a,b);
+
+				bestState(game, posMoves, 0, a, b);
+				//AIMove am = moveChain.front();
+				//println("{} ({})", am.move, am.score);
+				//am.move.print();
+
 				if(moveChain.size() < maxDepth-1)
 				{
 					println("End reached");
@@ -135,14 +122,14 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 			} while(end + (end - start) * 2 < endTime);
 
 			println("Depth: {}", moveChain.size());
-
-			move = (--cps.end())->second;
 		}
 		else
 		{
 			maxDepth = depth;
-			move = bestState(game, posMoves, 0, a, b).move;
+			maxDepth = 70;
+			bestState(game, posMoves, 0, a, b);
 		}
+		println("States: {}", states);
 	}
 
 	// clean up
@@ -163,10 +150,10 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 		usz steps = 0;
 		for(AIMove am: movePlan)
 		{
-			println("{} :: {}", am.score, am.move);
+			print("{} :: ", am.score);
 			am.move.print();
-			println();
 			game.execute(am.move);
+			println();
 			++steps;
 		}
 
@@ -174,29 +161,30 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 
 		for(AIMove& am: moveChain)
 		{
-			println("{} ({})", am.move, am.score);
+			print("{} :: ", am.score);
 			am.move.print();
-			println();
+			if(am.move.override)
+				print("");
 			game.execute(am.move);
+			println();
 			++steps;
 		}
 		while(steps--)
+		{
 			game.undo();
+		}
 
 		println();
 #endif
 
-		for(AIMove& am: moveChain)
-			movePlan.push_back(am);
+//		for(AIMove& am: moveChain)
+//			movePlan.push_back(am);
+
+		move = moveChain.front().move;
 
 		moveChain.clear();
 
 		println("##################################\n");
-
-		if(move.target->pos != movePlan.front().move.target->pos)
-			println("ROOT MOVES DIFFER");
-
-		move = movePlan.front().move;
 	}
 
 #if SAFE_GUARDS
@@ -207,34 +195,12 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 		throw std::runtime_error("map corruption");
 #endif
 
-	if(move.target)
-	{
-		switch(move.target->type)
-		{
-		case Cell::Type::BONUS:
-			// TODO: better choice algo
-			move.bonus = Move::Bonus::OVERRIDE;
-			break;
-		case Cell::Type::CHOICE:
-			// TODO: better choice algo
-			{
-			  Player* c =
-				*std::max_element(game.getPlayers().begin(), game.getPlayers().end(),
-					[](Player* a, Player* b) { return a->stones().size() < b->stones().size();
-				});
-			  move.choice = c->color;
-			}
-			break;
-		default:
-			break;
-		}
-	}
-
+	handleSpecials(move);
 	return move;
 }
 
 
-AIMove AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& a, Quality& b)
+Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& a, Quality& b)
 {
 	Player& ply = state.currPlayer();
 
@@ -246,18 +212,21 @@ AIMove AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& a
 #endif
 
 	// sorting
-	std::map<Quality, Move> sortedMoves;
+	std::map<Quality, Move&> sortedMoves;
 	for(Move& m: posMoves)
 	{
 		// TODO: better quality differenciation
 		auto h = evalMove(state, m);
 		sortedMoves.emplace(h, m);
 //		sortedMoves.emplace(evalMove(state, m), m);
+		states++;
+		if(m.override)
+			print("");
 	}
 
 	u32 d = depth+1;
 
-	std::function<bool(AIMove q, Quality& a, AIMove& v, Quality& b)> prune;
+	std::function<bool(const AIMove& q, Quality& a, AIMove& v, Quality& b)> prune;
 	std::vector<std::pair<const Quality, Move&> > moves;
 
 	AIMove best = { 0, { ply, nullptr }};
@@ -285,48 +254,65 @@ AIMove AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& a
 			if(prune({mp.first, mp.second}, a, best, b))
 				break;
 		}
+		handleSpecials(best.move);
+
 #if VERBOSE > 2
-		println(" MAX ({}) ", d);
+		println(" MAX ({}) {} :: {}", d, best.score, best.move);
 #endif
+
 	} else
 	{
 		for(auto& mp: moves)
 		{
 			Move& m = mp.second;
+
 #if VERBOSE > 3
-			println("  MOVE POSSIBLE: {} ({})", mp.second, mp.first);
+			print("  MOVE POSSIBLE: {} :: ", mp.first);
 			m.print();
 			println();
 #endif
 
+			if(m.override && m.player.color == Cell::Type::P1 && m.captures.empty())
+				print("");
+
+			handleSpecials(m);
 			state.execute(m);
 
-			Player& nextPly = state.nextPlayer();
-
-			AIMove next = { 0, { nextPly, nullptr }};
-			PossibleMoves nextPosMoves = nextPly.possibleMoves();
+			AIMove next = { 0, { state.currPlayer(), nullptr }};
+			PossibleMoves nextPosMoves = next.move.player.possibleMoves();
 			if(nextPosMoves.empty())
 			{
 #if VERBOSE
-				println(" END ({}) ", d);
+				println(" END ({}) {} :: {}", d, mp.first, m);
 #endif
 				next.score = mp.first * 10;
 			}
 			else
 			{
 #if VERBOSE
-				println("DEEPER ({}) ==>", d);
-				next = bestState(state, nextPosMoves, d, a, b);
-				println(" <== ({}) ", d);
+				println("DEEPER {} ==>", d);
+				next.score = bestState(state, nextPosMoves, d, a, b);
+				println(" <== {} ({}) ", d, next.score);
 #else
-				next = bestState(state, nextPosMoves, d, a, b);
+				next.score = bestState(state, nextPosMoves, d, a, b);
 #endif
 			}
 
-			state.prevPlayer();
+
+#if SAFE_GUARDS
+			if(state.getLastMove() != m)
+				throw std::runtime_error("move stack corruption");
+#endif
+
 			state.undo();
 
-			if(prune({next.score, m}, a, best, b))
+#if VERBOSE > 3
+			print("  MOVE UNDO: {} :: ", mp.first);
+			m.print();
+			println();
+#endif
+
+			if(prune({next.score+mp.first, m}, a, best, b))
 			{
 				break;
 			}
@@ -338,15 +324,50 @@ AIMove AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& a
 		throw std::runtime_error("map corruption");
 #endif
 
+	if(best.move.override && best.move.player.color == Cell::Type::P1 && best.move.captures.empty())
+		print("");
 
 	moveChain.push_front(best);
-
-	return best;
+	return best.score;
 }
 
-bool AI::playerMoved(Move& move)
+void AI::handleSpecials(Move& move)
 {
-	bool anticipated = !movePlan.empty() && movePlan.front().move.target->pos == move.target->pos;
+	Game& game = move.player.game;
+
+	switch(move.target->type)
+	{
+	case Cell::Type::BONUS:
+		// TODO: better choice algo
+		move.bonus = Move::Bonus::OVERRIDE;
+		break;
+	case Cell::Type::CHOICE:
+		// TODO: better choice algo
+		{
+		  Player* c =
+			*std::max_element(game.getPlayers().begin(), game.getPlayers().end(),
+				[](Player* a, Player* b) { return a->stones().size() < b->stones().size();
+			});
+		  move.choice = c->color;
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+bool AI::playerMoved(Move& real)
+{
+	if(movePlan.empty())
+		return false;
+
+	Move& pred = movePlan.front().move;
+
+	bool anticipated =
+			   pred.target->pos == real.target->pos
+			&& pred.bonus == real.bonus
+			&& pred.choice == real.choice;
+
 	if(anticipated)
 	{
 		movePlan.pop_front();
