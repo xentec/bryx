@@ -153,6 +153,11 @@ void Game::run()
 void Game::execute(Move &move)
 {
 #if SAFE_GUARDS
+	map->check();
+
+	if(move.player != currPlayer())
+		throw std::runtime_error("wrong player turn");
+
 	if(!move.target)
 		throw std::runtime_error("empty target");
 
@@ -222,6 +227,9 @@ void Game::execute(Move &move)
 	default:
 		break;
 	}
+#if SAFE_GUARDS
+	map->check();
+#endif
 
 	moveLog.push(backup);
 	stats.moves++;
@@ -285,7 +293,14 @@ void Game::undo()
 		map->at(c.first).type = c.second;
 
 	if(move.target->isCaptureable())
+	{
 		move.player.overrides++;
+		stats.overrides--;
+	}
+
+#if SAFE_GUARDS
+	map->check();
+#endif
 
 	stats.moves--;
 	moveLog.pop();
