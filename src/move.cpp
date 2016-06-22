@@ -21,8 +21,12 @@ Move::Move(const Move& other):
 Move& Move::operator =(const Move& other)
 {
 	player = other.player;
+
 	target = other.target;
 	override = other.override;
+	choice = other.choice;
+	bonus = other.bonus;
+
 	err = other.err;
 	captures = other.captures;
 	return *this;
