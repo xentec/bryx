@@ -50,8 +50,6 @@ struct Game
 	Player& addPlayer();
 
 	Player& currPlayer() const;
-	Player& nextPlayer();
-	Player& prevPlayer();
 
 	Map& getMap() const;
 	std::vector<Player*>& getPlayers();
@@ -66,6 +64,9 @@ struct Game
 	Move& getLastMove();
 
 protected:
+	Player& nextPlayer();
+	Player& prevPlayer();
+
 	Map* map;
 	std::vector<Player*> players;
 

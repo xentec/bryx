@@ -72,7 +72,6 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 			am.move.print();
 			println();
 			game.execute(am.move);
-			game.nextPlayer();
 		}
 
 		posMoves = game.currPlayer().possibleMoves();
@@ -147,14 +146,8 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 	}
 
 	// clean up
-	if(!movePlan.empty())
-	{
-		for(AIMove& m: movePlan)
-		{
-			game.prevPlayer();
-			game.undo();
-		}
-	}
+	for(usz i = 0; i < movePlan.size(); ++i)
+		game.undo();
 
 #if SAFE_GUARDS
 		if(save != game.getMap().asString())

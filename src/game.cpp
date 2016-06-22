@@ -146,9 +146,6 @@ void Game::run()
 
 		move.print();
 		execute(move);
-
-		nextPlayer();
-
 	}
 	while(!hasEnded());
 }
@@ -228,12 +225,16 @@ void Game::execute(Move &move)
 
 	moveLog.push(backup);
 	stats.moves++;
+
+	nextPlayer();
 }
 
 void Game::undo()
 {
 	MoveBackup& backup = moveLog.top();
 	Move& move = backup.move;
+
+	prevPlayer();
 
 	switch(backup.targetType) // ...then look at special cases
 	{
