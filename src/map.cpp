@@ -68,7 +68,7 @@ const Cell& Map::at(const vec &pos) const
 	return data[pos.x * height + pos.y];
 }
 
-string Map::asString(bool transistions)
+string Map::asString(bool transistions) const
 {
 	// TODO: Transistions
 
@@ -154,6 +154,23 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 	}
 }
 
+void Map::check() const
+{
+	for(const Cell& c: *this)
+	{
+		if(c.type == Cell::Type::VOID)
+			continue;
+
+		for(u32 dir = Direction::N; dir < Direction::_LAST; dir++)
+		{
+			const Cell::Transition& tr = c.trans[dir];
+
+			if(tr.to != nullptr && tr.to->trans[dir180(tr.entry)].to != &c)
+				throw std::runtime_error("map corruption");
+		}
+	}
+}
+
 
 bool Map::checkPos(const vec& pos) const
 {
@@ -209,7 +226,10 @@ Map Map::load(std::istream& file)
 		}
 	}
 
-	// init transitions
+	// Transitions
+	//#################
+
+	// default ones
 	for(Cell& c: map)
 	{
 		if(c.type == Cell::Type::VOID)
@@ -234,6 +254,8 @@ Map Map::load(std::istream& file)
 #endif
 		}
 	}
+
+	// special transistions
 
 	string line;
 	while(readline(file, line))
@@ -263,7 +285,8 @@ Map Map::load(std::istream& file)
 		}
 	}
 
-	//evaluate cells
+	// Evaluate cells
+	//#################
 	for(Cell& c: map)
 	{
 		if(c.type == Cell::Type::VOID)
@@ -377,6 +400,8 @@ Map Map::load(std::istream& file)
 		if(c.type == Cell::Type::CHOICE)
 			c.staticValue += CHOICE_VALUE;
 	}
+
+	map.check();
 
 	return map;
 }

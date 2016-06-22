@@ -36,8 +36,10 @@ struct Cell
 
 	struct Transition
 	{
-		Cell *to;
-		Direction exit, entry;
+		Cell *to;  // other cell
+		Direction
+			exit,  // exit from the current Cell
+			entry; // entry in the other cell
 	};
 
 	Cell(Map &map, vec pos, Type type);

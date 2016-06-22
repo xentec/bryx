@@ -26,10 +26,12 @@ struct Map
 	Cell& at(const vec& pos);
 	const Cell& at(const vec& pos) const;
 
-	string asString(bool transistions = true);
+	string asString(bool transistions = true) const;
 
 	void print(bool colored = true, bool ansi = true) const;
 	void print(std::unordered_map<vec, console::Format> highlight, bool colored = true, bool ansi = true) const;
+
+	void check() const;
 
 	static Map load(std::istream& file);
 
