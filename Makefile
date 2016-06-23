@@ -19,10 +19,11 @@ build:
 	cmake --build . --target all
 
 copy:
-	mkdir -p bin && cp -v build/bryx bin/client_01
+	mkdir -p bin && cp -v build/bryx bin/client01
+	rm -rf build
 
 .PHONY: clean
 clean:
-	rm -r build
+	rm -rf bin
 	git reset --hard master
 	git checkout master
