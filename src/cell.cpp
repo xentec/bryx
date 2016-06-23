@@ -4,24 +4,6 @@
 
 #include <fmt/format.h>
 
-
-inline vec dir2vec(Direction dir)
-{
-	switch(dir)
-	{
-	case Direction::N:  return {0,-1};
-	case Direction::NE: return {1,-1};
-	case Direction::E:  return {1, 0};
-	case Direction::SE: return {1, 1};
-	case Direction::S:  return {0, 1};
-	case Direction::SW: return {-1,1};
-	case Direction::W:  return {-1,0};
-	case Direction::NW: return {-1,-1};
-	default:
-		return {0,0};
-	}
-}
-
 // Cell
 //#######
 Cell::Cell(Map& map, vec pos, Type type):
@@ -222,5 +204,22 @@ string dir2str(Direction dir)
 	case Direction::NW: return "NW";
 	default:
 		return "!";
+	}
+}
+
+vec dir2vec(Direction dir)
+{
+	switch(dir)
+	{
+	case Direction::N:  return {0,-1};
+	case Direction::NE: return {1,-1};
+	case Direction::E:  return {1, 0};
+	case Direction::SE: return {1, 1};
+	case Direction::S:  return {0, 1};
+	case Direction::SW: return {-1,1};
+	case Direction::W:  return {-1,0};
+	case Direction::NW: return {-1,-1};
+	default:
+		return {0,0};
 	}
 }

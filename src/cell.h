@@ -13,6 +13,8 @@ enum Direction
 string dir2str(Direction dir);
 inline string dir2str(u32 i) { return dir2str(Direction(i)); }
 inline Direction dir180(Direction in) { return Direction((in+Direction::_LAST/2) % (Direction::_LAST)); }
+vec dir2vec(Direction dir);
+
 
 struct Map;
 
