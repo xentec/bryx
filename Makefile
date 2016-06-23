@@ -1,5 +1,5 @@
-export CC=clang
-export CXX=clang++
+#export CC=clang
+#export CXX=clang++
 
 MODE=Release
 
