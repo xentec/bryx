@@ -4,6 +4,7 @@
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+
 #include <initializer_list>
 
 struct vec
@@ -70,6 +71,18 @@ struct vec
 		return x*other.x + y*other.y;
 	}
 
+	inline vec& operator +=(const vec& other)
+	{
+		*this = *this + other;
+		return *this;
+	}
+
+	inline vec& operator -=(const vec& other)
+	{
+		*this = *this - other;
+		return *this;
+	}
+
 	inline string asString() const
 	{
 		return fmt::format("[{}, {}]", x, y);
@@ -107,4 +120,9 @@ namespace std {
 inline bool inBox(const vec& x, const vec& begin, const vec& end)
 {
 	return begin.x <= x.x && x.x <= end.x && begin.y <= x.y && x.y <= end.y;
+}
+
+inline vec clamp(const vec& v, const vec& begin, const vec& end)
+{
+	return vec{std::max(begin.x, std::min(end.x, v.x)), std::max(begin.y, std::min(end.y, v.y))};
 }
