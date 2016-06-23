@@ -3,6 +3,7 @@
 #include "util/console.h"
 
 #include <fmt/format.h>
+#include <queue>
 #include <unordered_map>
 
 // Map
@@ -67,6 +68,56 @@ const Cell& Map::at(const vec &pos) const
 		throw std::out_of_range("out of range: " + pos.asString());
 	return data[pos.x * height + pos.y];
 }
+
+
+std::vector<Cell*> Map::getQuad(vec centre, i32 radius)
+{
+	std::vector<Cell*> quad((radius*radius + radius)*4+1, nullptr);
+	std::queue<Cell*> q;
+
+	Cell& z = at(centre);
+	q.push(&z);
+
+	vec start = centre - vec(radius),
+		end = centre + vec(radius);
+
+	while(!q.empty())
+	{
+		Cell &c = *q.front();
+		q.pop();
+
+		c.helpValue++;
+		quad.push_back(&c);
+
+		for(Cell::Transition& tr : c)
+		{
+			if(tr.to == nullptr || tr.to->helpValue || !inBox(tr.to->pos, start, end))
+				continue;
+
+			if(tr.to && tr.to != c.getDirectNeighbor(tr.exit))
+			{
+				vec v = c.pos-centre;
+				i32 r = radius-1-std::max(v.x, v.y);
+				if(r >= 0)
+				{
+					auto sub = getQuad(tr.to->pos, r);
+					quad.insert(quad.end(), sub.begin(), sub.end());
+				}
+			}
+		}
+	}
+
+	for(Cell* c: quad)
+		c->helpValue--;
+
+#if SAFE_GUARDS
+	check();
+#endif
+	quad.shrink_to_fit();
+
+	return quad;
+}
+
 
 string Map::asString(bool transistions) const
 {

@@ -7,7 +7,7 @@
 // Cell
 //#######
 Cell::Cell(Map& map, vec pos, Type type):
-	pos(pos), type(type), staticValue(0), map(map)
+	pos(pos), type(type), staticValue(0), helpValue(0), map(map)
 {}
 
 Cell& Cell::operator =(const Cell &other)
@@ -17,6 +17,7 @@ Cell& Cell::operator =(const Cell &other)
 
 	type = other.type;
 	staticValue = other.staticValue; //TODO: reevaluate
+	helpValue = other.helpValue;
 	return *this;
 }
 

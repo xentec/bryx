@@ -26,6 +26,8 @@ struct Map
 	Cell& at(const vec& pos);
 	const Cell& at(const vec& pos) const;
 
+	std::vector<Cell*> getQuad(vec centre, i32 radius);
+
 	string asString(bool transistions = true) const;
 
 	void print(bool colored = true, bool ansi = true) const;

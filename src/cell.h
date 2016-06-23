@@ -79,6 +79,8 @@ struct Cell
 
 	i32 staticValue;
 
+	u32 helpValue;
+
 protected:
 	std::array<Transition, 8> trans;
 	Map& map;
