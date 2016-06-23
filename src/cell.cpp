@@ -78,6 +78,26 @@ Map &Cell::getMap() const
 	return map;
 }
 
+void Cell::clear()
+{
+	if(type == Type::VOID)
+		return;
+
+	type = Type::VOID;
+	staticValue = 0;
+
+	for(u32 d = Direction::N; d < Direction::_LAST; d+=2)
+	{
+		Direction dir = Direction(d);
+		Transition& tr = trans[d];
+
+		if(tr.to)
+			tr.to->trans[dir180(tr.entry)].to = nullptr;
+
+		tr = { nullptr, dir, dir };
+	}
+}
+
 Cell* Cell::getDirectNeighbor(Direction dir) const // TODO: null only
 {
 	vec dirPos = pos + dir2vec(dir);

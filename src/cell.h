@@ -60,6 +60,8 @@ struct Cell
 
 	Map& getMap() const;
 
+	void clear();
+
 	void addTransition(Direction exit, Direction entry, Cell* target);
 
 	Cell* getDirectNeighbor(Direction dir) const;
