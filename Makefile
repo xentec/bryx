@@ -25,3 +25,4 @@ copy:
 clean:
 	rm -r build
 	git reset --hard master
+	git checkout master
