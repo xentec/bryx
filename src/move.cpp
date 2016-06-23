@@ -72,7 +72,10 @@ void Move::print() const
 	cf.setBG(Format::WHITE);
 	hl.emplace(target->pos, cf);
 
+
+	println("{}", asString());
 	target->getMap().print(hl);
+	println("{}: O: {} B: {}", player, player.overrides + (bonus == Bonus::OVERRIDE), player.bombs + (bonus == Bonus::BOMB));
 }
 
 void Move::clear()
