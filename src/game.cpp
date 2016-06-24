@@ -180,6 +180,10 @@ void Game::execute(Move &move)
 
 	for(Cell* c: move.captures)
 	{
+#if SAFE_GUARDS
+		if(c->type == move.player.color)
+			throw std::runtime_error("invalid player capture");
+#endif
 		backup.captures.emplace_back(c->pos, c->type);
 		c->type = move.player.color;
 	}

@@ -116,6 +116,7 @@ void Player::evaluate(Move& move) const
 			{
 				if(!line.empty())
 					move.captures.merge(line);
+
 				break;
 			}
 
@@ -126,10 +127,23 @@ void Player::evaluate(Move& move) const
 				break;
 			}
 
-			line.push_back(trn->to);
+			if(trn->to->helpValue == 0)
+			{
+				line.push_back(trn->to);
+				trn->to->helpValue++;
+			}
+
 			trn = &trn->to->getNeighbor(trn->entry);
 		}
+		for(Cell* c: line)
+			c->helpValue--;
 	}
+
+	for(Cell* c: move.captures)
+		c->helpValue--;
+
+//	move.captures.sort();
+//	move.captures.unique();
 
 	if(move.captures.empty() && move.target->type != Cell::Type::EXPANSION)
 		move.err =  Move::Error::NO_CONNECTIONS;
