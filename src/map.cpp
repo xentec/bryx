@@ -283,9 +283,6 @@ Map Map::load(std::istream& file)
 	// default ones
 	for(Cell& c: map)
 	{
-		if(c.type == Cell::Type::VOID)
-			continue;
-
 		for(u32 d = Direction::N; d < Direction::_LAST; d++)
 		{
 			Direction dir = Direction(d);
@@ -299,7 +296,7 @@ Map Map::load(std::istream& file)
 			{
 #endif
 				Cell* nc = c.getDirectNeighbor(dir);
-				c.trans[d] = { nc && nc->type != Cell::Type::VOID ? nc : nullptr, dir, dir };
+				c.trans[d] = { nc && c.type != Cell::Type::VOID && nc->type != Cell::Type::VOID ? nc : nullptr, dir, dir };
 #if HARD_CORNERS
 			}
 #endif
