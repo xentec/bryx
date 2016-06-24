@@ -47,6 +47,7 @@ inline bool maxPrune (const AIMove& q, Quality& a, AIMove& v, Quality& b){ if(q.
 Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 {
 	maxDepth = 1;
+	deepest = 0;
 	states = 0;
 
 	Quality a = infMin, b = infMax;
@@ -95,6 +96,9 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 			TimePoint start, end;
 
 			println();
+
+			u32 deepest_pre = 0;
+
 			do
 			{
 				print("\rDeepening: {: <3} ", maxDepth);
@@ -111,12 +115,14 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 				//println("{} ({})", am.move, am.score);
 				//am.move.print();
 
-				if(moveChain.size() < maxDepth-1)
+//				if(moveChain.size() < maxDepth-1)
+				if(deepest < maxDepth && deepest_pre == deepest)
 				{
 					println("End reached");
 					break;
 				}
 
+				deepest_pre = deepest;
 				++maxDepth;
 				end = Clock::now();
 			} while(end + (end - start) * 2 < endTime);
@@ -126,7 +132,6 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 		else
 		{
 			maxDepth = depth;
-			maxDepth = 70;
 			bestState(game, posMoves, 0, a, b);
 		}
 		println("States: {}", states);
@@ -163,8 +168,6 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 		{
 			print("{} :: ", am.score);
 			am.move.print();
-			if(am.move.override)
-				print("");
 			game.execute(am.move);
 			println();
 			++steps;
@@ -200,6 +203,80 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 }
 
 
+Move AI::bomb(u32 time)
+{
+/*
+	Map& map = game.getMap();
+
+	std::vector<i32> row(map.width, 0);
+	std::vector<i32> col(map.height, 0);
+
+	for(u32 x = 0; x < map.width; ++x)
+	for(u32 y = 0; y < map.height; ++y)
+	{
+		Cell &c = map.at(x,y);
+
+		if(c.type == color)
+			row[x] -= 2;
+		else if(c.isPlayer())
+			row[x] += 2;
+		else
+			row[x] -= 1;
+	}
+
+	for(u32 y = 0; y < map.height; ++y)
+	for(u32 x = 0; x < map.width; ++x)
+	{
+		Cell &c = map.at(x,y);
+
+		if(c.type == color)
+			row[x] -= 2;
+		else if(c.isPlayer())
+			row[x] += 2;
+		else
+			row[x] -= 1;
+	}
+*/
+
+	Cell* best = nullptr;
+	Quality bestScore = infMin;
+
+	for(Cell& c: game.getMap())
+	{
+		if(c.type == Cell::Type::VOID)
+			continue;
+
+		std::vector<Cell*> damage = game.getMap().getQuad(c.pos, game.defaults.bombsStrength);
+		Quality score = 0;
+
+		for(Cell* cp: damage)
+		{
+			if(!cp)
+				score -= 2;
+
+			Cell &c = *cp;
+
+			if(c.type == color)
+				score -= 3;
+			else if(c.isPlayer())
+				score += 2;
+			else
+				score -= 1;
+		}
+
+		if(score >= bestScore)
+		{
+			bestScore = score;
+			best = &c;
+		}
+	}
+
+	return { *this, best };
+}
+
+
+
+
 Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& a, Quality& b)
 {
 	Player& ply = state.currPlayer();
@@ -220,8 +297,6 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 		sortedMoves.emplace(h, m);
 //		sortedMoves.emplace(evalMove(state, m), m);
 		states++;
-		if(m.override)
-			print("");
 	}
 
 	u32 d = depth+1;
@@ -246,6 +321,9 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 			moves.emplace_back(itr->first, itr->second);
 	}
 
+	if(d > deepest)
+		deepest = d;
+
 	if(d == maxDepth)
 	{
 		// reuse quality from BST
@@ -254,7 +332,6 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 			if(prune({mp.first, mp.second}, a, best, b))
 				break;
 		}
-		handleSpecials(best.move);
 
 #if VERBOSE > 2
 		println(" MAX ({}) {} :: {}", d, best.score, best.move);
@@ -271,9 +348,6 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 			m.print();
 			println();
 #endif
-
-			if(m.override && m.player.color == Cell::Type::P1 && m.captures.empty())
-				print("");
 
 			handleSpecials(m);
 			state.execute(m);
@@ -312,7 +386,21 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 			println();
 #endif
 
-			if(prune({next.score+mp.first, m}, a, best, b))
+#if SAFE_GUARDS
+			if(save != state.getMap().asString())
+			{
+				println(" MAP CORRUPTION ");
+
+				println("{}", save);
+				println();
+				println("{}", state.getMap().asString());
+
+
+				throw std::runtime_error("map corruption");
+			}
+#endif
+
+			if(prune({next.score, m}, a, best, b))
 			{
 				break;
 			}
@@ -324,14 +412,11 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 		throw std::runtime_error("map corruption");
 #endif
 
-	if(best.move.override && best.move.player.color == Cell::Type::P1 && best.move.captures.empty())
-		print("");
-
 	moveChain.push_front(best);
 	return best.score;
 }
 
-void AI::handleSpecials(Move& move)
+void AI::handleSpecials(Move& move) const
 {
 	Game& game = move.player.game;
 
@@ -441,14 +526,27 @@ Quality AI::evalState(Game &state) const
 {
 	Quality h = 0;
 
-	Player& futureMe = *state.getPlayers()[type2ply(color)];
 	for(Cell &c: state.getMap()){
 		if(c.type == color)
 			h += c.staticValue;
 	}
 
+	Player& futureMe = *state.getPlayers()[type2ply(color)];
+
+//	h *= 10;
+
 	h += futureMe.overrides * game.aiData.expectedOverriteValue;
 	h += futureMe.bombs * game.aiData.bombValue;
+
+
+	usz enemies = 0;
+	for(Player* ply: state.getPlayers())
+	{
+		if(!ply || ply->color == color)
+			continue;
+
+		enemies++;
+	}
 
 
 	return h;
@@ -456,19 +554,15 @@ Quality AI::evalState(Game &state) const
 
 Quality AI::evalMove(Game &state, Move &move) const
 {
-/*
-	usz movesBefore = move.player.possibleMoves().size();
+	handleSpecials(move);
 	state.execute(move);
 
-	usz movesAfter = move.player.possibleMoves().size();
-*/
 	Quality h = evalState(state);
-/*	h *= 1 + ((movesAfter - movesBefore) / 10); //todo: (futureMe-currentMe)/100
 
-	state.undo();
-*/
 	if(move.override)
 		h /= 2;
+
+	state.undo();
 
 	return h;
 }

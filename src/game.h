@@ -3,12 +3,13 @@
 #include "global.h"
 #include "map.h"
 #include "move.h"
-#include "player.h"
 
 #include "util/clock.h"
 
 struct Player;
 struct Client;
+
+using Bomb = vec;
 
 struct Game
 {
@@ -87,6 +88,8 @@ protected:
 	friend struct Client;
 };
 
+
+#include "player.h"
 
 template<class P>
 Player& Game::addPlayer()

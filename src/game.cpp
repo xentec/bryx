@@ -159,16 +159,33 @@ void Game::execute(Move &move)
 		throw std::runtime_error("wrong player turn");
 
 	if(!move.target)
-		throw std::runtime_error("empty target");
+		throw std::runtime_error("null target");
+#endif
 
+	if(phase == Phase::BOMB)
+	{
+#if SAFE_GUARDS
+		if(move.target->type == Cell::Type::VOID)
+			throw std::runtime_error("bombing void cell");
+#endif
+		std::vector<Cell*> field = map->getQuad(move.target->pos, defaults.bombsStrength);
+		for(Cell* c: field)
+			c->clear();
+
+		return;
+	}
+
+#if SAFE_GUARDS
 	if(move.target->type == Cell::Type::VOID)
 		throw std::runtime_error("wrong target");
 #endif
+
 	if(move.override)
 	{
+#if SAFE_GUARDS
 		if(move.player.overrides == 0)
 			throw std::runtime_error("no overrides left");
-
+#endif
 		move.player.overrides--;
 		stats.overrides++;
 	}

@@ -138,3 +138,9 @@ Move Human::move(std::deque<Move>&, u32, u32)
 
 	return move;
 }
+
+Move Human::bomb(u32 time)
+{
+	// TODO
+	return { *this, &game.getMap().at(0,0)};
+}

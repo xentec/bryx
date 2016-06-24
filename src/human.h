@@ -11,4 +11,5 @@ struct Human : Player
 
 	virtual Player* clone() const;
 	virtual Move move(std::deque<Move>&, u32, u32);
+	virtual Move bomb(u32 time);
 };
