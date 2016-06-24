@@ -72,8 +72,10 @@ const Cell& Map::at(const vec &pos) const
 
 std::vector<Cell*> Map::getQuad(vec centre, i32 radius)
 {
-	std::vector<Cell*> quad((radius*radius + radius)*4+1, nullptr);
+	std::vector<Cell*> quad;
 	std::queue<Cell*> q;
+
+	quad.reserve((radius*radius + radius)*4+1);
 
 	Cell& z = at(centre);
 	q.push(&z);
@@ -103,6 +105,9 @@ std::vector<Cell*> Map::getQuad(vec centre, i32 radius)
 					auto sub = getQuad(tr.to->pos, r);
 					quad.insert(quad.end(), sub.begin(), sub.end());
 				}
+			} else
+			{
+				q.push(tr.to);
 			}
 		}
 	}
