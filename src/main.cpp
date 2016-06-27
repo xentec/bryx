@@ -13,6 +13,8 @@
 #include <iostream>
 #include <unordered_map>
 
+#include <unistd.h>
+
 #define VERBOSE 1
 
 enum class Mode
@@ -140,6 +142,8 @@ void parseArgs(Options& opts, usz argc, char* argv[])
 int main(int argc, char* argv[])
 {
 	Options opts;
+
+	Map::printColored = isatty(STDOUT_FILENO);
 
 	try {
 		if(argc == 1)

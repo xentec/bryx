@@ -189,9 +189,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 			{
 				switch (c.type)
 				{
-				case Cell::Type::BONUS:
-				case Cell::Type::CHOICE:
-				case Cell::Type::INVERSION: ch = "░"; break;
+
 				case Cell::Type::EMPTY:     ch = "."; break;
 				case Cell::Type::VOID:      ch = "█"; break;
 
@@ -201,7 +199,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 			}
 
 			const auto& hl = highlight.find(c.pos);
-			if(hl != highlight.cend())
+			if(colored && printColored && hl != highlight.cend())
 				color = hl->second;
 
 			fmt::print("{}{}{}{}", color, ch, color::RESET, space);
