@@ -106,23 +106,25 @@ Die Bearbeitung der Aufgaben wurde wie folgt aufgeteilt:\newline
 	2.3 & Erweiterung der Überprüfung auf Gültigkeit & Utz Andrej\\
 	\hline
 	3.1 & Ausarbeiten einer Heuristik & Goldmann Simon, Utz Andrej\\
-	3.2 & Implementieren der Ausgearbeiteten Heuristik & Utz Andrej, Goldmann Simon\\
+	3.2 & Implementieren der Ausgearbeiteten Heuristik & Goldmann Simon, Utz Andrej\\
 	\hline
 	4.1 & Implementierung der Netzwerkfunktionalität & Utz Andrej\\
 	\hline
 	5.1 & Implementierung des Paranoidsuchverfahrens & Utz Andrej\\
 	\hline
 	6.1 & Implementierung des $\alpha$-$\beta$-Pruning's & Utz Andrej\\
-	6.2 & Erstellen von Statistiken zum $\alpha$-$\beta$-Pruning & \\
+	6.2 & Erstellen von Statistiken zum $\alpha$-$\beta$-Pruning & To Be Done\\
 	\hline
 	7.1 & Einbauen der Client-Parameter & Utz Andrej\\
 	7.2 & Implementierung des Iterative-Deepening-Verfahrens & Utz Andrej\\
 	\hline
-	8.1 & Implementieren des Aspiration-Windows-Verfahren & Utz Andrej\\
+	8.1 & Implementieren des Aspiration-Windows-Verfahren & To Be Done\\
 	\hline
 	9.1 & Implementierung der Bombenphase & Utz Andrej\\
 	\hline
-	10.1 & Schreiben des Projektberichts & Goldmann Simon, Utz Andrej\\
+	10.1 & Erstellen der Turnierspielfelder & Goldmann Simon\\
+	\hline
+	11.1 & Schreiben des Projektberichts & Goldmann Simon, Utz Andrej\\
 	\hline
 \end{tabular}
 \newpage
@@ -136,15 +138,19 @@ Bei jedem der Folgenden Einträge steht ein Vorteil dessen, der für die Wahl au
 Native Ausführung und deterministische Speicherverwaltung.
 \item Compiler: clang - \url{http://clang.llvm.org} \\
 Bessere Fehlermeldungen im Vergleich zu GCC.
-\item Betriebssystem: Arch Linux - \url{https://www.archlinux.org} \\
-Standardbetriebssystem des Teams.
+\item Betriebssystem: \newline
+Arch Linux - \url{https://www.archlinux.org} \\
+Betriebssystem von Andrej Utz, da er bereits viel Erfahrung mit Arch Linux hat. \newline
+Ubuntu 14.0.4 - \url{http://www.ubuntu.com} \\
+Betriebssystem von Simon Goldmann, da es das Betriebssystem ist, dass auf dem Server läuft.
 \item Projektgenerator: CMake - \url{https://cmake.org} \\
 Einfache und einheitliche Generierung der Projektdateien.
 \item IDE: QtCreator - \url{http://wiki.qt.io/Qt_Creator} \\
 Eine echte Open Source Alternative zu Visual Studio, die u.a. CMake versteht und dank Clang Static Analyzer semantische Fehler während des Schreibens anzeigt.
 \item Dokumentationsgenerator: Doxygen - \url{http://www.stack.nl/~dimitri/doxygen} \\
 De facto Standard zum Erstellen von Dokumentationen aus dem Quellcode.
-
+\item Projektbericht-PDF:\newline TeXstudio - \url{http://www.texstudio.org/}\newline MiKTEX - \url{http://miktex.org/}\newline
+Standard zum erstellen ordentlicher, größerer PDF-Dokumente.
 \item Verwendete Programmbibliotheken:
 \begin{itemize}
 \item fmtlib (ehem. cppformat) - \url{http://fmtlib.net} \\
@@ -157,7 +163,7 @@ Asynchrone Netzwerkbibliothek für C. Sorgt für bessere Abstraktion der Sockets
 \newpage
 
 \subsection{Datenstruktur}
-Als Grundlange für die Speicherung des Spielfeldes wurde der STL-Container \texttt{std::vector} aus der Standardbibliothek benutzt. Dieser ist nichts weiter als ein eindimensionaler, heapallokierter Array mit Verfolgung der Größe und Zugriffschecks. Der Zugriff auf Felder erfolgt über ihre X,Y-Koordinaten.
+Als Grundlage für die Speicherung des Spielfeldes wurde der STL-Container \texttt{std::vector} aus der Standardbibliothek benutzt. Dieser ist nichts weiter als ein eindimensionaler, heapallokierter Array mit Verfolgung der Größe und Zugriffschecks. Der Zugriff auf Felder erfolgt über ihre X,Y-Koordinaten.
 Ein Feld sieht wie folgt aus:
 
 \begin{lstlisting}[caption=\texttt{Cell} Struktur, label=lst:cell-struct]
@@ -177,17 +183,20 @@ struct Cell
 };
 \end{lstlisting}
 
-
 \texttt{Cell} speichert - neben dem eigentlichem Feldtyp - noch ihre Position als Vektor, eine Referenz zum Spielfeld und einen festen Array mit 8 Transitionen, welche den ihren Ausgangsrichtungen entsprechen.
 Eine \texttt{Transition} beinhaltet einen Zeiger auf eine andere Zelle und die Ausrichtung, die ein Zug bekommt, nachdem er die Transition passiert hat.
 Bei Nichtexistenz der \texttt{Transition} ist der Zeiger auf die \texttt{Cell} standardmäßig \texttt{NULL}.
 
-Die Variante aus \texttt{std::vector} und \texttt{std::array} wurde genommen, damit die Felder beieinander angrenzen. Damit werden Cache-Misses der CPU beim sequentiellen Zugriff gemindert.
+Die Variante aus \texttt{std::vector} und \texttt{std::array} wurde genommen, damit die Felder beieinander angrenzen. Damit werden Cache-Misses der CPU beim sequentiellen Zugriff gemindert.\newline
 
+\begin{minipage}{\linewidth}
+	\centering
+	\includegraphics[width=0.4\linewidth]{pics/BRYX-Cell.PNG}
+	\captionof{figure}[Cell]{Abbildung einer Zelle(=Cell) und deren Umgebung}
+	\label{fig:cell}
+\end{minipage}
 
 %Beschreiben Sie die Datenstruktur, die Sie zur Speicherung des Spielfeldes in Ihrem Client nutzen. Gehen Sie auf Besonderheiten ein und erklären Sie, wie diese funktionieren und was Sie sich davon erhoffen. Geben Sie falls möglich auch eine schematische Darstellung/ein Bild der Datenstruktur an.
-
-
 \newpage
 % ----------------------------------------------------------------------------------
 % Kapitel: Spielfeldbewertung
@@ -272,7 +281,9 @@ Integrieren Sie in diesen Abschnitt alle Ergebnisse von Projektaufgaben, die mit
 % Kapitel: Bombenphase
 % ----------------------------------------------------------------------------------
 \section{Bombenphase}
+Die Bombenphase wird eingeleitet, sobald kein Spieler mehr Steine oder Überschreibsteine setzen kann. In dieser Phase werden Bomben auf Nicht-Void-Felder geworfen. Die Explosion breitet sich wellenförmig aus(, so wie wenn man einen Stein ins Wasser wirft).Trifft eine Explosionswelle auf eine Transition, so breiten sich am anderen Ende der Transition die Wellen weiter aus. Diese Ausbreitung erweckt den Anschein, als ob an diesem Punkt im Spielfeld eine weitere -wenn auch kleinere- Bombe abgeworfen worden währe. Die Explosionswellen können keine Void-Felder überqueren, somit wird der Radius durch Void-Felder, an denen keine Transitionen liegen, eingeschränkt. Alles was innerhalb der Explosionswellen liegt wird in Void-Felder umgewandelt.
 
+Bei unserem Projekt wird für jedes Nicht-Void-Feld berechnet, wie sich ein Bombenabwurf auswirken würde. Bei der Berechnung wird konntrolliert welche Felder von der Explosion betroffen werden, und ob es Felder von gegnerischen Spielern, lehre- oder Void-Felder oder eigene Spielfelder sind.\newline Eigene Felder wirken sich sehr negativ auf die Berechnung aus und werden mit einer -3 bepunktet, da es zu Vermeiden ist, eigene Felder zu zerstören und möglicher Weise seine Siegeschancen zu schmälern.\newline Betroffene gegnerische Spielfelder fließen positiv in die Bewertung ein und sind mit +2 einberechnet. Je mehr gegner erwischt werden, desto besser.\newline Lehre- oder Void-Felder sind vergeudetes Potential und sind somit mit -1 leicht negativ bepunktet.\newline Sobald die Bewertung durchgeführt ist, wird eine Bombe auf eine Möglichst gute Position -d.h. ein Feld mit einer möglichst hohen Punktezahl- geworfen. Danach sind die Gegner reihum an der Reihe ihre Bomben zu werfen, bis wir wieder an der Reihe sind. Dies wiederhohlt sich solange Spieler noch Bomben haben. (Logischer-Weise können nur Spieler Bomben werfen, die welche auf Lager haben, alle anderen werden einfach übersprungen.)
 %Beschreiben Sie, wie Sie Bomben werfen (z.\,B.\ die eingesetzte Bewertungsheuristik und, ob Sie in die Tiefe rechnen und falls ja, wie tief Sie rechnen)
 \newpage
 % ----------------------------------------------------------------------------------
