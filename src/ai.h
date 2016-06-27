@@ -26,7 +26,7 @@ struct AI : Player
 
 	Quality evalState(Game &state) const;
 	Quality evalMove(Game &state, Move& move) const;
-	Quality bestState(Game& state, PossibleMoves &posMoves, u32 depth, Quality& a, Quality& b);
+	Quality bestState(Game& state, PossibleMoves &posMoves, u32 depth, Quality a, Quality b);
 	Move bestState2(Game &game);
 
 	void handleSpecials(Move& move) const;

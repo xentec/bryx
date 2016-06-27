@@ -40,9 +40,6 @@ static Quality
 	infMin = std::numeric_limits<Quality>::min(),
 	infMax = std::numeric_limits<Quality>::max();
 
-inline bool minPrune (const AIMove& q, Quality& a, AIMove& v, Quality& b){ if(q.score < v.score) { v = q; if(v.score < b) b = v.score; } return v.score <= a; }; // min
-inline bool maxPrune (const AIMove& q, Quality& a, AIMove& v, Quality& b){ if(q.score > v.score) { v = q; if(v.score > a) a = v.score; } return v.score >= b; }; // max
-
 
 Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 {
@@ -248,12 +245,46 @@ Move AI::bomb(u32 time)
 
 
 
-Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& a, Quality& b)
+inline bool minPrune (const AIMove& q, Quality& a, AIMove& v, Quality& b)
+{
+#if VERBOSE
+	println("a-b MIN :: q: {:<5} a: {:<5} v: {:<5} b: {:<5}", q.score, a, v.score, b);
+#endif
+	if(q.score < v.score)
+	{
+		v = q;
+		if(v.score < b)
+			b = v.score;
+	}
+#if VERBOSE
+	print("a-b MIN :: q: {:<5} a: {:<5} v: {:<5} b: {:<5}  ", q.score, a, v.score, b);
+	println("{}", v.score <= a ? "CUTOFF":"");
+#endif
+	return v.score <= a;
+};
+
+inline bool maxPrune (const AIMove& q, Quality& a, AIMove& v, Quality& b)
+{
+#if VERBOSE
+	println("a-b MAX :: q: {:<5} a: {:<5} v: {:<5} b: {:<5}", q.score, a, v.score, b);
+#endif
+	if(q.score > v.score)
+	{
+		v = q;
+		if(v.score > a)
+			a = v.score;
+	}
+#if VERBOSE
+	print("a-b MAX :: q: {:<5} a: {:<5} v: {:<5} b: {:<5}  ", q.score, a, v.score, b);
+	println("{}", v.score >= b ? "CUTOFF":"");
+#endif
+	return v.score >= b;
+}
+
+
+Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality a, Quality b)
 {
 	Player& ply = state.currPlayer();
-
-	if(posMoves.empty())
-		throw std::runtime_error("no move");
 
 #if SAFE_GUARDS
 	string save = state.getMap().asString();
