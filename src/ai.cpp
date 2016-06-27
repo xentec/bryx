@@ -55,6 +55,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 	string save = game.getMap().asString();
 #endif
 
+	println();
 	println("# CALCULATING MOVE");
 	println("##########################");
 	println();
@@ -89,16 +90,15 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 	{
 		if(time)
 		{
-			endTime = Clock::now() + Duration(time - time/200);
+			endTime = Clock::now() + Duration(time - time/20);
 			TimePoint start, end;
-
-			println();
 
 			u32 deepest_pre = 0;
 
 			do
 			{
-				print("\rDeepening: {: <3} ", maxDepth);
+				println();
+				print("\rDeepening: {: <4} :: States: {}", maxDepth, states);
 				fflush(stdout);
 
 				start = Clock::now();
@@ -115,6 +115,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 //				if(moveChain.size() < maxDepth-1)
 				if(deepest < maxDepth && deepest_pre == deepest)
 				{
+					println();
 					println("End reached");
 					break;
 				}
@@ -122,16 +123,15 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 				deepest_pre = deepest;
 				++maxDepth;
 				end = Clock::now();
-			} while(end + (end - start) * 2 < endTime);
+			} while(end + (end - start) * 5 < endTime);
 
-			println("Depth: {}", moveChain.size());
+			println();
 		}
 		else
 		{
 			maxDepth = depth;
 			bestState(game, posMoves, 0, a, b);
 		}
-		println("States: {}", states);
 	}
 
 	// clean up
@@ -298,7 +298,6 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality a
 		auto h = evalMove(state, m);
 		sortedMoves.emplace(h, m);
 //		sortedMoves.emplace(evalMove(state, m), m);
-		states++;
 	}
 
 	u32 d = depth+1;
@@ -554,8 +553,10 @@ Quality AI::evalState(Game &state) const
 	return h;
 }
 
-Quality AI::evalMove(Game &state, Move &move) const
+Quality AI::evalMove(Game &state, Move &move)
 {
+	states++;
+
 	handleSpecials(move);
 	state.execute(move);
 

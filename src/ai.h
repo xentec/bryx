@@ -25,7 +25,7 @@ struct AI : Player
 	virtual Move bomb(u32 time);
 
 	Quality evalState(Game &state) const;
-	Quality evalMove(Game &state, Move& move) const;
+	Quality evalMove(Game &state, Move& move);
 	Quality bestState(Game& state, PossibleMoves &posMoves, u32 depth, Quality a, Quality b);
 	Move bestState2(Game &game);
 
