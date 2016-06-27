@@ -123,7 +123,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 				deepest_pre = deepest;
 				++maxDepth;
 				end = Clock::now();
-			} while(end + (end - start) * 5 < endTime);
+			} while(end + (end - start) * 2 < endTime);
 
 			println();
 		}
@@ -245,7 +245,7 @@ Move AI::bomb(u32 time)
 
 
 
-inline bool minPrune (const AIMove& q, Quality& a, AIMove& v, Quality& b)
+inline bool minPrune(const AIMove& q, Quality& a, AIMove& v, Quality& b)
 {
 #if VERBOSE
 	println("a-b MIN :: q: {:<5} a: {:<5} v: {:<5} b: {:<5}", q.score, a, v.score, b);
@@ -263,7 +263,7 @@ inline bool minPrune (const AIMove& q, Quality& a, AIMove& v, Quality& b)
 	return v.score <= a;
 };
 
-inline bool maxPrune (const AIMove& q, Quality& a, AIMove& v, Quality& b)
+inline bool maxPrune(const AIMove& q, Quality& a, AIMove& v, Quality& b)
 {
 #if VERBOSE
 	println("a-b MAX :: q: {:<5} a: {:<5} v: {:<5} b: {:<5}", q.score, a, v.score, b);
@@ -279,6 +279,11 @@ inline bool maxPrune (const AIMove& q, Quality& a, AIMove& v, Quality& b)
 	println("{}", v.score >= b ? "CUTOFF":"");
 #endif
 	return v.score >= b;
+}
+
+inline bool isAfter(TimePoint endTime, Duration offset)
+{
+	return Clock::now()+offset > endTime;
 }
 
 
@@ -355,7 +360,7 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality a
 
 			AIMove next = { 0, { state.currPlayer(), nullptr }};
 			PossibleMoves nextPosMoves = next.move.player.possibleMoves();
-			if(nextPosMoves.empty())
+			if(nextPosMoves.empty() || isAfter(endTime, game.aiData.evalTime*moves.size()))
 			{
 #if VERBOSE
 				println(" END ({}) {} :: {}", d, mp.first, m);
@@ -372,7 +377,6 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality a
 				next.score = bestState(state, nextPosMoves, d, a, b);
 #endif
 			}
-
 
 #if SAFE_GUARDS
 			if(state.getLastMove() != m)
