@@ -205,38 +205,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 
 Move AI::bomb(u32 time)
 {
-/*
-	Map& map = game.getMap();
-
-	std::vector<i32> row(map.width, 0);
-	std::vector<i32> col(map.height, 0);
-
-	for(u32 x = 0; x < map.width; ++x)
-	for(u32 y = 0; y < map.height; ++y)
-	{
-		Cell &c = map.at(x,y);
-
-		if(c.type == color)
-			row[x] -= 2;
-		else if(c.isPlayer())
-			row[x] += 2;
-		else
-			row[x] -= 1;
-	}
-
-	for(u32 y = 0; y < map.height; ++y)
-	for(u32 x = 0; x < map.width; ++x)
-	{
-		Cell &c = map.at(x,y);
-
-		if(c.type == color)
-			row[x] -= 2;
-		else if(c.isPlayer())
-			row[x] += 2;
-		else
-			row[x] -= 1;
-	}
-*/
+#define BOMB_ENEMY_VALUE 2
 
 	Cell* best = nullptr;
 	Quality bestScore = infMin;
@@ -257,9 +226,9 @@ Move AI::bomb(u32 time)
 			Cell &c = *cp;
 
 			if(c.type == color)
-				score -= 3;
+				score -= BOMB_ENEMY_VALUE-1;
 			else if(c.isPlayer())
-				score += 2;
+				score += BOMB_ENEMY_VALUE;
 			else
 				score -= 1;
 		}
@@ -268,6 +237,8 @@ Move AI::bomb(u32 time)
 		{
 			bestScore = score;
 			best = &c;
+			if(bestScore == damage.size()*BOMB_ENEMY_VALUE)
+				break;
 		}
 	}
 
