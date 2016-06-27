@@ -11,7 +11,7 @@
 \MyTitlepage[pics/gamefield02]{G01}{
 \texttt{andrej.utz@st.oth-regensburg.de}\\
 \texttt{simon1.goldmann@st.oth-regensburg.de}}
-{??.06.\the\year} % FIXME optional: Gruppenlogo als PNG, Pflichtfelder: Gruppe, Authoren durch "\\" getrennt und Abgabedatum eingeben
+{27.06.\the\year} % FIXME optional: Gruppenlogo als PNG, Pflichtfelder: Gruppe, Authoren durch "\\" getrennt und Abgabedatum eingeben
 
 \setcounter{page}{1} 
 % ----------------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ damit die am häufigsten beanspruchten Gebiete der Informatik in der Umsetzung d
 Wir haben YIMB als Y-Fach gewählt, da es -wie bereits erwähnt- mehrere wichtige Bereiche der Informatik abdeckt. Zudem bietet es die Möglichkeit unser Wissen in, für die Technische Informatik relevanten Programmiersprachen zu vertiefen. Auch die betreute, vollständige Umsetzung eines Projekts sollte sich für die Zukunft, unter anderem im Hinblick auf die kommende Bachelor-Arbeit positiv auswirken. Zusätzlich erfordert dieses Projekt, dass man sich in \glqq LaTeX\grqq einarbeitet.
 
 
-In Reversi geht es darum die Spielsteine des Gegenspielers zu übernehmen. Spielsteine werden übernommen, wenn sie durch die Steine des Gegners eingekesselt sind. Im ursprünglichen Reversi spielen zwei Spieler gegeneinander, in der Erweiterung hingegen sind bis zu acht Spieler beteiligt. Auch das quadratische Spielfeld ist in der Erweiterung stark modifiziert in Form als auch in Funktion. Zum einen werden neue Sonderfelder und Sondersteine eingeführt, zum anderen werden an Spielfeldrändern Transitionen eingebaut.\newline Zu diesen Bonusfeldern gehören Choice-, Inversions-, Expansions- und Bonusfelder. Diese Sonderfelder werden zunächst wie normale Felder behandelt, das heißt es wird zuerst ganz normal umgefärbt, und dann treten die jeweiligen Sondereffekte auf. Bei Choice-Feldern darf man die Steine mit einem beliebigen Spieler tauschen. Inversionsfelder färben die Spielsteine aller Spieler in die Farbe des jeweiligen nachfolgenden Spielers. Expansionsfelder sind Felder die durch einen übernehmbaren Nicht-Spieler Spielstein besetzt sind. Bonusfelder geben je nach Wahl eine zusätzliche Bombe oder einen Überschreibstein.\newline Die Sondersteine setzen sich aus Überschreibsteinen und Bomben -welche in der Bombenphase Verwendung finden- zusammen. Überschreibsteine können direkt auf besetzte Felder gesetzt werden. Dabei müssen sie, sofern es sich nicht um einen Expansionsstein handelt, weitere besetzte Felder umfärben.Die Bombenphase findet statt, sobald kein Spieler mehr Steine oder Überschreib-Steine setzen kann. In dieser Phase werden Bombensteine auf besetzte oder unbesetzte Spielfelder, dabei werden alle Felder in einem vorgegebenen Radius gelöscht. Jeder Spieler hat am Anfang eine Vorgegebene Anzahl an Bomben und Überschreibsteinen.
+In Reversi geht es darum die Spielsteine des Gegenspielers zu übernehmen. Diese werden übernommen, wenn sie durch die Steine des Gegners eingekesselt sind. Im ursprünglichen Reversi spielen zwei Spieler gegeneinander, in der Erweiterung hingegen sind bis zu acht Spieler beteiligt. Auch das quadratische Spielfeld ist in der Erweiterung stark modifiziert in Form als auch in Funktion. Zum einen werden neue Sonderfelder und Sondersteine eingeführt, zum anderen werden an Spielfeldrändern Transitionen eingebaut.\newline Zu diesen Bonusfeldern gehören Choice-, Inversions-, Expansions- und Bonusfelder. Diese Sonderfelder werden zunächst wie normale Felder behandelt, das heißt es wird zuerst ganz normal umgefärbt, und dann treten die jeweiligen Sondereffekte auf. Bei Choice-Feldern darf man die Steine mit einem beliebigen Spieler tauschen. Inversionsfelder färben die Spielsteine aller Spieler in die Farbe des jeweiligen nachfolgenden Spielers. Expansionsfelder sind Felder die durch einen übernehmbaren Nicht-Spieler Spielstein besetzt sind. Bonusfelder geben je nach Wahl eine zusätzliche Bombe oder einen Überschreibstein.\newline Die Sondersteine setzen sich aus Überschreibsteinen und Bomben -welche in der Bombenphase Verwendung finden- zusammen. Überschreibsteine können direkt auf besetzte Felder gesetzt werden. Dabei müssen sie, sofern es sich nicht um einen Expansionsstein handelt, weitere besetzte Felder umfärben.Die Bombenphase findet statt, sobald kein Spieler mehr Steine oder Überschreib-Steine setzen kann. In dieser Phase werden Bombensteine auf besetzte oder unbesetzte Spielfelder, dabei werden alle Felder in einem vorgegebenen Radius gelöscht. Jeder Spieler hat am Anfang eine Vorgegebene Anzahl an Bomben und Überschreibsteinen.
 \newpage
 % ----------------------------------------------------------------------------------
 % Kapitel: Allgemeine Informationen
@@ -140,9 +140,9 @@ Native Ausführung und deterministische Speicherverwaltung.
 Bessere Fehlermeldungen im Vergleich zu GCC.
 \item Betriebssystem: \newline
 Arch Linux - \url{https://www.archlinux.org} \\
-Betriebssystem von Andrej Utz, da er bereits viel Erfahrung mit Arch Linux hat. \newline
-Ubuntu 14.0.4 - \url{http://www.ubuntu.com} \\
-Betriebssystem von Simon Goldmann, da es das Betriebssystem ist, dass auf dem Server läuft.
+Betriebssystem von Andrej Utz, da er bereits viel Erfahrung damit hat. \newline
+Ubuntu 14.04 - \url{http://www.ubuntu.com} \\
+Betriebssystem von Simon Goldmann, welches der Version auf dem Server entspricht.
 \item Projektgenerator: CMake - \url{https://cmake.org} \\
 Einfache und einheitliche Generierung der Projektdateien.
 \item IDE: QtCreator - \url{http://wiki.qt.io/Qt_Creator} \\
@@ -155,8 +155,6 @@ Standard zum erstellen ordentlicher, größerer PDF-Dokumente.
 \begin{itemize}
 \item fmtlib (ehem. cppformat) - \url{http://fmtlib.net} \\
 Typsichere Zeichenkettenformatierung und Konsolenausgabe.
-\item dyad - \url{https://github.com/rxi/dyad} \\
-Asynchrone Netzwerkbibliothek für C. Sorgt für bessere Abstraktion der Sockets.
 \end{itemize}
 
 \end{itemize}
@@ -204,18 +202,15 @@ Die Variante aus \texttt{std::vector} und \texttt{std::array} wurde genommen, da
 \section{Spielfeldbewertung}
 \subsection{Spielfeldbewertung: 1. Vorschlag}
 Bewertung durch entstehende Zugmöglichkeiten:\newline
-Bei dieser Bewertungsvariante wird geprüft wie viele Spielzugmöglichkeiten für die Gegner, als auch für den setzenden Spieler entstehen. Auch die Anzahl der übernehmbaren Steine die durch diesen Spielzug entstehen sind für die Heuristik relevant.\newline
-Ein Vorteil dieser Variante ist, dass man möglichst viele Steine übernehmen kann, ohne den Gegnern viele zu geben.\newline
-Nachteilhaft ist die Implementierung dieser Bewertungsmethode, da sie sehr aufwendig ist.
+Bei dieser Bewertungsvariante wird geprüft wie viele Spielzugmöglichkeiten für die Gegner, als auch für den setzenden Spieler entstehen. Auch die Anzahl der übernehmbaren Steine die durch diesen Spielzug entstehen sind für die Heuristik relevant. Ein Vorteil dieser Variante ist, dass man möglichst viele Steine übernehmen kann, ohne den Gegnern viele zu geben. Nachteilhaft ist die Implementierung dieser Bewertungsmethode, da sie sehr aufwendig ist.
 
 \subsection{Spielfeldbewertung: 2. Vorschlag}
-Bewertung nach Position:\newline
-Hierbei wird geprüft, ob der gesetzte Stein durch normale Spielzüge übernehmbar ist oder nicht. Optional wäre es zu testen, wie viele normale Züge notwendig wären um einen übernehmbaren Stein zu drehen.\newline 
-Diese Bewertungsweise ist relativ leicht umsetzbar, aber nur mäßig gut um das Spielfeld zu bewerten.
-\newpage
+Bewertung nach Position: Hierbei wird geprüft, ob der gesetzte Stein durch normale Spielzüge übernehmbar ist oder nicht. Optional wäre es zu testen, wie viele normale Züge notwendig wären um einen übernehmbaren Stein zu drehen. Diese Bewertungsweise ist relativ leicht umsetzbar, aber nur mäßig gut um das Spielfeld zu bewerten.
+
 
 \subsection{Final implementierte Spielfeldbewertung}
-Nachdem das Spielfeld eingelesen wurde, erhält jedes Feld einen Wert, der davon abhängt, wie vielen Void-Felder angrenzen und ob diese nebeneinander liegen.\newline
+Nachdem das Spielfeld eingelesen wurde, erhält jedes Feld einen Wert, der davon abhängt, wie vielen Void-Felder angrenzen und ob diese nebeneinander liegen.
+
 \begin{tabular}{|l|c|}
 	\hline
 	Beschreibung & Bewertung\\
@@ -248,7 +243,8 @@ Nachdem das Spielfeld eingelesen wurde, erhält jedes Feld einen Wert, der davon
 \end{tabular}
 
 Bei den angegebenen Bewertungen handelt es sich um Richtwerte, die sich in Abhängigkeit der Anzahl der angrenzenden Void-Felder ändert.\newline
-Zudem wird zu bei jedem Nicht-Void-Feld geprüft, ob es sich um ein Bonus- oder Choice-Feld handelt. Sofern es sich um eines dieser Sonderfelder handelt wird ein vordefinierter Wert zum vorher ermittelten Feldwert hinzugefügt. Die Feldwerterhöhung verfällt sobald das Sonderfeld zum ersten Mal von einem Spieler besetzt wird.\newline
+Zudem wird zu bei jedem Nicht-Void-Feld geprüft, ob es sich um ein Bonus- oder Choice-Feld handelt. Sofern es sich um eines dieser Sonderfelder handelt wird ein vordefinierter Wert zum vorher ermittelten Feldwert hinzugefügt. Die Feldwerterhöhung verfällt sobald das Sonderfeld zum ersten Mal von einem Spieler besetzt wird.
+
 \begin{tabular}{|l|c|}
 	\hline
 	Feldart & Bewertung\\
@@ -261,18 +257,20 @@ Zudem wird zu bei jedem Nicht-Void-Feld geprüft, ob es sich um ein Bonus- oder 
 
 Die Bewertung von Expansionssteinen und Inversionsfeldern wird durch das Paranoid-Verfahren bewältigt, da sie einen vordefinierten Einfluss auf das Spielfeld haben. Dieser Einfluss ist aus den, durch das Sonderfeld ausgelösten Umfärbungen ersichtlich.
 \newpage
-Sobald die Bewertung der Zellen durchgeführt ist, kann das Spiel -und somit die Bewertung der einzelnen Züge- beginnen. Die Zugbewertung erfolgt zunächst ähnlich wie die triviale Heuristik, die einfach nur Steine zählt. Es werden die Werte der eigenen Steine zusammenaddiert. Zusätzlich fließt die Anzahl der Überschreibsteine und Bomben mit ein. Somit wird es deutlicher, ob es sich lohnt Überschreibsteine zu einem bestimmten Zeitpunkt einzusetzen, da der \glqq Verlust\grqq eines Überschreibsteins eine konstante Wertabnahme bewirkt, die durch übernommene Steine ausgeglichen werden muss.\newline Bei Bonusfeldern wird der -zu Beginn bestimmte- Wert für Bomben mit dem konstanten Wert für Überschreibsteine verglichen und der höherwertige Bonusstein ausgewählt. Der Wert für Bomben wird wie folgt bestimmt:\newline
+Sobald die Bewertung der Zellen durchgeführt ist, kann das Spiel -und somit die Bewertung der einzelnen Züge- beginnen. Die Zugbewertung erfolgt zunächst ähnlich wie die triviale Heuristik, die einfach nur Steine zählt. Es werden die Werte der eigenen Steine zusammenaddiert. Zusätzlich fließt die Anzahl der Überschreibsteine und Bomben mit ein. Somit wird es deutlicher, ob es sich lohnt Überschreibsteine zu einem bestimmten Zeitpunkt einzusetzen, da der \glqq Verlust\grqq eines Überschreibsteins eine konstante Wertabnahme bewirkt, die durch übernommene Steine ausgeglichen werden muss.
+Bei Bonusfeldern wird der -zu Beginn bestimmte- Wert für Bomben mit dem konstanten Wert für Überschreibsteine verglichen und der höherwertige Bonusstein ausgewählt. Der Wert für Bomben wird wie folgt bestimmt:
+
 \begin{equation*}
 	\frac{100 \cdot (\text{Bombenstärke} \cdot 2 + 1)^2}{\text{Spielfeldbreite} \cdot \text{Spielfeldhöhe}}
 \end{equation*}
-\newline
+
 %Beschreiben Sie abschließend, welche Heuristik final in Ihrem Client umgesetzt ist. Beschreiben Sie dazu auch Werte von Parametern (Kriterien und Gewichtungen), die Sie in den einzelnen Implementierungen nutzen. Welche statischen Vorberechnungen Sie machen, um z.B.\ das Spielfeld zu analysieren, etc.
 \newpage
 % ----------------------------------------------------------------------------------
 % Kapitel: Statistiken
 % ----------------------------------------------------------------------------------
 \section{Statistiken}
-Integrieren Sie in diesen Abschnitt alle Ergebnisse von Projektaufgaben, die mit Erstellungen von Statistiken zu tun haben. Geben Sie dabei auch Diagramme an und interpretieren Sie die darin dargestellten Kurven. Beschreiben Sie zu jedem implementierten Verfahren, ob und welchen Nutzen es aus Ihrer Sicht gebracht hat.
+%Integrieren Sie in diesen Abschnitt alle Ergebnisse von Projektaufgaben, die mit Erstellungen von Statistiken zu tun haben. Geben Sie dabei auch Diagramme an und interpretieren Sie die darin dargestellten Kurven. Beschreiben Sie zu jedem implementierten Verfahren, ob und welchen Nutzen es aus Ihrer Sicht gebracht hat.
 
 \subsection{Vergleich ... und ...}
 
@@ -281,9 +279,11 @@ Integrieren Sie in diesen Abschnitt alle Ergebnisse von Projektaufgaben, die mit
 % Kapitel: Bombenphase
 % ----------------------------------------------------------------------------------
 \section{Bombenphase}
-Die Bombenphase wird eingeleitet, sobald kein Spieler mehr Steine oder Überschreibsteine setzen kann. In dieser Phase werden Bomben auf Nicht-Void-Felder geworfen. Die Explosion breitet sich wellenförmig aus(, so wie wenn man einen Stein ins Wasser wirft).Trifft eine Explosionswelle auf eine Transition, so breiten sich am anderen Ende der Transition die Wellen weiter aus. Diese Ausbreitung erweckt den Anschein, als ob an diesem Punkt im Spielfeld eine weitere -wenn auch kleinere- Bombe abgeworfen worden währe. Die Explosionswellen können keine Void-Felder überqueren, somit wird der Radius durch Void-Felder, an denen keine Transitionen liegen, eingeschränkt. Alles was innerhalb der Explosionswellen liegt wird in Void-Felder umgewandelt.
+Die Bombenphase wird eingeleitet, sobald kein Spieler mehr Steine oder Überschreibsteine setzen kann. In dieser Phase werden Bomben auf Nicht-Void-Felder geworfen. Die Explosion breitet sich wellenförmig aus (ähnlich einem ins Wasser geworfenen Stein).Trifft eine Explosionswelle auf eine Transition, so breiten sich am anderen Ende der Transition die Wellen weiter aus. Diese Ausbreitung erweckt den Anschein, als ob an diesem Punkt im Spielfeld eine weitere -wenn auch kleinere- Bombe abgeworfen worden währe. Die Explosionswellen können keine Void-Felder überqueren, somit wird der Radius durch Void-Felder, an denen keine Transitionen liegen, eingeschränkt. Alles was innerhalb der Explosionswellen liegt wird in Void-Felder umgewandelt.
 
-Bei unserem Projekt wird für jedes Nicht-Void-Feld berechnet, wie sich ein Bombenabwurf auswirken würde. Bei der Berechnung wird konntrolliert welche Felder von der Explosion betroffen werden, und ob es Felder von gegnerischen Spielern, lehre- oder Void-Felder oder eigene Spielfelder sind.\newline Eigene Felder wirken sich sehr negativ auf die Berechnung aus und werden mit einer -3 bepunktet, da es zu Vermeiden ist, eigene Felder zu zerstören und möglicher Weise seine Siegeschancen zu schmälern.\newline Betroffene gegnerische Spielfelder fließen positiv in die Bewertung ein und sind mit +2 einberechnet. Je mehr gegner erwischt werden, desto besser.\newline Lehre- oder Void-Felder sind vergeudetes Potential und sind somit mit -1 leicht negativ bepunktet.\newline Sobald die Bewertung durchgeführt ist, wird eine Bombe auf eine Möglichst gute Position -d.h. ein Feld mit einer möglichst hohen Punktezahl- geworfen. Danach sind die Gegner reihum an der Reihe ihre Bomben zu werfen, bis wir wieder an der Reihe sind. Dies wiederhohlt sich solange Spieler noch Bomben haben. (Logischer-Weise können nur Spieler Bomben werfen, die welche auf Lager haben, alle anderen werden einfach übersprungen.)
+Bei unserem Projekt wird für jedes Nicht-Void-Feld berechnet, wie sich ein Bombenabwurf auswirken würde. Bei der Berechnung wird kontrolliert welche Felder von der Explosion betroffen werden, und ob es Felder von gegnerischen Spielern, leere- oder Void-Felder oder eigene Spielfelder sind. Eigene Felder wirken sich sehr negativ auf die Berechnung aus und werden mit einer -3 bepunktet, da es zu Vermeiden ist, eigene Felder zu zerstören und möglicher Weise seine Siegeschancen zu schmälern. Betroffene gegnerische Spielfelder fließen positiv in die Bewertung ein und sind mit +2 einberechnet. Je mehr gegner erwischt werden, desto besser. Lehre- oder Void-Felder sind vergeudetes Potential und sind somit mit -1 leicht negativ bepunktet.
+
+Sobald die Bewertung durchgeführt ist, wird eine Bombe auf eine Möglichst gute Position, d.h. ein Feld mit einer möglichst hohen Punktezahl, geworfen. Danach sind die Gegner reihum an der Reihe ihre Bomben zu werfen, bis wir wieder an der Reihe sind. Dies wiederholt sich solange Spieler noch Bomben haben. (Logischer-Weise können nur Spieler Bomben werfen, die welche auf Lager haben, alle anderen werden einfach übersprungen.)
 %Beschreiben Sie, wie Sie Bomben werfen (z.\,B.\ die eingesetzte Bewertungsheuristik und, ob Sie in die Tiefe rechnen und falls ja, wie tief Sie rechnen)
 \newpage
 % ----------------------------------------------------------------------------------
