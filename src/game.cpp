@@ -48,13 +48,19 @@ Player& Game::currPlayer() const
 
 Player& Game::nextPlayer()
 {
-	currPly = (currPly+1) % players.size();
+	do{
+		currPly = (currPly+1) % players.size();
+	} while(players[currPly] == nullptr);
+
 	return currPlayer();
 }
 
 Player& Game::prevPlayer()
 {
-	currPly = (currPly-1) % players.size();
+	do{
+		currPly = (currPly-1) % players.size();
+	} while(players[currPly] == nullptr);
+
 	return currPlayer();
 }
 
