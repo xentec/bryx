@@ -34,6 +34,8 @@ struct Game
 		u32 bombValue;
 		u32 expectedOverriteValue;
 		Duration evalTime;
+        bool gameNearEnd;
+        u32 amountMoves;
 	} aiData;
 
 	enum class Phase
@@ -64,6 +66,8 @@ struct Game
 
 	Move& getLastMove();
 
+    usz getMoveNum() const;
+
 protected:
 	Player& nextPlayer();
 	Player& prevPlayer();
@@ -86,6 +90,7 @@ protected:
 	std::stack<MoveBackup> bombLog;
 
 	friend struct Client;
+
 };
 
 

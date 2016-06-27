@@ -465,6 +465,22 @@ bool AI::playerMoved(Move& real)
 	} else
 		movePlan.clear();
 
+    if(game.aiData.gameNearEnd == false){
+        if((game.aiData.amountMoves / 10) > (game.aiData.amountMoves - game.getMoveNum())){
+            for(Cell &c: game.getMap()){
+                if(c.type == Cell::Type::VOID)
+                    continue;
+
+                c.staticValue = 1;
+                if(c.type == Cell::Type::BONUS)
+                    c.staticValue += BONUS_VALUE;
+                else if(c.type == Cell::Type::CHOICE)
+                    c.staticValue += CHOICE_VALUE;
+            }
+            game.aiData.gameNearEnd = true;
+        }
+    }
+
 	return anticipated;
 }
 

@@ -11,7 +11,7 @@
 
 Game::Game():
 	defaults{ 0, 0, 0, 0 }, stats { 0, 0, 0, {} },
-	aiData{ 0, 15, {} },
+    aiData{ 0, 15, {}, false, 0 },
 	phase(Phase::REVERSI),
 	map(nullptr),
 	currPly(0), moveless(0)
@@ -77,6 +77,11 @@ std::vector<Player*>& Game::getPlayers()
 std::vector<Player*> Game::getPlayers() const
 {
 	return players;
+}
+
+usz Game::getMoveNum() const
+{
+    return moveLog.size();
 }
 
 bool Game::hasEnded()
@@ -361,6 +366,13 @@ void Game::load(std::istream& file)
 
 	aiData.bombValue = (((defaults.bombsStrength * 2 + 1) * (defaults.bombsStrength * 2 + 1))
 						/ (map->width * map->height)) * 100;
+    for(Cell &c: *map){
+        if(c.type == Cell::Type::VOID)
+            continue;
+
+        aiData.amountMoves++;
+    }
+    aiData.amountMoves += defaults.players * defaults.overrides;
 
 	// Make some meassurements
 	AI tester(*this, Cell::Type::P1);
