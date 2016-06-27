@@ -89,7 +89,6 @@ beschreiben lässt:
 
 Das persistente Chatprotokoll erlaubt Austausch und Festhaltung der Ideen und für längere Diskussionen kann man auch Sprachkommunikation nutzen.
 
-% todo begründen
 Programmversionen wurden mithilfe von Git ausgetauscht und verwaltet.
 
 Die Bearbeitung der Aufgaben wurde wie folgt aufgeteilt:\newline
@@ -256,24 +255,32 @@ Zudem wird zu bei jedem Nicht-Void-Feld geprüft, ob es sich um ein Bonus- oder 
 \end{tabular}
 
 Die Bewertung von Expansionssteinen und Inversionsfeldern wird durch das Paranoid-Verfahren bewältigt, da sie einen vordefinierten Einfluss auf das Spielfeld haben. Dieser Einfluss ist aus den, durch das Sonderfeld ausgelösten Umfärbungen ersichtlich.
-\newpage
+
 Sobald die Bewertung der Zellen durchgeführt ist, kann das Spiel -und somit die Bewertung der einzelnen Züge- beginnen. Die Zugbewertung erfolgt zunächst ähnlich wie die triviale Heuristik, die einfach nur Steine zählt. Es werden die Werte der eigenen Steine zusammenaddiert. Zusätzlich fließt die Anzahl der Überschreibsteine und Bomben mit ein. Somit wird es deutlicher, ob es sich lohnt Überschreibsteine zu einem bestimmten Zeitpunkt einzusetzen, da der \glqq Verlust\grqq eines Überschreibsteins eine konstante Wertabnahme bewirkt, die durch übernommene Steine ausgeglichen werden muss.
 Bei Bonusfeldern wird der -zu Beginn bestimmte- Wert für Bomben mit dem konstanten Wert für Überschreibsteine verglichen und der höherwertige Bonusstein ausgewählt. Der Wert für Bomben wird wie folgt bestimmt:
 
 \begin{equation*}
 	\frac{100 \cdot (\text{Bombenstärke} \cdot 2 + 1)^2}{\text{Spielfeldbreite} \cdot \text{Spielfeldhöhe}}
 \end{equation*}
-
+\newline \newline %i want those (gos)
+Sobald sich das Spiel dem Ende nähert, wird der Wert aller Nicht-Void-Felder auf 1 gesetzt und bei Bonus- und Choice-Feldern wird der bereits erwähnte Wert hinzuaddiert. Dies sorgt dafür, dass gegen Ende des Spiels mehr auf die Anzahl der Steine geachtet wird, als auf deren Lage. Die vorhergehende KI ist dafür da, dass möglichst viele Steine im sogenannten \glqq Lategame\grqq auf einmal übernommen werden können. Der KI-Wechsels tritt auf, sobald ca. 90\% aller Züge durchgeführt wurden.
 %Beschreiben Sie abschließend, welche Heuristik final in Ihrem Client umgesetzt ist. Beschreiben Sie dazu auch Werte von Parametern (Kriterien und Gewichtungen), die Sie in den einzelnen Implementierungen nutzen. Welche statischen Vorberechnungen Sie machen, um z.B.\ das Spielfeld zu analysieren, etc.
 \newpage
 % ----------------------------------------------------------------------------------
 % Kapitel: Statistiken
 % ----------------------------------------------------------------------------------
 \section{Statistiken}
+Aufgrund dessen, dass das Projekt erst am Tag der Abgabe des Projektberichts weitestgehend fertiggestellt wurde liegen keine konkreten Statistiken vor. Dennoch möchten wir darstellen, was wir für Algorithmen entworfen und gegebenenfalls auch wieder verworfen haben, sowie die Gedanken die uns zu den jeweiligen Ideen geführt haben.\newline Aufgrund dessen möchten wir darauf verweisen, dass sich der Code noch ändern kann, und somit auch die Statistiken.
 %Integrieren Sie in diesen Abschnitt alle Ergebnisse von Projektaufgaben, die mit Erstellungen von Statistiken zu tun haben. Geben Sie dabei auch Diagramme an und interpretieren Sie die darin dargestellten Kurven. Beschreiben Sie zu jedem implementierten Verfahren, ob und welchen Nutzen es aus Ihrer Sicht gebracht hat.
 
-\subsection{Vergleich ... und ...}
+\subsection{Entwicklung der Heuristik}
+Zu Beginn war die unsereHeuristik kaum mehr als die der triviale KI. Sie konnte Steine zählen und gesonderte Felder erkennen. Die gesonderten Felder wurden jedoch alle gleich behandelt. Diese Heuristik wurde umgesetzt, um den restlichen Code leichter testbar zu machen, war aber als Heuristik an und für sich zwar schnell, aber nicht wirklich zu gebrauchen.\newline Diese Heuristik wurde dahingehend ausgebaut, dass sie erkennt von was für Feldern jedes einzelne Feld umgeben ist, und infolge dessen darüber entscheiden wie wertvoll jedes einzelne ist. Hinzu kommt die detailirte Behandlug von Sonderfeldern, die es verständlicher macht, wie sich diese Felder sich auf den Spielverlauf auswirken. Durch diese Erweiterung wurde die Dauer um die Heuristik durchzuführen nicht merklich beeinflusst. Allerdings wird mehr Zeit zur Initialisierung benötigt.\newline Um die Erfogschancen unseres Projekts zu erhöhen wurde die Heuristik dahingehend erweitert, dass sie gegen Ende jedes Spiels mehr Wert auf die Anzahl der Steine legt, satatt wie bisher auf deren Lage. Dies erscheint uns sinvoll, da es zum Schluss mehr auf die Anzahl der Steine ankommt, als auf deren Lage. Allerdings wird bei exzessiven Bombenphasen dise Erwartung nicht immer erfüllt. Auch bei dieser Erweiterung ist der Mehraufwand nicht nennenswert.\newline Der Gedanke die enstehenden und ferschwindenden Zugmöglichkeiten mit in die Bewertung mit einfließen zu lassen wurde nach einigen Überlegungen und Disskussionen verworfen, da er größtenteils durch das Paranoid-Verfahren abgedeckt wird.
 
+\subsection{Alpha-Beta-Pruning und Zugsortierung}
+Die Einführung dieser beiden Algorithmen erhöht die Geschwindigkeit unserer KI deutlich. Konkreteres können wir im Augenblick nich sagen.
+
+\subsection{Iterative-Deepening}
+Die Einführund dieses Algorithnus verlangsamt unser Programm geringfügig, ermöglicht es aber besser auf Zeit zu spielen. 
 \newpage
 % ----------------------------------------------------------------------------------
 % Kapitel: Bombenphase
