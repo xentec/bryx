@@ -57,8 +57,9 @@ Player& Game::nextPlayer()
 
 Player& Game::prevPlayer()
 {
-	do{
-		currPly = (currPly-1) % players.size();
+	do {
+		// "..size() + " needed or an underflow will happen
+		currPly = (players.size() + currPly - 1) % players.size();
 	} while(players[currPly] == nullptr);
 
 	return currPlayer();

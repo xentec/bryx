@@ -170,7 +170,7 @@ void Client::play()
 				return;
 			}
 			delete *dp;
-			game.getPlayers().erase(dp);
+			*dp = nullptr;
 		}
 			break;
 		case packet::BOMB_PHASE:
