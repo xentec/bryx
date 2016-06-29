@@ -49,4 +49,6 @@ private:
 	std::deque<AIMove> movePlan;
 
 	Duration evaltime;
+public:
+	static bool disableSorting;
 };

@@ -73,6 +73,8 @@ void parseArgs(Options& opts, usz argc, char* argv[])
 				if(arg)
 					opt.port = static_cast<u16>(std::stoi(*arg)), i++;
 			}},
+		{"-n", [](Options&, const string&, usz&, const string*){ AI::disableSorting = true; }},
+
 
 		{"-q", [](Options&, const string&, usz&, const string*){ console::quiet = true; }},
 		{"-nc", [](Options&, const string&, usz&, const string*){ Map::printColored = false; }},
@@ -161,6 +163,8 @@ int main(int argc, char* argv[])
 
 	println("Bryx - a ReversiXT implementation");
 	println("Mode: {}", mode2str(opts.mode));
+	if(AI::disableSorting)
+		println("Move sorting disabled!");
 	std::cout.flush();
 
 	Game game;

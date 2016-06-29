@@ -13,6 +13,8 @@ static Quality
 	infMin = std::numeric_limits<Quality>::min(),
 	infMax = std::numeric_limits<Quality>::max();
 
+bool AI::disableSorting = false;
+
 AI::AI(Game &game, Cell::Type color):
 	Player(game, color, "bryx"),
 	maxDepth(1), endTime(Duration::max()), asp{infMin, infMax}
@@ -307,19 +309,22 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 
 	// sorting
 	std::map<Quality, Move&> sortedMoves;
-	for(Move& m: posMoves)
+	std::vector<std::pair<const Quality, Move&> > moves;
+
+	if(disableSorting)
 	{
-		// TODO: better quality differenciation
-		auto h = evalMove(state, m);
-		sortedMoves.emplace(h, m);
-//		sortedMoves.emplace(evalMove(state, m), m);
+		for(Move& m: posMoves)
+			moves.emplace_back(evalMove(state, m), m);
+	}
+	else
+	{
+		for(Move& m: posMoves)
+			sortedMoves.emplace(evalMove(state, m), m);
 	}
 
 	u32 d = depth+1;
 
 	std::function<bool(const AIMove& q, Quality& a, AIMove& v, Quality& b)> prune;
-	std::vector<std::pair<const Quality, Move&> > moves;
-
 	AIMove best = { 0, { ply, nullptr }};
 
 
