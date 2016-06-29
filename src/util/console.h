@@ -87,3 +87,13 @@ void println()
 {
 	print("\n");
 }
+
+
+template <typename... Args>
+inline
+void println(console::Format f, const char *format, const Args & ... args)
+{
+	print("{}", f);
+	print(format, args...);
+	print("{}\n", console::color::RESET);
+}
