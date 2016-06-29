@@ -7,16 +7,15 @@
 #include <numeric>
 #include <map>
 
-#include <atomic>
-#include <thread>
-
-#include <pthread.h>
-
 #define VERBOSE 0
+
+static Quality
+	infMin = std::numeric_limits<Quality>::min(),
+	infMax = std::numeric_limits<Quality>::max();
 
 AI::AI(Game &game, Cell::Type color):
 	Player(game, color, "bryx"),
-	maxDepth(1), endTime(Duration::max())
+	maxDepth(1), endTime(Duration::max()), asp{infMin, infMax}
 {}
 
 AI::AI(const AI &other):
@@ -36,9 +35,7 @@ Player *AI::clone() const
 	return new AI(*this);
 }
 
-static Quality
-	infMin = std::numeric_limits<Quality>::min(),
-	infMax = std::numeric_limits<Quality>::max();
+
 
 
 Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
@@ -46,8 +43,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 	maxDepth = 1;
 	deepest = 0;
 	states = 0;
-
-	Quality a = infMin, b = infMax;
+	cutoffs = 0;
 
 	Move move{ *this, nullptr };
 
@@ -83,6 +79,9 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 
 
 	moveChain.clear();
+
+	Quality a = infMin, b = infMax;
+
 	auto reset = (game.currPlayer().color == color) ?
 				[](Quality& a, Quality& b) { a = infMin, b = infMax;}:
 				[](Quality& a, Quality& b) { a = infMax, b = infMin;};
@@ -98,35 +97,47 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 
 			do
 			{
-				print("\rDeepening: {: <4} :: States: {} ", maxDepth, states);
-				fflush(stdout);
-
 				start = Clock::now();
 
 				moveChain.clear();
 
-				reset(a,b);
-
-				bestState(game, posMoves, 0, a, b);
+				println("Deepening START: {:<2} :: a: {:<5} b: {:<5} ", maxDepth, a, b);
+				Quality v = bestState(game, posMoves, 0, a, b);
 				//AIMove am = moveChain.front();
 				//println("{} ({})", am.move, am.score);
 				//am.move.print();
 
 //				if(moveChain.size() < maxDepth-1)
+
+				end = Clock::now();
+
+				println("Deepening END: {:<2} States: {:<6} CO: {:<4} :: a: {:<5} v: {:<5} b: {:<5} ", maxDepth, states, cutoffs, a, v, b);
+				fflush(stdout);
+
 				if(deepest < maxDepth && deepest_pre == deepest)
 				{
 					println(":: End reached");
 					break;
 				}
 
+
+				if(v <= a && b <= v)
+				{
+					println(console::color::RED_LIGHT, "BROKEN: a: {:<5} v: {:<5} b: {:<5}", a, v, b);
+
+					reset(a, b);
+					reset(asp.a, asp.b);
+					continue;
+				}
+
+
+				a = v-(v-asp.a)/2;
+				b = v+(v+asp.b)/2;
+
 				deepest_pre = deepest;
 				++maxDepth;
-				end = Clock::now();
+
 			} while(end + (end - start) * 2 < endTime);
-
-			println();
-			println("\rDeepening: {: <4} :: States: {}", maxDepth, states);
-
 		}
 		else
 		{
@@ -286,7 +297,7 @@ inline bool isAfter(TimePoint endTime, Duration offset)
 }
 
 
-Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality a, Quality b)
+Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& a, Quality& b)
 {
 	Player& ply = state.currPlayer();
 
@@ -337,13 +348,12 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality a
 			if(prune({mp.first, mp.second}, a, best, b))
 				break;
 		}
-
-#if VERBOSE > 2
-		println(" MAX ({}) {} :: {}", d, best.score, best.move);
+#if VERBOSE > 1
+		println("LIMIT END :: D: {}  Q: {} :: a: {:<5} b: {:<5} ", d, best.score, a, b);
 #endif
-
 	} else
 	{
+		Quality nextA = a, nextB = b;
 		for(auto& mp: moves)
 		{
 			Move& m = mp.second;
@@ -360,22 +370,22 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality a
 			PossibleMoves nextPosMoves = next.move.player.possibleMoves();
 			if(nextPosMoves.empty())
 			{
-				next.score = mp.first + mp.first/5;
-				println("END :: D: {}  Q: {} :: {}", d, next.score, m);
+				next.score = mp.first + mp.first/3;
+				println("GAME END :: D: {}  Q: {}", d, next.score);
 			}
 			else if(isAfter(endTime, game.aiData.evalTime*moves.size()))
 			{
 				next.score = mp.first - mp.first/5;
-				println("NO TIME :: D: {}  Q: {} :: {}", d, next.score, m);
+				println("NO TIME :: D: {}  Q: {}", d, next.score);
 			}
 			else
 			{
 #if VERBOSE
 				println("DEEPER {} ==>", d);
-				next.score = bestState(state, nextPosMoves, d, a, b);
+				next.score = bestState(state, nextPosMoves, d, nextA, nextB);
 				println(" <== {} ({}) ", d, next.score);
 #else
-				next.score = bestState(state, nextPosMoves, d, a, b);
+				next.score = bestState(state, nextPosMoves, d, nextA, nextB);
 #endif
 			}
 
@@ -408,6 +418,7 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality a
 
 			if(prune({next.score, m}, a, best, b))
 			{
+				cutoffs++;
 				break;
 			}
 		}
@@ -417,6 +428,9 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality a
 	if(save != state.getMap().asString())
 		throw std::runtime_error("map corruption");
 #endif
+
+	asp.a = std::max(a, asp.a);
+	asp.b = std::min(b, asp.b);
 
 	moveChain.push_front(best);
 	return best.score;
