@@ -11,7 +11,7 @@
 
 Game::Game():
 	defaults{ 0, 0, 0, 0 }, stats { 0, 0, 0, {} },
-    aiData{ 0, 15, {}, false, 0 },
+	aiData{ 0, 15, {}, false, 0 },
 	phase(Phase::REVERSI),
 	map(nullptr),
 	currPly(0), moveless(0)
@@ -82,7 +82,7 @@ std::vector<Player*> Game::getPlayers() const
 
 usz Game::getMoveNum() const
 {
-    return moveLog.size();
+	return moveLog.size();
 }
 
 bool Game::hasEnded()
@@ -204,7 +204,6 @@ void Game::execute(Move &move)
 
 	MoveBackup backup { move, move.target->type, {} };
 
-	Cell::Type targetCell = move.target->type; // first make a complete move...
 	move.target->type = move.player.color;
 
 	for(Cell* c: move.captures)
@@ -217,52 +216,14 @@ void Game::execute(Move &move)
 		c->type = move.player.color;
 	}
 
-	switch(targetCell) // ...then look at special cases
-	{
-	case Cell::Type::BONUS:
-		move.target->staticValue -= BONUS_VALUE;
-		switch(move.bonus)
-		{
-		case Move::BOMB:
-			move.player.bombs++;
-			break;
-		case Move::OVERRIDE:
-			move.player.overrides++;
-			break;
-		default:
-			break;
-		}
-		break;
-	case Cell::Type::CHOICE:
-	{
-		move.target->staticValue -= CHOICE_VALUE;
-		if(move.player.color == move.choice)
-			break;
+	handleSpecial(backup);
 
-		for(Cell& c: getMap())
-		{
-			if(c.type == move.player.color)
-				c.type = move.choice;
-			else if(c.type == move.choice)
-				c.type = move.player.color;
-		}
-	}
-		break;
-	case Cell::Type::INVERSION:
-		for(Cell& c: getMap())
-		{
-			if(c.isPlayer())
-				c.type = ply2type((type2ply(c.type)+1) % players.size());
-		}
 
-		stats.inversions++;
-		break;
-	default:
-		break;
-	}
 #if SAFE_GUARDS
 	map->check();
 #endif
+
+	backup.move = move;
 
 	moveLog.push(backup);
 	stats.moves++;
@@ -277,49 +238,7 @@ void Game::undo()
 
 	prevPlayer();
 
-	switch(backup.targetType) // ...then look at special cases
-	{
-	case Cell::Type::BONUS:
-		move.target->staticValue += BONUS_VALUE;
-		switch(move.bonus)
-		{
-		case Move::BOMB:
-			move.player.bombs--;
-			break;
-		case Move::OVERRIDE:
-			move.player.overrides--;
-			break;
-		default:
-			break;
-		}
-		break;
-	case Cell::Type::CHOICE:
-	{
-		move.target->staticValue += CHOICE_VALUE;
-		if(move.player.color == move.choice)
-			break;
-
-		for(Cell& c: getMap())
-		{
-			if(c.type == move.player.color)
-				c.type = move.choice;
-			else if(c.type == move.choice)
-				c.type = move.player.color;
-		}
-	}
-		break;
-	case Cell::Type::INVERSION:
-		for(Cell& c: getMap())
-		{
-			if(c.isPlayer())
-				c.type = ply2type((type2ply(c.type)-1) % players.size());
-		}
-
-		stats.inversions--;
-		break;
-	default:
-		break;
-	}
+	handleSpecial(backup, true);
 
 	move.target->type = backup.targetType;
 	for(auto c : backup.captures)
@@ -337,6 +256,57 @@ void Game::undo()
 
 	stats.moves--;
 	moveLog.pop();
+}
+
+void Game::handleSpecial(MoveBackup& mb, bool undo)
+{
+	Move& move = mb.move;
+	i32 rev = undo ? -1 : 1;
+
+	switch(mb.targetType) // ...then look at special cases
+	{
+	case Cell::Type::BONUS:
+		move.target->staticValue += BONUS_VALUE*rev;
+		switch(move.bonus)
+		{
+		case Move::BOMB:
+			move.player.bombs += rev;
+			break;
+		case Move::OVERRIDE:
+			move.player.overrides += rev;
+			break;
+		default:
+			break;
+		}
+		break;
+	case Cell::Type::CHOICE:
+	{
+		move.target->staticValue += CHOICE_VALUE*rev;
+		if(move.player.color == move.choice)
+			break;
+
+		for(Cell& c: getMap())
+		{
+			if(c.type == move.player.color)
+				c.type = move.choice;
+			else if(c.type == move.choice)
+				c.type = move.player.color;
+		}
+	}
+		break;
+	case Cell::Type::INVERSION:
+		for(Cell& c: getMap())
+		{
+			if(c.isPlayer())
+				// "..size() + " needed or an underflow will happen
+				c.type = ply2type((players.size() + type2ply(c.type)+rev) % players.size());
+		}
+
+		stats.inversions += rev;
+		break;
+	default:
+		break;
+	}
 }
 
 Move& Game::getLastMove()
@@ -367,13 +337,13 @@ void Game::load(std::istream& file)
 
 	aiData.bombValue = (((defaults.bombsStrength * 2 + 1) * (defaults.bombsStrength * 2 + 1))
 						/ (map->width * map->height)) * 100;
-    for(Cell &c: *map){
-        if(c.type == Cell::Type::VOID)
-            continue;
+	for(Cell &c: *map){
+		if(c.type == Cell::Type::VOID)
+			continue;
 
-        aiData.amountMoves++;
-    }
-    aiData.amountMoves += defaults.players * defaults.overrides;
+		aiData.amountMoves++;
+	}
+	aiData.amountMoves += defaults.players * defaults.overrides;
 
 	// Make some meassurements
 	AI tester(*this, Cell::Type::P1);

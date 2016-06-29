@@ -140,7 +140,13 @@ void Player::evaluate(Move& move) const
 	}
 
 	for(Cell* c: move.captures)
+	{
+#if SAFE_GUARDS
+		if(c->type == move.player.color)
+			throw std::runtime_error("invalid player capture");
+#endif
 		c->helpValue--;
+	}
 
 //	move.captures.sort();
 //	move.captures.unique();

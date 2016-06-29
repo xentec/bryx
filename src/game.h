@@ -34,8 +34,8 @@ struct Game
 		u32 bombValue;
 		u32 expectedOverriteValue;
 		Duration evalTime;
-        bool gameNearEnd;
-        u32 amountMoves;
+		bool gameNearEnd;
+		u32 amountMoves;
 	} aiData;
 
 	enum class Phase
@@ -66,7 +66,7 @@ struct Game
 
 	Move& getLastMove();
 
-    usz getMoveNum() const;
+	usz getMoveNum() const;
 
 protected:
 	Player& nextPlayer();
@@ -85,6 +85,8 @@ protected:
 		Cell::Type targetType;
 		std::deque<std::pair<vec, Cell::Type> > captures;
 	};
+
+	void handleSpecial(MoveBackup& mb, bool undo = false);
 
 	std::stack<MoveBackup> moveLog;
 	std::stack<MoveBackup> bombLog;
