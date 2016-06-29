@@ -82,6 +82,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 	}
 
 
+	moveChain.clear();
 	auto reset = (game.currPlayer().color == color) ?
 				[](Quality& a, Quality& b) { a = infMin, b = infMax;}:
 				[](Quality& a, Quality& b) { a = infMax, b = infMin;};
@@ -97,8 +98,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 
 			do
 			{
-				println();
-				print("\rDeepening: {: <4} :: States: {}", maxDepth, states);
+				print("\rDeepening: {: <4} :: States: {} ", maxDepth, states);
 				fflush(stdout);
 
 				start = Clock::now();
@@ -115,8 +115,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 //				if(moveChain.size() < maxDepth-1)
 				if(deepest < maxDepth && deepest_pre == deepest)
 				{
-					println();
-					println("End reached");
+					println(":: End reached");
 					break;
 				}
 
@@ -126,6 +125,8 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 			} while(end + (end - start) * 2 < endTime);
 
 			println();
+			println("\rDeepening: {: <4} :: States: {}", maxDepth, states);
+
 		}
 		else
 		{
@@ -181,8 +182,6 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 //			movePlan.push_back(am);
 
 		move = moveChain.front().move;
-
-		moveChain.clear();
 
 		println("##################################\n");
 	}
@@ -355,17 +354,19 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality a
 			println();
 #endif
 
-			handleSpecials(m);
 			state.execute(m);
 
 			AIMove next = { 0, { state.currPlayer(), nullptr }};
 			PossibleMoves nextPosMoves = next.move.player.possibleMoves();
-			if(nextPosMoves.empty() || isAfter(endTime, game.aiData.evalTime*moves.size()))
+			if(nextPosMoves.empty())
 			{
-#if VERBOSE
-				println(" END ({}) {} :: {}", d, mp.first, m);
-#endif
-				next.score = mp.first * 10;
+				next.score = mp.first + mp.first/5;
+				println("END :: D: {}  Q: {} :: {}", d, next.score, m);
+			}
+			else if(isAfter(endTime, game.aiData.evalTime*moves.size()))
+			{
+				next.score = mp.first - mp.first/5;
+				println("NO TIME :: D: {}  Q: {} :: {}", d, next.score, m);
 			}
 			else
 			{
@@ -465,21 +466,21 @@ bool AI::playerMoved(Move& real)
 	} else
 		movePlan.clear();
 
-    if(game.aiData.gameNearEnd == false){
-        if((game.aiData.amountMoves / 10) > (game.aiData.amountMoves - game.getMoveNum())){
-            for(Cell &c: game.getMap()){
-                if(c.type == Cell::Type::VOID)
-                    continue;
+	if(game.aiData.gameNearEnd == false){
+		if((game.aiData.amountMoves / 10) > (game.aiData.amountMoves - game.getMoveNum())){
+			for(Cell &c: game.getMap()){
+				if(c.type == Cell::Type::VOID)
+					continue;
 
-                c.staticValue = 1;
-                if(c.type == Cell::Type::BONUS)
-                    c.staticValue += BONUS_VALUE;
-                else if(c.type == Cell::Type::CHOICE)
-                    c.staticValue += CHOICE_VALUE;
-            }
-            game.aiData.gameNearEnd = true;
-        }
-    }
+				c.staticValue = 1;
+				if(c.type == Cell::Type::BONUS)
+					c.staticValue += BONUS_VALUE;
+				else if(c.type == Cell::Type::CHOICE)
+					c.staticValue += CHOICE_VALUE;
+			}
+			game.aiData.gameNearEnd = true;
+		}
+	}
 
 	return anticipated;
 }
@@ -554,38 +555,42 @@ Quality AI::evalState(Game &state) const
 
 	Player& futureMe = *state.getPlayers()[type2ply(color)];
 
-//	h *= 10;
+	h *= 10;
 
 	h += futureMe.overrides * game.aiData.expectedOverriteValue;
 	h += futureMe.bombs * game.aiData.bombValue;
-
-
-	usz enemies = 0;
-	for(Player* ply: state.getPlayers())
-	{
-		if(!ply || ply->color == color)
-			continue;
-
-		enemies++;
-	}
-
 
 	return h;
 }
 
 Quality AI::evalMove(Game &state, Move &move)
 {
-	states++;
 
+#if SAFE_GUARDS
+	string save = game.getMap().asString();
+#endif
+
+	states++;
 	handleSpecials(move);
+
+	Player& futureMe = *state.getPlayers()[type2ply(color)];
+	Quality h = 0;
+
 	state.execute(move);
 
-	Quality h = evalState(state);
+	h += evalState(state);
+	h += futureMe.possibleMoves().size() / 3;
 
 	if(move.override)
-		h /= 2;
+		h *= 2, h /= 3;
 
 	state.undo();
+
+
+#if SAFE_GUARDS
+	if(save != game.getMap().asString())
+		throw std::runtime_error("map corruption");
+#endif
 
 	return h;
 }
