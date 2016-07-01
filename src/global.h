@@ -5,7 +5,7 @@
 #define DEBUG 0
 #define YIMB_GROUP 01
 
-#define SAFE_GUARDS 1 //
+#define SAFE_GUARDS 0 //
 
 // #######
 
