@@ -93,7 +93,7 @@ std::vector<Cell*> Map::getQuad(vec centre, i32 radius)
 
 		for(Cell::Transition& tr : c)
 		{
-			if(tr.to == nullptr || tr.to->helpValue || !inBox(tr.to->pos, start, end))
+			if(tr.to == nullptr || tr.to->helpValue)
 				continue;
 
 			if(tr.to && tr.to != c.getDirectNeighbor(tr.exit))
@@ -105,7 +105,7 @@ std::vector<Cell*> Map::getQuad(vec centre, i32 radius)
 					auto sub = getQuad(tr.to->pos, r);
 					quad.insert(quad.end(), sub.begin(), sub.end());
 				}
-			} else
+			} else if(inBox(tr.to->pos, start, end))
 			{
 				q.push(tr.to);
 			}
