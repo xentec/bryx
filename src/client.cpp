@@ -139,18 +139,15 @@ void Client::play()
 					{
 						if(packet.extra == Move::Bonus::BOMB || packet.extra == Move::Bonus::OVERRIDE)
 						{
-							 move.bonus = static_cast<Move::Bonus>(packet.extra);
+							move.bonus = static_cast<Move::Bonus>(packet.extra);
 						} else
 							move.choice = ply2type(packet.extra-1);
 					}
 
-					bool exp = me->playerMoved(move);
+					me->playerMoved(move);
 
 					if(ply.color != me->color)
-					{
 						move.print();
-						println("{}", exp ? "ANTICIPATED" : "SURPRISED!");
-					}
 				}
 
 				game.execute(move);

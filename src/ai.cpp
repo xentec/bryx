@@ -466,28 +466,35 @@ void AI::handleSpecials(Move& move) const
 	}
 }
 
-bool AI::playerMoved(Move& real)
+void AI::playerMoved(Move& real)
 {
-	if(movePlan.empty())
-		return false;
-
-	Move& pred = movePlan.front().move;
-
-	bool anticipated =
-			   pred.target->pos == real.target->pos
-			&& pred.bonus == real.bonus
-			&& pred.choice == real.choice;
-
-	if(anticipated)
+	if(!movePlan.empty())
 	{
-		movePlan.pop_front();
-		println("moveplan: {}", movePlan.size());
-	} else
-		movePlan.clear();
+		Move& pred = movePlan.front().move;
 
-	if(game.aiData.gameNearEnd == false){
-		if((game.aiData.amountMoves / 10) > (game.aiData.amountMoves - game.getMoveNum())){
-			for(Cell &c: game.getMap()){
+		bool anticipated =
+				   pred.target->pos == real.target->pos
+				&& pred.bonus == real.bonus
+				&& pred.choice == real.choice;
+
+		if(anticipated)
+		{
+			println("ANTICIPATED");
+			movePlan.pop_front();
+			println("moveplan: {}", movePlan.size());
+		} else
+		{
+			movePlan.clear();
+			println("SURPRISED!");
+		}
+	}
+
+	if(game.aiData.gameNearEnd == false)
+	{
+		if((game.aiData.amountMoves / 10) > (game.aiData.amountMoves - game.getMoveNum()))
+		{
+			for(Cell &c: game.getMap())
+			{
 				if(c.type == Cell::Type::VOID)
 					continue;
 
@@ -500,8 +507,6 @@ bool AI::playerMoved(Move& real)
 			game.aiData.gameNearEnd = true;
 		}
 	}
-
-	return anticipated;
 }
 
 

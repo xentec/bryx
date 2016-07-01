@@ -31,7 +31,7 @@ struct AI : Player
 
 	void handleSpecials(Move& move) const;
 
-	bool playerMoved(Move& move);
+	void playerMoved(Move& move);
 private:
 	u32 maxDepth;
 	TimePoint endTime;
