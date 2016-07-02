@@ -128,6 +128,7 @@ void Game::run()
 			{
 				println("No moves");
 				moveless++;
+				nextPlayer();
 				continue;
 			}
 
@@ -163,6 +164,7 @@ void Game::run()
 			if(ply.bombs == 0)
 			{
 				moveless++;
+				nextPlayer();
 				continue;
 			}
 
