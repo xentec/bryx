@@ -1,13 +1,9 @@
-#export CC=clang
-#export CXX=clang++
-
 MODE=Release
 
 all: checkout create build copy
 
 checkout:
 	git submodule update --init
-	git checkout working
 
 create:
 	mkdir -p build
@@ -25,5 +21,3 @@ copy:
 .PHONY: clean
 clean:
 	rm -rf bin
-	git reset --hard master
-	git checkout master
