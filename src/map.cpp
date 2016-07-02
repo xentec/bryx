@@ -96,10 +96,10 @@ std::vector<Cell*> Map::getQuad(vec centre, i32 radius)
 			if(tr.to == nullptr || tr.to->helpValue)
 				continue;
 
-			if(tr.to && tr.to != c.getDirectNeighbor(tr.exit))
+			if(tr.to != c.getDirectNeighbor(tr.exit))
 			{
 				vec v = c.pos-centre;
-				i32 r = radius-1-std::max(v.x, v.y);
+				i32 r = radius-1-std::max(std::abs(v.x), std::abs(v.y));
 				if(r >= 0)
 				{
 					auto sub = getQuad(tr.to->pos, r);
