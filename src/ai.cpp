@@ -246,8 +246,6 @@ Move AI::bomb(u32 time)
 		{
 			bestScore = score;
 			best = &c;
-			if(bestScore == damage.size()*BOMB_ENEMY_VALUE)
-				break;
 		}
 	}
 
