@@ -381,6 +381,8 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 			{
 				next.score = mp.first - mp.first/5;
 				println("NO TIME :: D: {}  Q: {}", d, next.score);
+				prune({next.score, m}, a, best, b);
+				break;
 			}
 			else
 			{
