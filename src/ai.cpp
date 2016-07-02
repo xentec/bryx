@@ -50,7 +50,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 
 	Move move{ *this, nullptr };
 
-#if SAFE_GUARDS
+#if SAFE_GUARDS > 2
 	string save = game.getMap().asString();
 #endif
 
@@ -153,7 +153,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 	for(usz i = 0; i < movePlan.size(); ++i)
 		game.undo();
 
-#if SAFE_GUARDS
+#if SAFE_GUARDS > 2
 		if(save != game.getMap().asString())
 			throw std::runtime_error("map corruption");
 #endif
@@ -203,9 +203,10 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 #if SAFE_GUARDS
 	if(move.player.color != color)
 		throw std::runtime_error("player color shifter");
-
+#if SAFE_GUARDS > 2
 	if(save != game.getMap().asString())
 		throw std::runtime_error("map corruption");
+#endif
 #endif
 
 	handleSpecials(move);
@@ -303,7 +304,7 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 {
 	Player& ply = state.currPlayer();
 
-#if SAFE_GUARDS
+#if SAFE_GUARDS > 2
 	string save = state.getMap().asString();
 #endif
 
@@ -398,7 +399,7 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 #endif
 			}
 
-#if SAFE_GUARDS
+#if SAFE_GUARDS > 1
 			if(state.getLastMove() != m)
 				throw std::runtime_error("move stack corruption");
 #endif
@@ -411,7 +412,7 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 			println();
 #endif
 
-#if SAFE_GUARDS
+#if SAFE_GUARDS > 2
 			if(save != state.getMap().asString())
 			{
 				println(" MAP CORRUPTION ");
@@ -433,7 +434,7 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 		}
 	}
 
-#if SAFE_GUARDS
+#if SAFE_GUARDS > 2
 	if(save != state.getMap().asString())
 		throw std::runtime_error("map corruption");
 #endif
@@ -594,7 +595,7 @@ Quality AI::evalState(Game &state) const
 Quality AI::evalMove(Game &state, Move &move)
 {
 
-#if SAFE_GUARDS
+#if SAFE_GUARDS > 2
 	string save = game.getMap().asString();
 #endif
 
@@ -615,7 +616,7 @@ Quality AI::evalMove(Game &state, Move &move)
 	state.undo();
 
 
-#if SAFE_GUARDS
+#if SAFE_GUARDS > 2
 	if(save != game.getMap().asString())
 		throw std::runtime_error("map corruption");
 #endif

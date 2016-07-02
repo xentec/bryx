@@ -193,7 +193,9 @@ void Game::run()
 void Game::execute(Move &move)
 {
 #if SAFE_GUARDS
+#if SAFE_GUARDS > 2
 	map->check();
+#endif
 
 	if(move.player != currPlayer())
 		throw std::runtime_error("wrong player turn");
@@ -252,7 +254,7 @@ void Game::execute(Move &move)
 
 	}
 
-#if SAFE_GUARDS
+#if SAFE_GUARDS > 2
 	map->check();
 #endif
 
@@ -283,7 +285,7 @@ void Game::undo()
 		stats.overrides--;
 	}
 
-#if SAFE_GUARDS
+#if SAFE_GUARDS > 2
 	map->check();
 #endif
 
