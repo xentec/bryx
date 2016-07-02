@@ -30,8 +30,8 @@ struct Map
 
 	string asString(bool transistions = true) const;
 
-	void print(bool colored = true, bool ansi = true) const;
-	void print(std::unordered_map<vec, console::Format> highlight, bool colored = true, bool ansi = true) const;
+	void print() const;
+	void print(std::unordered_map<vec, console::Format> highlight) const;
 
 	void check() const;
 
@@ -45,7 +45,6 @@ private:
 	std::vector<Cell> data;
 
 public:
-	static bool printColored;
 	static bool printAnsi;
 
 	template<class T, class M>

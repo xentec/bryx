@@ -7,6 +7,7 @@ namespace console
 {
 
 extern bool quiet;
+extern bool colorfull;
 
 struct Format
 {
@@ -39,6 +40,7 @@ struct Format
 	{
 		return os << format.asString();
 	}
+
 };
 
 namespace color

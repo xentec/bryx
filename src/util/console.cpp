@@ -9,6 +9,11 @@
 
 bool console::quiet = false;
 
+#ifdef _WIN32
+bool console::colorfull = false;
+#else
+bool console::colorfull = true;
+#endif
 
 using namespace console;
 
@@ -19,6 +24,9 @@ Format::Format(Color fg, Attribute attr):
 string Format::asString() const
 {
 	fmt::MemoryWriter w;
+
+	if(!colorfull)
+		return w.str();
 
 #ifdef _WIN32
 	static HANDLE hCon = GetStdHandle(STD_OUTPUT_HANDLE);

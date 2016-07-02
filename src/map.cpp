@@ -12,10 +12,8 @@
 #define HARD_CORNERS 0
 
 #ifdef _WIN32
-bool Map::printColored = false;
 bool Map::printAnsi = false;
 #else
-bool Map::printColored = true;
 bool Map::printAnsi = true;
 #endif
 
@@ -133,55 +131,63 @@ string Map::asString(bool transistions) const
 	return str.str();
 }
 
-void Map::print(bool colored, bool ansi) const
+void Map::print() const
 {
-	print(std::unordered_map<vec, console::Format>(), colored, ansi);
+	print(std::unordered_map<vec, console::Format>());
 }
 
-
-// TODO: color und ansi flags
-void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored, bool ansi) const
+void Map::print(std::unordered_map<vec, console::Format> highlight) const
 {
 	using namespace console;
 	if(quiet)
 		return;
 
-	string space = ansi ? "": " ";
 
-	fmt::print("   ");
-	for (usz x = 0; x < width; x++)
+	// x axis
+	string space = printAnsi ? "": " ";
+	fmt::print("{:3}"," ");
+	if(printAnsi)
 	{
-		if(x%5 == 0)
-			fmt::print("{:-<2}", x++);
-		else
-			fmt::print("-{}", space);
+		for (usz x = 0; x < width; x++)
+		{
+			if(x%5 == 0)
+				fmt::print("{:-<2}", x++);
+			else
+				fmt::print("-");
+		}
+	} else
+	{
+		for (usz x = 0; x < width; x++)
+		{
+			if(x%5 == 0)
+				fmt::print("{:<2}", x);
+			else
+				fmt::print("- ");
+		}
 	}
-
 	fmt::print("\n");
 
 
 	for (u32 y = 0; y < height; y++)
 	{
+		// y axis
 		if(y%5 == 0)
 			fmt::print("{:2} ", y);
 		else
 			fmt::print(" | ");
 
-		Format color;
-
+		// map v-line
 		for (u32 x = 0; x < width; x++)
 		{
 			const Cell& c = at(x, y);
 			string ch = c.asString();
 
-			if(colored && printColored)
-				color = c.getFormat();
+			Format color = c.getFormat();
 
-			if(ansi && printAnsi)
+			if(printAnsi)
 			{
 				switch (c.type)
 				{
-
 				case Cell::Type::EMPTY:     ch = "."; break;
 				case Cell::Type::VOID:      ch = "█"; break;
 
@@ -191,7 +197,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool colored
 			}
 
 			const auto& hl = highlight.find(c.pos);
-			if(colored && printColored && hl != highlight.cend())
+			if(hl != highlight.cend())
 				color = hl->second;
 
 			fmt::print("{}{}{}{}", color, ch, color::RESET, space);

@@ -77,7 +77,7 @@ void parseArgs(Options& opts, usz argc, char* argv[])
 
 
 		{"-q", [](Options&, const string&, usz&, const string*){ console::quiet = true; }},
-		{"-nc", [](Options&, const string&, usz&, const string*){ Map::printColored = false; }},
+		{"-nc", [](Options&, const string&, usz&, const string*){ console::colorfull = false; }},
 		{"-na", [](Options&, const string&, usz&, const string*){ Map::printAnsi = false; }},
 	};
 
@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
 {
 	Options opts;
 
-	Map::printColored = isatty(STDOUT_FILENO);
+	console::colorfull = isatty(STDOUT_FILENO);
 
 	try {
 		if(argc == 1)
