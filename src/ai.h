@@ -36,6 +36,8 @@ private:
 	u32 maxDepth;
 	TimePoint endTime;
 
+	bool stopSearch;
+
 	u32 states;
 	u32 deepest;
 
