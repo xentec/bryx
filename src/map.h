@@ -26,7 +26,7 @@ struct Map
 	Cell& at(const vec& pos);
 	const Cell& at(const vec& pos) const;
 
-	std::vector<Cell*> getQuad(vec centre, i32 radius);
+	std::deque<Cell*> getQuad(vec centre, i32 radius);
 
 	string asString(bool transistions = true) const;
 

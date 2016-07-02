@@ -224,7 +224,7 @@ Move AI::bomb(u32 time)
 		if(c.type == Cell::Type::VOID)
 			continue;
 
-		std::vector<Cell*> damage = game.getMap().getQuad(c.pos, game.defaults.bombsStrength);
+		std::deque<Cell*> damage = game.getMap().getQuad(c.pos, game.defaults.bombsStrength);
 		Quality score = 0;
 
 		for(Cell* cp: damage)

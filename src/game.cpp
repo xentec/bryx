@@ -180,7 +180,7 @@ void Game::execute(Move &move)
 		if(move.target->type == Cell::Type::VOID)
 			throw std::runtime_error("bombing void cell");
 #endif
-		std::vector<Cell*> field = map->getQuad(move.target->pos, defaults.bombsStrength);
+		std::deque<Cell*> field = map->getQuad(move.target->pos, defaults.bombsStrength);
 		for(Cell* c: field)
 			c->clear();
 

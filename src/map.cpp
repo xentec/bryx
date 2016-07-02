@@ -70,56 +70,47 @@ const Cell& Map::at(const vec &pos) const
 }
 
 
-std::vector<Cell*> Map::getQuad(vec centre, i32 radius)
+std::deque<Cell*> Map::getQuad(vec centre, i32 radius)
 {
-	std::vector<Cell*> quad;
-	std::queue<Cell*> q;
+	struct Dist
+	{
+		Cell *c;
+		i32 r;
+	};
 
-	quad.reserve((radius*radius + radius)*4+1);
+	std::queue<Dist> q;
+	std::deque<Cell*> quad;
 
 	Cell& z = at(centre);
-	q.push(&z);
+	q.push({ &z, radius });
 	z.helpValue++;
-
-	vec start = centre - vec(radius),
-		end = centre + vec(radius);
 
 	while(!q.empty())
 	{
-		Cell &c = *q.front();
+		Dist &dst = q.front();
 		q.pop();
 
-		quad.push_back(&c);
+		quad.push_back(dst.c);
 
-		for(Cell::Transition& tr : c)
+		if(dst.r == 0)
+			continue;
+
+		for(Cell::Transition& tr : *dst.c)
 		{
 			if(tr.to == nullptr || tr.to->helpValue)
 				continue;
 
-			if(tr.to != c.getDirectNeighbor(tr.exit))
-			{
-				vec v = c.pos-centre;
-				i32 r = radius-1-std::max(std::abs(v.x), std::abs(v.y));
-				if(r >= 0)
-				{
-					auto sub = getQuad(tr.to->pos, r);
-					quad.insert(quad.end(), sub.begin(), sub.end());
-				}
-			} else if(inBox(tr.to->pos, start, end))
-			{
-				q.push(tr.to);
-				tr.to->helpValue++;
-			}
+			q.push({ tr.to, dst.r-1 });
+			tr.to->helpValue++;
 		}
 	}
 
 	for(Cell* c: quad)
 		c->helpValue--;
 
-#if SAFE_GUARDS
+#if SAFE_GUARDS > 2
 	check();
 #endif
-	quad.shrink_to_fit();
 
 	return quad;
 }
