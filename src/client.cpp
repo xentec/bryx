@@ -124,6 +124,8 @@ void Client::play()
 			{
 				auto packet = recv<packet::Move>();
 
+				println("MOVE: {} -> {} ex: {}", packet.player, packet.pos(), packet.extra);
+
 				game.currPly = packet.player - 1;
 				Player& ply = game.currPlayer();
 
@@ -163,12 +165,17 @@ void Client::play()
 		{
 			auto packet = recv<packet::Disq>();
 
+			println("DISQ: {}", packet.player);
+
 			auto dp = game.getPlayers().begin() + packet.player - 1;
 			if(*dp == me) // NOOOOOOOOOOOO!!!!!111111
 			{
 				println("It was nice while it lasted... ;_;");
 				return;
 			}
+
+			println("Player {} is gone.", **dp);
+
 			delete *dp;
 			*dp = nullptr;
 		}

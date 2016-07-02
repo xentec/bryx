@@ -12,7 +12,7 @@ bool console::quiet = false;
 
 using namespace console;
 
-Format::Format(Color fg, Format::Attribute attr):
+Format::Format(Color fg, Attribute attr):
 	attr(attr), fg(fg), bg(RESET)
 {}
 
