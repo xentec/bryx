@@ -79,6 +79,7 @@ std::vector<Cell*> Map::getQuad(vec centre, i32 radius)
 
 	Cell& z = at(centre);
 	q.push(&z);
+	z.helpValue++;
 
 	vec start = centre - vec(radius),
 		end = centre + vec(radius);
@@ -88,7 +89,6 @@ std::vector<Cell*> Map::getQuad(vec centre, i32 radius)
 		Cell &c = *q.front();
 		q.pop();
 
-		c.helpValue++;
 		quad.push_back(&c);
 
 		for(Cell::Transition& tr : c)
@@ -108,6 +108,7 @@ std::vector<Cell*> Map::getQuad(vec centre, i32 radius)
 			} else if(inBox(tr.to->pos, start, end))
 			{
 				q.push(tr.to);
+				tr.to->helpValue++;
 			}
 		}
 	}
