@@ -216,7 +216,7 @@ Move AI::bomb(u32 time)
 {
 #define BOMB_ENEMY_VALUE 2
 
-	Cell* best = nullptr;
+	Move best{ *this, nullptr };
 	Quality bestScore = infMin;
 
 	for(Cell& c: game.getMap())
@@ -245,11 +245,12 @@ Move AI::bomb(u32 time)
 		if(score >= bestScore)
 		{
 			bestScore = score;
-			best = &c;
+			best.target = &c;
+			best.captures = damage;
 		}
 	}
 
-	return { *this, best };
+	return best;
 }
 
 

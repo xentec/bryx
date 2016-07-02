@@ -143,12 +143,15 @@ void Client::play()
 						} else
 							move.choice = ply2type(packet.extra-1);
 					}
-
 					me->playerMoved(move);
-
-					if(ply.color != me->color)
-						move.print();
 				}
+				else
+				{
+					move.captures = game.getMap().getQuad(move.target->pos, game.defaults.bombsStrength);
+				}
+
+				if(ply.color != me->color)
+					move.print();
 
 				game.execute(move);
 				game.getMap().print();
