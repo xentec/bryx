@@ -22,6 +22,8 @@ Game::Game(const Game &other):
 	map(nullptr),
 	currPly(other.currPly), moveless(other.moveless)
 {
+	throw std::runtime_error("game copy");
+
 	if(other.map)
 		map = new Map(*other.map);
 
@@ -330,7 +332,7 @@ void Game::handleSpecial(MoveBackup& mb, bool undo)
 		{
 			if(c.isPlayer())
 				// "..size() + " needed or an underflow will happen
-				c.type = ply2type((players.size() + type2ply(c.type)+rev) % players.size());
+				c.type = ply2type((defaults.players + type2ply(c.type)+rev) % defaults.players);
 		}
 
 		stats.inversions += rev;

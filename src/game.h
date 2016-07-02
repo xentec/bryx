@@ -50,7 +50,7 @@ struct Game
 	void load(std::istream& file);
 
 	template<class P>
-	Player& addPlayer();
+	P& addPlayer();
 
 	Player& currPlayer() const;
 
@@ -99,14 +99,14 @@ protected:
 #include "player.h"
 
 template<class P>
-Player& Game::addPlayer()
+P& Game::addPlayer()
 {
 	if(players.size() == defaults.players)
 		throw std::runtime_error("game is full");
 
-	Player* player = new P(*this, ply2type(players.size()));
+	P* player = new P(*this, ply2type(players.size()));
 	player->bombs = defaults.bombs;
 	player->overrides = defaults.overrides;
 	players.push_back(player);
-	return *players.back();
+	return *player;
 }
