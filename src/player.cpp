@@ -54,9 +54,9 @@ Player::~Player()
 
 }
 
-std::list<Cell*> Player::stones()
+std::deque<Cell*> Player::stones()
 {
-	std::list<Cell*> s;
+	std::deque<Cell*> s;
 	for(Cell& c: game.getMap())
 		if(c.type == color)
 			s.push_back(&c);
@@ -107,7 +107,7 @@ void Player::evaluate(Move& move) const
 		if(dir.entry == banned)
 			continue;
 
-		std::list<Cell*> line;
+		std::deque<Cell*> line;
 		const Cell::Transition* trn = &dir;
 
 		while(trn->to && trn->to->isCaptureable())
@@ -115,7 +115,10 @@ void Player::evaluate(Move& move) const
 			if(trn->to->type == move.player.color)
 			{
 				if(!line.empty())
-					move.captures.merge(line);
+				{
+					move.captures.insert(move.captures.end(), line.begin(), line.end());
+					line.clear();
+				}
 
 				break;
 			}

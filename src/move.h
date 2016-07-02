@@ -4,7 +4,7 @@
 
 #include "cell.h"
 
-#include <list>
+#include <deque>
 #include <vector>
 
 struct Cell;
@@ -46,7 +46,7 @@ struct Move
 	Cell::Type choice;
 
 	Error err;
-	std::list<Cell*> captures;
+	std::deque<Cell*> captures;
 
 	friend std::ostream& operator<<(std::ostream &os, const Move &object)
 	{
