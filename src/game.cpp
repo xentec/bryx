@@ -115,51 +115,75 @@ void Game::run()
 		println("Bombs: {}", ply.bombs);
 		println();
 
+		Move move = { ply, nullptr };
+
+		if(phase == Phase::REVERSI)
+		{
 #if MOVES_ITERATOR
-		std::deque<Move> moves = ply.possibleMoves().all();
+			std::deque<Move> moves = ply.possibleMoves().all();
 #else
-		std::deque<Move> moves = ply.possibleMoves();
+			std::deque<Move> moves = ply.possibleMoves();
 #endif
-		if(moves.empty())
-		{
-			println("No moves");
-			moveless++;
-			continue;
-		}
+			if(moves.empty())
+			{
+				println("No moves");
+				moveless++;
+				continue;
+			}
 
-		{
-			u32 ovr = 0, num = moves.size();
-			for(Move& m: moves)
-				if(m.override)
-					ovr++;
+			{
+				u32 ovr = 0, num = moves.size();
+				for(Move& m: moves)
+					if(m.override)
+						ovr++;
 
-			println("Moves: {} ({})", num-ovr, num);
-			println();
+				println("Moves: {} ({})", num-ovr, num);
+				println();
 
 #if 0
-			for(Move m: moves)
-			{
-				m.print();
-				println();
-			}
+				for(Move m: moves)
+				{
+					m.print();
+					println();
+				}
 #endif
+			}
+
+			start = Clock::now();
+			move = ply.move(moves,0,2);
+			end = Clock::now();
+
+			elapsed = end-start;
+			if(elapsed > stats.time.moveMax)
+				stats.time.moveMax = elapsed;
+
+			stats.time.moveAvg += elapsed/(num*(num+1));
+			num++;
+		} else {
+			if(ply.bombs == 0)
+			{
+				moveless++;
+				continue;
+			}
+
+			move = ply.bomb(0);
 		}
-
-		start = Clock::now();
-		Move move = ply.move(moves,0,5);
-		end = Clock::now();
-
-		elapsed = end-start;
-		if(elapsed > stats.time.moveMax)
-			stats.time.moveMax = elapsed;
-
-		stats.time.moveAvg += elapsed/(num*(num+1));
-		num++;
 
 		move.print();
 		execute(move);
 	}
 	while(!hasEnded());
+
+	if(phase == Phase::REVERSI)
+	{
+		println();
+		println("BOMB phase has begun!");
+		println();
+
+		phase = Phase::BOMB;
+		moveless = 0;
+		run();
+	}
 }
 
 void Game::execute(Move &move)
@@ -174,6 +198,8 @@ void Game::execute(Move &move)
 		throw std::runtime_error("null target");
 #endif
 
+	MoveBackup backup { move, move.target->type, {} };
+
 	if(phase == Phase::BOMB)
 	{
 #if SAFE_GUARDS
@@ -184,40 +210,41 @@ void Game::execute(Move &move)
 		for(Cell* c: field)
 			c->clear();
 
-		return;
-	}
-
-#if SAFE_GUARDS
-	if(move.target->type == Cell::Type::VOID)
-		throw std::runtime_error("wrong target");
-#endif
-
-	if(move.override)
+		move.player.bombs--;
+	} else
 	{
+
 #if SAFE_GUARDS
-		if(move.player.overrides == 0)
-			throw std::runtime_error("no overrides left");
+		if(move.target->type == Cell::Type::VOID)
+			throw std::runtime_error("wrong target");
 #endif
-		move.player.overrides--;
-		stats.overrides++;
-	}
 
-	MoveBackup backup { move, move.target->type, {} };
-
-	move.target->type = move.player.color;
-
-	for(Cell* c: move.captures)
-	{
+		if(move.override)
+		{
 #if SAFE_GUARDS
-		if(c->type == move.player.color)
-			throw std::runtime_error("invalid player capture");
+			if(move.player.overrides == 0)
+				throw std::runtime_error("no overrides left");
 #endif
-		backup.captures.emplace_back(c->pos, c->type);
-		c->type = move.player.color;
+			move.player.overrides--;
+			stats.overrides++;
+		}
+
+
+		move.target->type = move.player.color;
+
+		for(Cell* c: move.captures)
+		{
+#if SAFE_GUARDS
+			if(c->type == move.player.color)
+				throw std::runtime_error("invalid player capture");
+#endif
+			backup.captures.emplace_back(c->pos, c->type);
+			c->type = move.player.color;
+		}
+
+		handleSpecial(backup);
+
 	}
-
-	handleSpecial(backup);
-
 
 #if SAFE_GUARDS
 	map->check();
