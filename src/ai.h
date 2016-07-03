@@ -38,15 +38,16 @@ private:
 
 	bool stopSearch;
 
-	u32 states;
-	u32 deepest;
-	u32 gameEnds;
+	struct {
+		u32 states;
+		u32 deepest;
+		u32 cutoffs;
+		u32 gameEnds;
+	} stats;
 
 	struct {
 		Quality a, b;
 	} asp;
-
-	u32 cutoffs;
 
 	std::deque<AIMove> moveChain;
 	std::deque<AIMove> movePlan;

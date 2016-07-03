@@ -41,10 +41,8 @@ Player *AI::clone() const
 Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 {
 	maxDepth = 1;
-	deepest = 0;
-	states = 0;
-	cutoffs = 0;
-	stopSearch = false;
+	stats = {};
+
 
 	Move move{ *this, nullptr };
 
@@ -95,8 +93,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 			{
 				start = Clock::now();
 
-				cutoffs = 0;
-				gameEnds = 0;
+				stats.cutoffs = stats.gameEnds = 0;
 				moveChain.clear();
 
 				println("Deepening START: {:<2}", maxDepth);
@@ -112,12 +109,12 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 				end = Clock::now();
 
 				println("Deepening END: {:<2}", maxDepth);
-				println("  States: {}, Cutoffs: {}, GameEnds: {}", states, cutoffs, gameEnds);
+				println("  States: {}, Cutoffs: {}, GameEnds: {}", stats.states, stats.cutoffs, stats.gameEnds);
 				println("  a: {:<8}  max a: {}", a, asp.a);
 				println(console::color::GREEN_LIGHT, "  v: {}", v);
 				println("  b: {:<8}  max b: {}", b, asp.b);
 
-				if(deepest < maxDepth && deepest_pre == deepest)
+				if(stats.deepest < maxDepth && deepest_pre == stats.deepest)
 				{
 					println(console::color::GREEN, "  Max possible depth reached!");
 					break;
@@ -138,7 +135,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 				a = v-(v+asp.a)/2;
 				b = v+(v+asp.b)/2;
 
-				deepest_pre = deepest;
+				deepest_pre = stats.deepest;
 				++maxDepth;
 
 			} while(end + (end - start) * 2 < endTime);
@@ -151,7 +148,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 			bestState(game, posMoves, 0, a, b);
 
 			println(console::color::GREEN, "Done");
-			println("  States: {}, Cutoffs: {}", states, cutoffs);
+			println("  States: {}, Cutoffs: {}", stats.states, stats.cutoffs);
 		}
 		println();
 	}
@@ -198,10 +195,10 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 		}
 
 		println();
-#endif
 
-//		for(AIMove& am: moveChain)
-//			movePlan.push_back(am);
+		for(AIMove& am: moveChain)
+			movePlan.push_back(am);
+#endif
 
 		move = moveChain.front().move;
 	}
@@ -349,11 +346,11 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 			moves.emplace_back(itr->first, itr->second);
 	}
 
-	if(d > deepest)
-		deepest = d;
-
 	if(d == maxDepth)
 	{
+		if(d > stats.deepest)
+			stats.deepest = d;
+
 		// reuse quality from BST
 		for(auto& mp: moves)
 		{
@@ -387,7 +384,7 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 			{
 				next.score = mp.first + mp.first/3;
 //				println("GAME END :: D: {}  Q: {}", d, next.score);
-				gameEnds++;
+				stats.gameEnds++;
 			}
 			else if(isAfter(endTime, game.aiData.evalTime*nextPosMoves.size()))
 			{
@@ -435,7 +432,7 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 
 			if(prune({next.score, m}, a, best, b))
 			{
-				cutoffs++;
+				stats.cutoffs++;
 				break;
 			}
 		}
@@ -609,7 +606,7 @@ Quality AI::evalMove(Game &state, Move &move)
 	string save = game.getMap().asString();
 #endif
 
-	states++;
+	stats.states++;
 	handleSpecials(move);
 
 	Player& futureMe = *state.getPlayers()[type2ply(color)];
