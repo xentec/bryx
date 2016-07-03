@@ -120,11 +120,11 @@ Move Human::move(PossibleMoves&, u32, u32)
 			println("You have hit a choice stone!");
 			do
 			{
-				print("Select another players (or yours) color by entering his number (1-{}): ", game.getPlayers().size());
+				print("Select another players (or yours) color by entering his number (1-{}): ", game.defaults.players);
 				u32 desired = 1;
 				std::cin >> desired;
 
-				if(desired < 1 || game.getPlayers().size() < desired)
+				if(desired < 1 || game.defaults.players < desired)
 				{
 					println("Your choice '{}' is not valid player!", desired);
 					continue;

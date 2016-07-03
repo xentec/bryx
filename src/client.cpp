@@ -113,6 +113,8 @@ void Client::play()
 				send(resp);
 
 				move.print();
+				println();
+				fflush(stdout);
 			}
 			break;
 		case packet::MOVE:
@@ -123,8 +125,6 @@ void Client::play()
 
 				game.currPly = packet.player - 1;
 				Player& ply = game.currPlayer();
-
-				println("Got player move: {} -> {} ex: {}", ply, packet.pos(), packet.extra);
 
 				Move move = { ply, &game.getMap().at(packet.pos()) };
 

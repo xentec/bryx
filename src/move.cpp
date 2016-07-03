@@ -47,9 +47,27 @@ bool Move::operator !=(const Move& other)
 
 string Move::asString() const
 {
-	return target ?
-				fmt::format("P{} -> {}{}", player, target->pos, override ? "!":"") :
-				fmt::format("P{} -> {}", player, "NULL");
+	using namespace console::color;
+
+	fmt::MemoryWriter w;
+
+	w.write("{}P{}{} -> ", Cell::getTypeFormat(player.color), player, RESET);
+	if(target)
+	{
+		w.write("{}{}{}", target->getFormat(), target->pos, RESET);
+		if(override)
+			w.write("{}!{}", RED, RESET);
+
+		switch(bonus)
+		{
+		case Bonus::BOMB:  w.write(" +B ({})", player.bombs+1); break;
+		case Bonus::OVERRIDE:  w.write(" +O ({})", player.overrides+1); break;
+		default: break;
+		}
+	} else
+		w.write("{}NULL{}", RED, RESET);
+
+	return w.str();
 }
 
 void Move::print() const
@@ -72,10 +90,8 @@ void Move::print() const
 	cf.setBG(Format::WHITE);
 	hl.emplace(target->pos, cf);
 
-
 	println("{}", asString());
 	target->getMap().print(hl);
-	println("{}: O: {} B: {}", player, player.overrides + (bonus == Bonus::OVERRIDE), player.bombs + (bonus == Bonus::BOMB));
 }
 
 void Move::clear()

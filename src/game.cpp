@@ -19,6 +19,7 @@ Game::Game():
 
 Game::Game(const Game &other):
 	defaults(other.defaults), stats(other.stats),
+	aiData(other.aiData),
 	map(nullptr),
 	currPly(other.currPly), moveless(other.moveless)
 {
@@ -108,7 +109,7 @@ void Game::run()
 		println();
 		println("Player {}", ply);
 
-		println("##########");
+		print("##########");
 		for(usz i = 0; i < ply.name.size(); i++)
 			print("#");
 		println();
@@ -117,77 +118,79 @@ void Game::run()
 		println("Bombs: {}", ply.bombs);
 		println();
 
-		Move move = { ply, nullptr };
 
-		if(phase == Phase::REVERSI)
+		PossibleMoves moves = ply.possibleMoves();
+
+		if(moves.empty())
 		{
-#if MOVES_ITERATOR
-			std::deque<Move> moves = ply.possibleMoves().all();
-#else
-			std::deque<Move> moves = ply.possibleMoves();
-#endif
-			if(moves.empty())
-			{
-				println("No moves");
-				moveless++;
-				nextPlayer();
-				continue;
-			}
-
-			{
-				u32 ovr = 0, num = moves.size();
-				for(Move& m: moves)
-					if(m.override)
-						ovr++;
-
-				println("Moves: {} ({})", num-ovr, num);
-				println();
-
-#if 0
-				for(Move m: moves)
-				{
-					m.print();
-					println();
-				}
-#endif
-			}
-
-			start = Clock::now();
-			move = ply.move(moves,0,2);
-			end = Clock::now();
-
-			elapsed = end-start;
-			if(elapsed > stats.time.moveMax)
-				stats.time.moveMax = elapsed;
-
-			stats.time.moveAvg += elapsed/(num*(num+1));
-			num++;
-		} else {
-			if(ply.bombs == 0)
-			{
-				moveless++;
-				nextPlayer();
-				continue;
-			}
-
-			move = ply.bomb(0);
+			println("No moves");
+			moveless++;
+			nextPlayer();
+			continue;
 		}
+		moveless = 0;
+
+		{
+			u32 ovr = 0, num = moves.size();
+			for(Move& m: moves)
+				if(m.override)
+					ovr++;
+
+			println("Moves: {} ({})", num-ovr, num);
+			println();
+		}
+
+		start = Clock::now();
+		Move move = ply.move(moves,0,2);
+		end = Clock::now();
+
+		elapsed = end-start;
+		if(elapsed > stats.time.moveMax)
+			stats.time.moveMax = elapsed;
+
+		stats.time.moveAvg += elapsed/(num*(num+1));
+		num++;
 
 		move.print();
 		execute(move);
 	}
 	while(!hasEnded());
 
-	if(phase == Phase::REVERSI)
+	println();
+	println("BOMB phase has begun!");
+	println();
+
+	phase = Phase::BOMB;
+	moveless = 0;
+
+	do
 	{
+		Player& ply = currPlayer();
+
 		println();
-		println("BOMB phase has begun!");
+		println("Player {}", ply);
+
+		print("##########");
+		for(usz i = 0; i < ply.name.size(); i++)
+			print("#");
 		println();
 
-		phase = Phase::BOMB;
+		println("Bombs: {}", ply.bombs);
+		println();
+
+		if(ply.bombs == 0)
+		{
+			moveless++;
+			nextPlayer();
+			continue;
+		}
 		moveless = 0;
-		run();
+
+		Move move = ply.bomb(0);
+		move.print();
+		execute(move);
 	}
+	while(!hasEnded());
 }
 
 void Game::execute(Move &move)
@@ -347,6 +350,11 @@ void Game::handleSpecial(MoveBackup& mb, bool undo)
 Move& Game::getLastMove()
 {
 	return phase == Phase::REVERSI ? moveLog.top().move : moveLog.top().move;
+}
+
+void Game::printInfo() const
+{
+
 }
 
 void Game::load(std::istream& file)

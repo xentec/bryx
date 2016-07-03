@@ -40,6 +40,7 @@ private:
 
 	u32 states;
 	u32 deepest;
+	u32 gameEnds;
 
 	struct {
 		Quality a, b;

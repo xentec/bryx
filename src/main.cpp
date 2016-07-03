@@ -162,6 +162,7 @@ int main(int argc, char* argv[])
 	}
 
 	println("Bryx - a ReversiXT implementation");
+	println();
 	println("Mode: {}", mode2str(opts.mode));
 	if(AI::disableSorting)
 		println("Move sorting disabled!");
@@ -237,9 +238,7 @@ int main(int argc, char* argv[])
 	for(Cell& c: game.getMap())
 	{
 		if(c.isPlayer())
-		{
 			++scores[type2ply(c.type)];
-		}
 	}
 
 	println();

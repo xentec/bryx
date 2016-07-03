@@ -65,8 +65,9 @@ struct Game
 	void undo();
 
 	Move& getLastMove();
-
 	usz getMoveNum() const;
+
+	void printInfo() const;
 
 protected:
 	Player& nextPlayer();

@@ -38,8 +38,6 @@ Player *AI::clone() const
 }
 
 
-
-
 Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 {
 	maxDepth = 1;
@@ -53,11 +51,6 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 #if SAFE_GUARDS > 2
 	string save = game.getMap().asString();
 #endif
-
-	println();
-	println("# CALCULATING MOVE");
-	println("##########################");
-	println();
 
 	if(!movePlan.empty())
 	{
@@ -102,9 +95,13 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 			{
 				start = Clock::now();
 
+				cutoffs = 0;
+				gameEnds = 0;
 				moveChain.clear();
 
-				println("Deepening START: {:<2} :: a: {:<5} b: {:<5} ", maxDepth, a, b);
+				println("Deepening START: {:<2}", maxDepth);
+				println("  a: {}", a);
+				println("  b: {}", b);
 				Quality v = bestState(game, posMoves, 0, a, b);
 				//AIMove am = moveChain.front();
 				//println("{} ({})", am.move, am.score);
@@ -114,27 +111,31 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 
 				end = Clock::now();
 
-				println("Deepening END: {:<2} States: {:<6} CO: {:<4} :: a: {:<5} v: {:<5} b: {:<5} ", maxDepth, states, cutoffs, a, v, b);
-				fflush(stdout);
+				println("Deepening END: {:<2}", maxDepth);
+				println("  States: {}, Cutoffs: {}, GameEnds: {}", states, cutoffs, gameEnds);
+				println("  a: {:<8}  max a: {}", a, asp.a);
+				println(console::color::GREEN_LIGHT, "  v: {}", v);
+				println("  b: {:<8}  max b: {}", b, asp.b);
 
 				if(deepest < maxDepth && deepest_pre == deepest)
 				{
-					println(":: End reached");
+					println(console::color::GREEN, "  Max possible depth reached!");
 					break;
 				}
 
-
 				if(v <= a && b <= v)
 				{
-					println(console::color::RED_LIGHT, "BROKEN: a: {:<5} v: {:<5} b: {:<5}", a, v, b);
+					println(console::color::RED_LIGHT, "  AW to narrow!");
+					println();
 
 					reset(a, b);
 					reset(asp.a, asp.b);
 					continue;
 				}
+				println();
+				fflush(stdout);
 
-
-				a = v-(v-asp.a)/2;
+				a = v-(v+asp.a)/2;
 				b = v+(v+asp.b)/2;
 
 				deepest_pre = deepest;
@@ -145,9 +146,16 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 		else
 		{
 			maxDepth = depth;
+			println("Searching to depth {}", maxDepth);
+
 			bestState(game, posMoves, 0, a, b);
+
+			println(console::color::GREEN, "Done");
+			println("  States: {}, Cutoffs: {}", states, cutoffs);
 		}
+		println();
 	}
+
 
 	// clean up
 	for(usz i = 0; i < movePlan.size(); ++i)
@@ -196,8 +204,6 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 //			movePlan.push_back(am);
 
 		move = moveChain.front().move;
-
-		println("##################################\n");
 	}
 
 #if SAFE_GUARDS
@@ -380,9 +386,10 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 			if(nextPosMoves.empty())
 			{
 				next.score = mp.first + mp.first/3;
-				println("GAME END :: D: {}  Q: {}", d, next.score);
+//				println("GAME END :: D: {}  Q: {}", d, next.score);
+				gameEnds++;
 			}
-			else if(isAfter(endTime, game.aiData.evalTime*moves.size()))
+			else if(isAfter(endTime, game.aiData.evalTime*nextPosMoves.size()))
 			{
 				next.score = mp.first - mp.first/5;
 				println("NO TIME :: D: {}  Q: {}", d, next.score);
@@ -459,11 +466,14 @@ void AI::handleSpecials(Move& move) const
 	case Cell::Type::CHOICE:
 		// TODO: better choice algo
 		{
-		  Player* c =
-			*std::max_element(game.getPlayers().begin(), game.getPlayers().end(),
-				[](Player* a, Player* b) { return a->stones().size() < b->stones().size();
-			});
-		  move.choice = c->color;
+			std::vector<u32> scores(game.defaults.players, 0);
+
+			for(Cell& c: game.getMap())
+			{
+				if(c.isPlayer())
+					++scores[type2ply(c.type)];
+			}
+			move.choice = ply2type(*std::max_element(scores.begin(), scores.end()));
 		}
 		break;
 	default:
@@ -608,7 +618,7 @@ Quality AI::evalMove(Game &state, Move &move)
 	state.execute(move);
 
 	h += evalState(state);
-	h += futureMe.possibleMoves().size() / 3;
+	h += futureMe.possibleMoves().size() / 2;
 
 	if(move.override)
 		h *= 2, h /= 3;

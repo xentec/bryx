@@ -150,39 +150,3 @@ void Player::evaluate(Move& move) const
 		move.err =  Move::Error::NO_CONNECTIONS;
 	return;
 }
-
-#if MOVES_ITERATOR
-
-usz PossibleMoves::size()
-{
-	usz i = 0;
-	for(Move& m: *this)
-		i++;
-
-	return i;
-}
-
-bool PossibleMoves::empty()
-{
-	return size() == 0;
-}
-
-std::list<Move> PossibleMoves::all()
-{
-	std::deque<Move> all;
-	for(Move& m: *this)
-		all.push_back(m);
-
-	return all;
-}
-
-PossibleMoves::iterator<Move> PossibleMoves::begin()
-{
-	return iterator<Move>(player, map.begin());
-}
-
-PossibleMoves::iterator<Move> PossibleMoves::end()
-{
-	return iterator<Move>(player, map.end());
-}
-#endif

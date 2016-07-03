@@ -8,7 +8,7 @@
 #include "util/misc.h"
 
 #include <iterator>
-#include <forward_list>
+#include <list>
 #include <unordered_map>
 #include <vector>
 
@@ -27,7 +27,7 @@ struct Map
 	Cell& at(const vec& pos);
 	const Cell& at(const vec& pos) const;
 
-	std::forward_list<Cell*> getQuad(vec centre, i32 radius);
+	std::list<Cell*> getQuad(vec centre, i32 radius);
 
 	string asString(bool transistions = true) const;
 
