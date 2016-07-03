@@ -54,9 +54,9 @@ Player::~Player()
 
 }
 
-std::deque<Cell*> Player::stones()
+std::list<Cell*> Player::stones()
 {
-	std::deque<Cell*> s;
+	std::list<Cell*> s;
 	for(Cell& c: game.getMap())
 		if(c.type == color)
 			s.push_back(&c);
@@ -65,10 +65,7 @@ std::deque<Cell*> Player::stones()
 
 PossibleMoves Player::possibleMoves()
 {
-#if MOVES_ITERATOR
-	return PossibleMoves { *this, game.getMap() };
-#else
-	std::deque<Move> moves;
+	PossibleMoves moves;
 	Move move { *this, nullptr };
 
 	for(Cell& c: game.getMap())
@@ -82,7 +79,6 @@ PossibleMoves Player::possibleMoves()
 		move.clear();
 	}
 	return moves;
-#endif
 }
 
 void Player::evaluate(Move& move) const
@@ -102,23 +98,22 @@ void Player::evaluate(Move& move) const
 
 	Direction banned = Direction::_LAST;
 
+	std::forward_list<Cell*> line;
+
 	for(const Cell::Transition& dir : *move.target)
 	{
 		if(dir.entry == banned)
 			continue;
 
-		std::deque<Cell*> line;
 		const Cell::Transition* trn = &dir;
+		line.clear();
 
 		while(trn->to && trn->to->isCaptureable())
 		{
 			if(trn->to->type == move.player.color)
 			{
 				if(!line.empty())
-				{
-					move.captures.insert(move.captures.end(), line.begin(), line.end());
-					line.clear();
-				}
+					move.captures.splice_after(move.captures.before_begin(), line);
 
 				break;
 			}
@@ -132,7 +127,7 @@ void Player::evaluate(Move& move) const
 
 			if(trn->to->helpValue == 0)
 			{
-				line.push_back(trn->to);
+				line.push_front(trn->to);
 				trn->to->helpValue++;
 			}
 
@@ -150,9 +145,6 @@ void Player::evaluate(Move& move) const
 #endif
 		c->helpValue--;
 	}
-
-//	move.captures.sort();
-//	move.captures.unique();
 
 	if(move.captures.empty() && move.target->type != Cell::Type::EXPANSION)
 		move.err =  Move::Error::NO_CONNECTIONS;

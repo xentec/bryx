@@ -34,10 +34,10 @@ struct Player
 
 	string asString() const;
 
-	virtual Move move(std::deque<Move>& moves, u32 time, u32 depth) = 0;
+	virtual Move move(PossibleMoves& moves, u32 time, u32 depth) = 0;
 	virtual Move bomb(u32 time) = 0;
 
-	std::deque<Cell*> stones();
+	std::list<Cell*> stones();
 	PossibleMoves possibleMoves();
 
 	void evaluate(Move& move) const;

@@ -29,7 +29,7 @@ Player *Human::clone() const
 	return new Human(*this);
 }
 
-Move Human::move(std::deque<Move>&, u32, u32)
+Move Human::move(PossibleMoves&, u32, u32)
 {
 	Move move { *this, nullptr };
 

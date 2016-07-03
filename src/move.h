@@ -6,6 +6,8 @@
 
 #include <deque>
 #include <vector>
+#include <forward_list>
+
 
 struct Cell;
 struct Game;
@@ -46,7 +48,7 @@ struct Move
 	Cell::Type choice;
 
 	Error err;
-	std::deque<Cell*> captures;
+	std::forward_list<Cell*> captures;
 
 	friend std::ostream& operator<<(std::ostream &os, const Move &object)
 	{

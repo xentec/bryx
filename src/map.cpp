@@ -68,7 +68,7 @@ const Cell& Map::at(const vec &pos) const
 }
 
 
-std::deque<Cell*> Map::getQuad(vec centre, i32 radius)
+std::list<Cell*> Map::getQuad(vec centre, i32 radius)
 {
 	struct Dist
 	{
@@ -77,7 +77,7 @@ std::deque<Cell*> Map::getQuad(vec centre, i32 radius)
 	};
 
 	std::queue<Dist> q;
-	std::deque<Cell*> quad;
+	std::list<Cell*> quad;
 
 	Cell& z = at(centre);
 	q.push({ &z, radius });

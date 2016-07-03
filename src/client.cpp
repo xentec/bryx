@@ -14,7 +14,7 @@ struct Dummy : Player
 	Dummy(const Dummy& other): Player(other) {}
 	virtual ~Dummy() {}
 	virtual Player* clone() const { return new Dummy(*this); }
-	virtual Move move(std::deque<Move>&, u32, u32) { return Move(*this, nullptr); }
+	virtual Move move(PossibleMoves&, u32, u32) { return Move(*this, nullptr); }
 	virtual Move bomb(u32) { return Move(*this, nullptr); }
 };
 
@@ -93,12 +93,7 @@ void Client::play()
 
 				if(game.phase == Game::Phase::REVERSI)
 				{
-#if MOVES_ITERATOR
-					PossibleMoves moves = me->possibleMoves().all();
-#else
 					PossibleMoves moves = me->possibleMoves();
-#endif
-
 #if SAFE_GUARDS
 					if(moves.empty())
 						throw std::runtime_error("no moves found");
@@ -149,7 +144,8 @@ void Client::play()
 				}
 				else
 				{
-					move.captures = game.getMap().getQuad(move.target->pos, game.defaults.bombsStrength);
+					auto damage = game.getMap().getQuad(move.target->pos, game.defaults.bombsStrength);
+					move.captures.assign(damage.begin(), damage.end());
 				}
 
 				if(ply.color != me->color)

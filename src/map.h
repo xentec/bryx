@@ -8,8 +8,9 @@
 #include "util/misc.h"
 
 #include <iterator>
-#include <vector>
+#include <forward_list>
 #include <unordered_map>
+#include <vector>
 
 #define BONUS_VALUE 11
 #define CHOICE_VALUE 5
@@ -26,7 +27,7 @@ struct Map
 	Cell& at(const vec& pos);
 	const Cell& at(const vec& pos) const;
 
-	std::deque<Cell*> getQuad(vec centre, i32 radius);
+	std::forward_list<Cell*> getQuad(vec centre, i32 radius);
 
 	string asString(bool transistions = true) const;
 
