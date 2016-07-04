@@ -56,7 +56,7 @@ string Move::asString() const
 	{
 		w.write("{}{}{}", target->getFormat(), target->pos, RESET);
 		if(override)
-			w.write("{}!{}", RED, RESET);
+			w.write("{}!{}", RED_LIGHT, RESET);
 
 		switch(bonus)
 		{
@@ -64,6 +64,8 @@ string Move::asString() const
 		case Bonus::OVERRIDE:  w.write(" +O ({})", player.overrides+1); break;
 		default: break;
 		}
+		if(choice != Cell::Type::VOID)
+			w.write(" {}=> {}P{}", RED_LIGHT, Cell::getTypeFormat(choice), player);
 	} else
 		w.write("{}NULL{}", RED, RESET);
 
