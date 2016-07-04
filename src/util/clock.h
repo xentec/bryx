@@ -3,7 +3,7 @@
 #include <chrono>
 
 #include "global.h"
-
+#include "misc.h"
 
 using Duration = std::chrono::duration<f64, std::milli>;
 
@@ -21,3 +21,13 @@ struct Clock
 };
 
 using TimePoint = Clock::time_point;
+
+
+struct Timer
+{
+	TimePoint begin;
+
+	inline void start() { begin = Clock::now(); }
+	inline Duration& stop() { prev.push(Clock::now()-begin); return prev.data.back(); }
+	LowPass<Duration, 10> prev;
+};
