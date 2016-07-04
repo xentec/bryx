@@ -83,6 +83,10 @@ PossibleMoves Player::possibleMoves()
 
 void Player::evaluate(Move& move) const
 {
+#if SAFE_GUARDS
+	if(move.getPlayer().color != color)
+		throw std::runtime_error("wrong player in move");
+#endif
 	if(move.target->type == Cell::Type::VOID)
 	{
 		move.err = Move::Error::WRONG_START;
@@ -110,7 +114,7 @@ void Player::evaluate(Move& move) const
 
 		while(trn->to && trn->to->isCaptureable())
 		{
-			if(trn->to->type == move.player.color)
+			if(trn->to->type == color)
 			{
 				if(!line.empty())
 					move.captures.splice_after(move.captures.before_begin(), line);
@@ -140,7 +144,7 @@ void Player::evaluate(Move& move) const
 	for(Cell* c: move.captures)
 	{
 #if SAFE_GUARDS
-		if(c->type == move.player.color)
+		if(c->type == color)
 			throw std::runtime_error("invalid player capture");
 #endif
 		c->helpValue--;

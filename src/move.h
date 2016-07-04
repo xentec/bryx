@@ -35,12 +35,14 @@ struct Move
 	bool operator ==(const Move& other);
 	bool operator !=(const Move& other);
 
+	Player& getPlayer();
+
 	string asString() const;
 	void print() const;
 
 	void clear();
 
-	Player& player;
+	Player* player;
 
 	Cell *target;
 	bool override;

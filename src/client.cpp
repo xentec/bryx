@@ -109,7 +109,7 @@ void Client::play()
 				if(move.choice != Cell::Type::VOID)
 					resp.extra = type2ply(move.choice)+1;
 
-				println("Sending move: {} -> {} ex: {}", move.player, move.target->pos, resp.extra);
+				println("Sending move: {} -> {} ex: {}", move.getPlayer(), move.target->pos, resp.extra);
 				send(resp);
 
 				move.print();

@@ -53,7 +53,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 	if(!movePlan.empty())
 	{
 #if SAFE_GUARDS
-		if(movePlan.front().move.player.color != color)
+		if(movePlan.front().move.getPlayer().color != color)
 			throw std::runtime_error("me != last player of the move plan");
 #endif
 		println("PREVIOUS MOVE PLAN:");

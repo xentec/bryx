@@ -200,7 +200,7 @@ void Game::execute(Move &move)
 	map->check();
 #endif
 
-	if(move.player != currPlayer())
+	if(move.getPlayer() != currPlayer())
 		throw std::runtime_error("wrong player turn");
 
 	if(!move.target)
@@ -221,7 +221,7 @@ void Game::execute(Move &move)
 			c->clear();
 		}
 
-		move.player.bombs--;
+		move.getPlayer().bombs--;
 	} else
 	{
 
@@ -233,24 +233,24 @@ void Game::execute(Move &move)
 		if(move.override)
 		{
 #if SAFE_GUARDS
-			if(move.player.overrides == 0)
+			if(move.getPlayer().overrides == 0)
 				throw std::runtime_error("no overrides left");
 #endif
-			move.player.overrides--;
+			move.getPlayer().overrides--;
 			stats.overrides++;
 		}
 
 
-		move.target->type = move.player.color;
+		move.target->type = move.getPlayer().color;
 
 		for(Cell* c: move.captures)
 		{
 #if SAFE_GUARDS
-			if(c->type == move.player.color)
+			if(c->type == move.getPlayer().color)
 				throw std::runtime_error("invalid player capture");
 #endif
 			backup.captures.emplace_back(c->pos, c->type);
-			c->type = move.player.color;
+			c->type = move.getPlayer().color;
 		}
 
 		handleSpecial(backup);
@@ -284,7 +284,7 @@ void Game::undo()
 
 	if(move.target->isCaptureable())
 	{
-		move.player.overrides++;
+		move.getPlayer().overrides++;
 		stats.overrides--;
 	}
 
@@ -308,10 +308,10 @@ void Game::handleSpecial(MoveBackup& mb, bool undo)
 		switch(move.bonus)
 		{
 		case Move::BOMB:
-			move.player.bombs += rev;
+			move.getPlayer().bombs += rev;
 			break;
 		case Move::OVERRIDE:
-			move.player.overrides += rev;
+			move.getPlayer().overrides += rev;
 			break;
 		default:
 			break;
@@ -320,15 +320,15 @@ void Game::handleSpecial(MoveBackup& mb, bool undo)
 	case Cell::Type::CHOICE:
 	{
 		move.target->staticValue += CHOICE_VALUE*rev;
-		if(move.player.color == move.choice)
+		if(move.getPlayer().color == move.choice)
 			break;
 
 		for(Cell& c: getMap())
 		{
-			if(c.type == move.player.color)
+			if(c.type == move.getPlayer().color)
 				c.type = move.choice;
 			else if(c.type == move.choice)
-				c.type = move.player.color;
+				c.type = move.getPlayer().color;
 		}
 	}
 		break;

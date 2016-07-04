@@ -5,7 +5,7 @@
 #include "util/console.h"
 
 Move::Move(Player& player, Cell* target):
-	player(player),
+	player(&player),
 	target(target), override(false),
 	bonus(Bonus::NONE), choice(Cell::Type::VOID),
 	err(Error::NONE), captures()
@@ -37,12 +37,17 @@ bool Move::operator ==(const Move& other)
 	if(!target || !other.target)
 		return false;
 
-	return player.color == other.player.color && *target == *other.target;
+	return player->color == other.player->color && *target == *other.target;
 }
 
 bool Move::operator !=(const Move& other)
 {
 	return !(*this == other);
+}
+
+Player&Move::getPlayer()
+{
+	return *player;
 }
 
 string Move::asString() const
@@ -51,7 +56,7 @@ string Move::asString() const
 
 	fmt::MemoryWriter w;
 
-	w.write("{}P{}{} -> ", Cell::getTypeFormat(player.color), player, RESET);
+	w.write("{}P{}{} -> ", Cell::getTypeFormat(player->color), *player, RESET);
 	if(target)
 	{
 		w.write("{}{}{}", target->getFormat(), target->pos, RESET);
@@ -60,12 +65,12 @@ string Move::asString() const
 
 		switch(bonus)
 		{
-		case Bonus::BOMB:  w.write(" +B ({})", player.bombs+1); break;
-		case Bonus::OVERRIDE:  w.write(" +O ({})", player.overrides+1); break;
+		case Bonus::BOMB:  w.write(" +B ({})", player->bombs+1); break;
+		case Bonus::OVERRIDE:  w.write(" +O ({})", player->overrides+1); break;
 		default: break;
 		}
 		if(choice != Cell::Type::VOID)
-			w.write(" {}=> {}P{}", RED_LIGHT, Cell::getTypeFormat(choice), player);
+			w.write(" {}=> {}P{}", RED_LIGHT, Cell::getTypeFormat(choice), choice);
 	} else
 		w.write("{}NULL{}", RED, RESET);
 
@@ -82,7 +87,7 @@ void Move::print() const
 	Format cf;
 	std::unordered_map<vec, Format> hl;
 
-	cf.setBG(Cell::getTypeFormat(player.color).fg);
+	cf.setBG(Cell::getTypeFormat(player->color).fg);
 	cf.setFG(Format::BLACK);
 
 	for(Cell* c: captures)
