@@ -3,6 +3,7 @@
 #include "vector.h"
 #include "player.h"
 #include "util/clock.h"
+#include "util/misc.h"
 
 #include <deque>
 
@@ -39,20 +40,28 @@ private:
 	bool stopSearch;
 
 	struct {
-		u32 states;
-		u32 deepest;
-		u32 cutoffs;
-		u32 gameEnds;
-	} stats;
-
-	struct {
 		Quality a, b;
 	} asp;
+
 
 	std::deque<AIMove> moveChain;
 	std::deque<AIMove> movePlan;
 
-	Duration evaltime;
+	// Statistics
+	//############
+	struct {
+		u32 states;
+		u32 deepest;
+		u32 cutoffs;
+		u32 gameEnds;
+
+		struct {
+			Timer eval;
+			Timer escape;
+			RunningAverage<Duration> move;
+		} durs;
+	} stats;
+
 public:
 	static bool disableSorting;
 };

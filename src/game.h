@@ -90,10 +90,8 @@ protected:
 	void handleSpecial(MoveBackup& mb, bool undo = false);
 
 	std::stack<MoveBackup> moveLog;
-	std::stack<MoveBackup> bombLog;
 
 	friend struct Client;
-
 };
 
 

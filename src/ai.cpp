@@ -17,17 +17,22 @@ bool AI::disableSorting = false;
 
 AI::AI(Game &game, Cell::Type color):
 	Player(game, color, "bryx"),
-	maxDepth(1), endTime(Duration::max()), asp{infMin, infMax}
-{}
+	maxDepth(1), endTime(Duration::max()),
+	stopSearch(false),
+	asp{infMin, infMax},
+	stats{}
+{
+	stats.durs.escape.prev.data.fill(Duration(0));
+	stats.durs.eval.prev.data.fill(game.aiData.evalTime*4);
+}
 
 AI::AI(const AI &other):
 	Player(other),
 	maxDepth(other.maxDepth),
 	endTime(other.endTime),
-	evaltime(other.evaltime)
-{
-
-}
+	stopSearch(other.stopSearch),
+	stats(other.stats)
+{}
 
 AI::~AI()
 {}
@@ -41,8 +46,6 @@ Player *AI::clone() const
 Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 {
 	maxDepth = 1;
-	stats = {};
-
 
 	Move move{ *this, nullptr };
 
@@ -84,9 +87,11 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 	{
 		if(time)
 		{
-			endTime = Clock::now() + Duration(time - time/20);
-			TimePoint start, end;
+			stopSearch = false;
+			stats.states = 0;
+			endTime = Clock::now() + Duration(time - time/5);
 
+			TimePoint start, end;
 			u32 deepest_pre = 0;
 
 			do
@@ -106,13 +111,14 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 
 //				if(moveChain.size() < maxDepth-1)
 
-				end = Clock::now();
-
 				println("Deepening END: {:<2}", maxDepth);
 				println("  States: {}, Cutoffs: {}, GameEnds: {}", stats.states, stats.cutoffs, stats.gameEnds);
 				println("  a: {:<8}  max a: {}", a, asp.a);
 				println(console::color::GREEN_LIGHT, "  v: {}", v);
 				println("  b: {:<8}  max b: {}", b, asp.b);
+
+				if(stopSearch)
+					break;
 
 				if(stats.deepest < maxDepth && deepest_pre == stats.deepest)
 				{
@@ -138,7 +144,11 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 				deepest_pre = stats.deepest;
 				++maxDepth;
 
-			} while(end + (end - start) * 2 < endTime);
+				end = Clock::now();
+			} while(end + (end - start) < endTime);
+
+			println("  avr time for eval:   ~{} ms", stats.durs.eval.prev.average().count());
+			println("  avr time for escape: ~{} ms", stats.durs.escape.prev.average().count());
 		}
 		else
 		{
@@ -204,7 +214,7 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 	}
 
 #if SAFE_GUARDS
-	if(move.player.color != color)
+	if(move.getPlayer().color != color)
 		throw std::runtime_error("player color shifter");
 #if SAFE_GUARDS > 2
 	if(save != game.getMap().asString())
@@ -212,54 +222,57 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 #endif
 #endif
 
-	handleSpecials(move);
+//	if(stopSearch)
+//		stats.durs.escape.stop();
+
 	return move;
 }
 
-
-Move AI::bomb(u32 time)
+void AI::playerMoved(Move& real)
 {
-#define BOMB_ENEMY_VALUE 2
-
-	Move best{ *this, nullptr };
-	Quality bestScore = infMin;
-
-	for(Cell& c: game.getMap())
+	if(!movePlan.empty())
 	{
-		if(c.type == Cell::Type::VOID)
-			continue;
+		Move& pred = movePlan.front().move;
 
-		std::list<Cell*> damage = game.getMap().getQuad(c.pos, game.defaults.bombsStrength);
-		Quality score = 0;
+		bool anticipated =
+				   pred.target->pos == real.target->pos
+				&& pred.bonus == real.bonus
+				&& pred.choice == real.choice;
 
-		for(Cell* cp: damage)
+		if(anticipated)
 		{
-			if(!cp)
-				score -= 2;
-
-			Cell &c = *cp;
-
-			if(c.type == color)
-				score -= BOMB_ENEMY_VALUE-1;
-			else if(c.isPlayer())
-				score += BOMB_ENEMY_VALUE;
-			else
-				score -= 1;
-		}
-
-		if(score >= bestScore)
+			println("ANTICIPATED");
+			movePlan.pop_front();
+			println("moveplan: {}", movePlan.size());
+		} else
 		{
-			bestScore = score;
-			best.target = &c;
-			best.captures.assign(damage.begin(), damage.end());
+			movePlan.clear();
+			println("SURPRISED!");
 		}
 	}
 
-	return best;
+	if(game.aiData.gameNearEnd == false)
+	{
+		if((game.aiData.amountMoves / 10) > (game.aiData.amountMoves - game.getMoveNum()))
+		{
+			for(Cell &c: game.getMap())
+			{
+				if(c.type == Cell::Type::VOID)
+					continue;
+
+				c.staticValue = 1;
+				if(c.type == Cell::Type::BONUS)
+					c.staticValue += BONUS_VALUE;
+				else if(c.type == Cell::Type::CHOICE)
+					c.staticValue += CHOICE_VALUE;
+			}
+			game.aiData.gameNearEnd = true;
+		}
+	}
 }
 
 
-
+// Pruner
 
 inline bool minPrune(const AIMove& q, Quality& a, AIMove& v, Quality& b)
 {
@@ -302,6 +315,18 @@ inline bool isAfter(TimePoint endTime, Duration offset)
 	return Clock::now()+offset > endTime;
 }
 
+
+/*
+
+	 ######  ########    ###    ########   ######  ##     ##
+	##    ## ##         ## ##   ##     ## ##    ## ##     ##
+	##       ##        ##   ##  ##     ## ##       ##     ##
+	 ######  ######   ##     ## ########  ##       #########
+		  ## ##       ######### ##   ##   ##       ##     ##
+	##    ## ##       ##     ## ##    ##  ##    ## ##     ##
+	 ######  ######## ##     ## ##     ##  ######  ##     ##
+
+*/
 
 Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& a, Quality& b)
 {
@@ -379,28 +404,29 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 			state.execute(m);
 
 			AIMove next = { 0, { state.currPlayer(), nullptr }};
-			PossibleMoves nextPosMoves = next.move.player.possibleMoves();
+			PossibleMoves nextPosMoves = next.move.getPlayer().possibleMoves();
+			Duration eval, esc;
+			TimePoint end;
+
 			if(nextPosMoves.empty())
 			{
 				next.score = mp.first + mp.first/3;
-//				println("GAME END :: D: {}  Q: {}", d, next.score);
 				stats.gameEnds++;
 			}
-			else if(isAfter(endTime, game.aiData.evalTime*nextPosMoves.size()))
+			else if((end = Clock::now() + (eval = stats.durs.eval.prev.average() * nextPosMoves.size()) + (esc = stats.durs.escape.prev.average())) > endTime)
 			{
-				next.score = mp.first - mp.first/5;
-				println("NO TIME :: D: {}  Q: {}", d, next.score);
+				//stats.durs.escape.start();
 				stopSearch = true;
+
+				next.score = mp.first - mp.first/5;
+				println(console::color::YELLOW, "NO TIME! D: {}: Over {} ms", depth, (end-Clock::now()).count());
+				println("  time for next depth: ~{} ms", eval.count());
+				println("  time for escape:     ~{} ms", esc.count());
+				println();
 			}
 			else
 			{
-#if VERBOSE
-				println("DEEPER {} ==>", d);
 				next.score = bestState(state, nextPosMoves, d, nextA, nextB);
-				println(" <== {} ({}) ", d, next.score);
-#else
-				next.score = bestState(state, nextPosMoves, d, nextA, nextB);
-#endif
 			}
 
 #if SAFE_GUARDS > 1
@@ -452,7 +478,7 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 
 void AI::handleSpecials(Move& move) const
 {
-	Game& game = move.player.game;
+	Game& game = move.getPlayer().game;
 
 	switch(move.target->type)
 	{
@@ -470,7 +496,17 @@ void AI::handleSpecials(Move& move) const
 				if(c.isPlayer())
 					++scores[type2ply(c.type)];
 			}
-			move.choice = ply2type(*std::max_element(scores.begin(), scores.end()));
+
+			u32 best = 0;
+			for(usz i = 0; i < game.defaults.players; i++)
+			{
+				if(scores[i] > best)
+				{
+					best = scores[i];
+					move.choice = ply2type(i);
+				}
+			}
+
 		}
 		break;
 	default:
@@ -478,48 +514,139 @@ void AI::handleSpecials(Move& move) const
 	}
 }
 
-void AI::playerMoved(Move& real)
+
+Move AI::bomb(u32 time)
 {
-	if(!movePlan.empty())
+#define BOMB_ENEMY_VALUE 2
+	endTime = Clock::now() + Duration(time - time/20);
+
+	Move best{ *this, nullptr };
+	Quality bestScore = infMin;
+
+	for(Cell& c: game.getMap())
 	{
-		Move& pred = movePlan.front().move;
+		if(c.type == Cell::Type::VOID)
+			continue;
 
-		bool anticipated =
-				   pred.target->pos == real.target->pos
-				&& pred.bonus == real.bonus
-				&& pred.choice == real.choice;
+		std::list<Cell*> damage = game.getMap().getQuad(c.pos, game.defaults.bombsStrength);
+		u32 me, enemy, empty;
+		me = enemy = empty = 0;
 
-		if(anticipated)
+		for(Cell* c: damage)
 		{
-			println("ANTICIPATED");
-			movePlan.pop_front();
-			println("moveplan: {}", movePlan.size());
-		} else
-		{
-			movePlan.clear();
-			println("SURPRISED!");
+			bool m = c->type == color,
+				 p = c->isPlayer();
+
+			me += m;
+			enemy += p && !m;
+			empty += !p;
 		}
+
+		u32 score = enemy*2 - empty - me*3;
+
+		if(score >= bestScore)
+		{
+			bestScore = score;
+			best.target = &c;
+			best.captures.assign(damage.begin(), damage.end());
+		}
+		if(time && Clock::now() > endTime)
+			break;
 	}
 
-	if(game.aiData.gameNearEnd == false)
-	{
-		if((game.aiData.amountMoves / 10) > (game.aiData.amountMoves - game.getMoveNum()))
-		{
-			for(Cell &c: game.getMap())
-			{
-				if(c.type == Cell::Type::VOID)
-					continue;
-
-				c.staticValue = 1;
-				if(c.type == Cell::Type::BONUS)
-					c.staticValue += BONUS_VALUE;
-				else if(c.type == Cell::Type::CHOICE)
-					c.staticValue += CHOICE_VALUE;
-			}
-			game.aiData.gameNearEnd = true;
-		}
-	}
+	return best;
 }
+
+/*
+
+######## ##     ##    ###    ##
+##       ##     ##   ## ##   ##
+##       ##     ##  ##   ##  ##
+######   ##     ## ##     ## ##
+##        ##   ##  ######### ##
+##         ## ##   ##     ## ##
+########    ###    ##     ## ########
+
+*/
+Quality AI::evalState(Game &state) const
+{
+	Quality h = 0;
+
+	std::vector<u32> scores(game.defaults.players, 0);
+
+	for(Cell &c: state.getMap())
+	{
+		if(c.isPlayer())
+			scores[type2ply(c.type)]++;
+		if(c.type == color)
+			h += c.staticValue;
+	}
+
+	u32 me = 0, enemies = 0;
+	u32 bestScore = 0;
+	u32 bestPly = 0;
+	for(usz i = 0; i < game.defaults.players; i++)
+	{
+		bool m = i == type2ply(color);
+
+		me += m * scores[i];
+		enemies += !m * scores[i];
+
+		if(scores[i] > bestScore)
+		{
+			bestScore = scores[i];
+			bestPly = ply2type(i);
+		}
+	}
+
+	h -= enemies;
+
+	if(ply2type(bestPly) == color)
+		h *= 2;
+
+	h += overrides * 10; // * game.aiData.expectedOverriteValue;
+	h += bombs * game.aiData.bombValue;
+
+	return h;
+}
+
+Quality AI::evalMove(Game &state, Move &move)
+{
+	stats.durs.eval.start();
+
+#if SAFE_GUARDS > 2
+	string save = game.getMap().asString();
+#endif
+
+	stats.states++;
+	handleSpecials(move);
+
+	Player& futureMe = *state.getPlayers()[type2ply(color)];
+	Quality h = 0;
+
+	state.execute(move);
+
+	h += evalState(state);
+	h += futureMe.possibleMoves().size() * 50;
+
+	if(move.override)
+		h /= 2;
+
+	state.undo();
+
+
+#if SAFE_GUARDS > 2
+	if(save != game.getMap().asString())
+		throw std::runtime_error("map corruption");
+#endif
+
+	stats.durs.eval.stop();
+
+	return h;
+}
+
+//###################################
+//###################################
 
 
 #if 0
@@ -579,54 +706,3 @@ Move AI::bestState2(Game &state)
 }
 #endif
 
-
-Quality AI::evalState(Game &state) const
-{
-	Quality h = 0;
-
-	for(Cell &c: state.getMap()){
-		if(c.type == color)
-			h += c.staticValue;
-	}
-
-	Player& futureMe = *state.getPlayers()[type2ply(color)];
-
-	h *= 10;
-
-	h += futureMe.overrides * game.aiData.expectedOverriteValue;
-	h += futureMe.bombs * game.aiData.bombValue;
-
-	return h;
-}
-
-Quality AI::evalMove(Game &state, Move &move)
-{
-
-#if SAFE_GUARDS > 2
-	string save = game.getMap().asString();
-#endif
-
-	stats.states++;
-	handleSpecials(move);
-
-	Player& futureMe = *state.getPlayers()[type2ply(color)];
-	Quality h = 0;
-
-	state.execute(move);
-
-	h += evalState(state);
-	h += futureMe.possibleMoves().size() / 2;
-
-	if(move.override)
-		h *= 2, h /= 3;
-
-	state.undo();
-
-
-#if SAFE_GUARDS > 2
-	if(save != game.getMap().asString())
-		throw std::runtime_error("map corruption");
-#endif
-
-	return h;
-}

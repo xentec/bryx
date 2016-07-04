@@ -114,9 +114,9 @@ void Game::run()
 			print("#");
 		println();
 
+		println("Stones: {}", ply.stones().size());
 		println("Overrides: {}", ply.overrides);
 		println("Bombs: {}", ply.bombs);
-		println();
 
 
 		PossibleMoves moves = ply.possibleMoves();
@@ -349,7 +349,7 @@ void Game::handleSpecial(MoveBackup& mb, bool undo)
 
 Move& Game::getLastMove()
 {
-	return phase == Phase::REVERSI ? moveLog.top().move : moveLog.top().move;
+	return moveLog.top().move;
 }
 
 void Game::printInfo() const
