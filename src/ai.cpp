@@ -340,18 +340,28 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 	std::map<Quality, Move&> sortedMoves;
 	std::vector<std::pair<const Quality, Move&> > moves;
 
+	std::function<void(Quality q, Move& m)> insert = [&](Quality q, Move& m) { sortedMoves.emplace(q, m); };
 	if(disableSorting)
-	{
-		for(Move& m: posMoves)
-			moves.emplace_back(evalMove(state, m), m);
-	}
-	else
-	{
-		for(Move& m: posMoves)
-			sortedMoves.emplace(evalMove(state, m), m);
-	}
+		insert = [&](Quality q, Move& m) { moves.emplace_back(q, m); };
 
 	u32 d = depth+1;
+
+	TimePoint end;
+
+	for(Move& m: posMoves)
+	{
+		insert(evalMove(state, m), m);
+		if((end = Clock::now() + stats.durs.eval.prev.data.back()) > endTime)
+		{
+			d = maxDepth;
+			stopSearch = true;
+			println(console::color::YELLOW, "NO TIME! (eval) D: {}: Over {} ms", depth, (end-Clock::now()).count());
+			println("  moves: {}", posMoves.size());
+			println("  evaluated: {}", disableSorting ? moves.size() : sortedMoves.size());
+			break;
+		}
+	}
+
 
 	std::function<bool(const AIMove& q, Quality& a, AIMove& v, Quality& b)> prune;
 	AIMove best = { 0, { ply, nullptr }};
@@ -406,7 +416,6 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 			AIMove next = { 0, { state.currPlayer(), nullptr }};
 			PossibleMoves nextPosMoves = next.move.getPlayer().possibleMoves();
 			Duration eval, esc;
-			TimePoint end;
 
 			if(nextPosMoves.empty())
 			{
@@ -419,7 +428,7 @@ Quality AI::bestState(Game& state, PossibleMoves& posMoves, u32 depth, Quality& 
 				stopSearch = true;
 
 				next.score = mp.first - mp.first/5;
-				println(console::color::YELLOW, "NO TIME! D: {}: Over {} ms", depth, (end-Clock::now()).count());
+				println(console::color::YELLOW, "NO TIME! (next) D: {}: Over {} ms", depth, (end-Clock::now()).count());
 				println("  time for next depth: ~{} ms", eval.count());
 				println("  time for escape:     ~{} ms", esc.count());
 				println();
