@@ -304,7 +304,12 @@ void Game::handleSpecial(MoveBackup& mb, bool undo)
 	switch(mb.targetType) // ...then look at special cases
 	{
 	case Cell::Type::BONUS:
-		move.target->staticValue += BONUS_VALUE*rev;
+		move.target->staticValue -= BONUS_VALUE*rev;
+		for(Cell::Transition& tr: *move.target)
+		{
+			if(tr.to)
+				tr.to->staticValue += BONUS_VALUE*rev;
+		}
 		switch(move.bonus)
 		{
 		case Move::BOMB:
@@ -318,8 +323,13 @@ void Game::handleSpecial(MoveBackup& mb, bool undo)
 		}
 		break;
 	case Cell::Type::CHOICE:
-	{
-		move.target->staticValue += CHOICE_VALUE*rev;
+		move.target->staticValue -= CHOICE_VALUE*rev;
+		for(Cell::Transition& tr: *move.target)
+		{
+			if(tr.to)
+				tr.to->staticValue += CHOICE_VALUE*rev;
+		}
+
 		if(move.getPlayer().color == move.choice)
 			break;
 
@@ -330,7 +340,6 @@ void Game::handleSpecial(MoveBackup& mb, bool undo)
 			else if(c.type == move.choice)
 				c.type = move.getPlayer().color;
 		}
-	}
 		break;
 	case Cell::Type::INVERSION:
 		for(Cell& c: getMap())

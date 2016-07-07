@@ -384,11 +384,12 @@ Map Map::load(std::istream& file)
 			if(c.trans[j % Direction::_LAST].to == nullptr)   //which is contained in maxCount
 			{
 				counter++;
+
 			}else
 			{
-				if(counter > maxCounter){
+				if(counter > maxCounter)
 					maxCounter = counter;
-				}
+
 				totalCounter += counter;
 				counter = 0;
 			}
@@ -396,95 +397,108 @@ Map Map::load(std::istream& file)
 		totalCounter /= 2;
 		//maxCounter decides the maximum length of the wall
 		//totalCounter decides the total amount of walls
-		switch(maxCounter){
-			case 0:                             //no attached walls
-				c.staticValue = 1;
-				break;
+		switch(maxCounter)
+		{
 			case 1:                             //at least 1 wall with no neighbour-walls
 				switch(totalCounter){
 					case 2:                     //-||- with a total of 2 attached walls
-						c.staticValue = 3;
+						c.staticValue += 3;
 						break;
 					case 3:                     //-||- with a total of 3 attached walls
-						c.staticValue = 4;
+						c.staticValue += 4;
 						break;
 					case 4:                     //-||- with a total of 4 attached walls
-						c.staticValue = 3;
+						c.staticValue += 3;
 						break;
 					default:                    //exact 1 wall or unexpected amount of attached walls
-						c.staticValue = 2;
+						c.staticValue += 2;
 						break;
 				}
 				break;
 			case 2:                             //at least 2 neighbour-walls
 				switch(totalCounter){
 					case 3:                     //...
-						c.staticValue = 4;
+						c.staticValue += 4;
 						break;
 					case 4:
-						c.staticValue = 5;
+						c.staticValue += 5;
 						break;
 					default:
-						c.staticValue = 3;
+						c.staticValue += 3;
 						break;
 				}
 				break;
 			case 3:
 				switch(totalCounter){
 					case 4:
-						c.staticValue = 6;
+						c.staticValue += 6;
 						break;
 					case 5:
-						c.staticValue = 4;
+						c.staticValue += 4;
 						break;
 					case 6:
-						c.staticValue = 3;
+						c.staticValue += 3;
 						break;
 					default:
-						c.staticValue = 5;
+						c.staticValue += 5;
 						break;
 				}
 				break;
 			case 4:
 				switch(totalCounter){
 					case 5:
-						c.staticValue = 8;
+						c.staticValue += 8;
 						break;
 					case 6:
-						c.staticValue = 6;
+						c.staticValue += 6;
 						break;
 					case 7:
-						c.staticValue = 4;
+						c.staticValue += 4;
 						break;
 					default:
-						c.staticValue = 10;
+						c.staticValue += 10;
 						break;
 				}
 				break;
 			case 5:
 				switch(totalCounter){
 					case 6:
-						c.staticValue = 6;
+						c.staticValue += 6;
 						break;
 					default:
-						c.staticValue = 7;
+						c.staticValue += 7;
 						break;
 				}
 				break;
 			case 6:
-				c.staticValue = 4;
+				c.staticValue += 4;
 				break;
 			case 7:
-				c.staticValue = 2;
+				c.staticValue += 2;
 				break;
 			default:
-				c.staticValue = 1;
+				c.staticValue += 1;
 				break;
 		}
+
 		if(c.type == Cell::Type::BONUS)
+		{
 			c.staticValue += BONUS_VALUE;
-		if(c.type == Cell::Type::CHOICE)
+			for(Cell::Transition& tr: c)
+			{
+				if(tr.to)
+					tr.to->staticValue -= BONUS_VALUE;
+			}
+		}
+		else if(c.type == Cell::Type::CHOICE)
+		{
 			c.staticValue += CHOICE_VALUE;
+			for(Cell::Transition& tr: c)
+			{
+				if(tr.to)
+					tr.to->staticValue -= CHOICE_VALUE;
+			}
+		}
 	}
 
 	map.check();
