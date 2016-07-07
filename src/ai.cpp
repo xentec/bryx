@@ -77,11 +77,15 @@ Move AI::move(PossibleMoves& posMoves, u32 time, u32 depth)
 
 	moveChain.clear();
 
-	Quality a = infMin, b = infMax;
+	Quality a, b;
 
 	auto reset = (game.currPlayer().color == color) ?
 				[](Quality& a, Quality& b) { a = infMin, b = infMax;}:
 				[](Quality& a, Quality& b) { a = infMax, b = infMin;};
+
+
+	reset(a, b);
+	reset(asp.a, asp.b);
 
 	if(!move.target)
 	{
@@ -529,6 +533,8 @@ Move AI::bomb(u32 time)
 #define BOMB_ENEMY_VALUE 2
 	endTime = Clock::now() + Duration(time - time/20);
 
+	println("Locating target...");
+
 	Move best{ *this, nullptr };
 	Quality bestScore = infMin;
 
@@ -560,7 +566,10 @@ Move AI::bomb(u32 time)
 			best.captures.assign(damage.begin(), damage.end());
 		}
 		if(time && Clock::now() > endTime)
+		{
+			println(console::color::YELLOW, "NO TIME!");
 			break;
+		}
 	}
 
 	return best;
@@ -611,9 +620,9 @@ Quality AI::evalState(Game &state) const
 	h -= enemies;
 
 	if(ply2type(bestPly) == color)
-		h *= 2;
+		h += 10;
 
-	h += overrides * 10; // * game.aiData.expectedOverriteValue;
+	h += overrides * 5; // * game.aiData.expectedOverriteValue;
 	h += bombs * game.aiData.bombValue;
 
 	return h;
@@ -636,7 +645,7 @@ Quality AI::evalMove(Game &state, Move &move)
 	state.execute(move);
 
 	h += evalState(state);
-	h += futureMe.possibleMoves().size() * 50;
+	h += futureMe.possibleMoves().size();
 
 	if(move.override)
 		h /= 2;
