@@ -31,8 +31,8 @@ struct Map
 
 	string asString(bool transistions = true) const;
 
-	void print() const;
-	void print(std::unordered_map<vec, console::Format> highlight) const;
+	void print(bool print_statics = true) const;
+	void print(std::unordered_map<vec, console::Format> highlight, bool print_statics = true) const;
 
 	void check() const;
 

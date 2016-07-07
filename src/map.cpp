@@ -131,50 +131,40 @@ string Map::asString(bool transistions) const
 	return str.str();
 }
 
-void Map::print() const
+void Map::print(bool print_statics) const
 {
-	print(std::unordered_map<vec, console::Format>());
+	print(std::unordered_map<vec, console::Format>(), print_statics);
 }
 
-void Map::print(std::unordered_map<vec, console::Format> highlight) const
+void Map::print(std::unordered_map<vec, console::Format> highlight, bool print_statics) const
 {
 	using namespace console;
 	if(quiet)
 		return;
 
-
 	// x axis
-	string space = printAnsi ? "": " ";
-	fmt::print("{:3}"," ");
-	if(printAnsi)
+	auto printAxisNumber = printAnsi ?
+				[](usz& x){ if(x%5 == 0) fmt::print("{:-<2}", x++); else fmt::print("-"); } :
+				[](usz& x){ if(x%5 == 0) fmt::print("{:<2}", x); else fmt::print("- "); };
+
+	u8 twice = print_statics;
+	do
 	{
+		fmt::print("{:3}"," ");
+		if(print_statics && !twice)
+			fmt::print(" ");
 		for (usz x = 0; x < width; x++)
-		{
-			if(x%5 == 0)
-				fmt::print("{:-<2}", x++);
-			else
-				fmt::print("-");
-		}
-	} else
-	{
-		for (usz x = 0; x < width; x++)
-		{
-			if(x%5 == 0)
-				fmt::print("{:<2}", x);
-			else
-				fmt::print("- ");
-		}
-	}
+			printAxisNumber(x);
+	} while(twice--);
+
 	fmt::print("\n");
 
+	printAxisNumber = [](usz& y) { if(y%5 == 0)	fmt::print("{:2} ", y);	else fmt::print(" | "); };
 
-	for (u32 y = 0; y < height; y++)
+	for (usz y = 0; y < height; y++)
 	{
 		// y axis
-		if(y%5 == 0)
-			fmt::print("{:2} ", y);
-		else
-			fmt::print(" | ");
+		printAxisNumber(y);
 
 		// map v-line
 		for (u32 x = 0; x < width; x++)
@@ -200,7 +190,54 @@ void Map::print(std::unordered_map<vec, console::Format> highlight) const
 			if(hl != highlight.cend())
 				color = hl->second;
 
-			fmt::print("{}{}{}{}", color, ch, color::RESET, space);
+			fmt::print("{}{}{}{}", color, ch, color::RESET, printAnsi ? "": " ");
+		}
+		if(print_statics)
+		{
+			fmt::print(" ");
+			printAxisNumber(y);
+
+			for (u32 x = 0; x < width; x++)
+			{
+				string ch = "░";
+				Format color;
+
+				const Cell& c = at(x, y);
+				if(c.type == Cell::Type::VOID)
+				{
+					color = c.getFormat();
+
+					ch = c.asString();
+					if(printAnsi)
+						ch = "█";
+				}
+				else
+				{
+					if(c.staticValue > 1)
+					{
+						if(c.staticValue > 20)
+							color = color::CYAN;
+						else
+							color = color::GREEN;
+					}
+					else if(c.staticValue == 1)
+					{
+						color = color::GRAY;
+					}
+					else
+					{
+						if(c.staticValue < -20)
+							color = color::MAGENTA;
+						else
+							color = color::RED;
+					}
+
+					const auto& hl = highlight.find(c.pos);
+						if(hl != highlight.cend())
+							ch = "X";
+				}
+				fmt::print("{}{}{}{}", color, ch, color::RESET, printAnsi ? "": " ");
+			}
 		}
 		fmt::print("\n");
 	}
