@@ -213,6 +213,8 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool print_s
 				}
 				else
 				{
+					if(!c.isFree())
+						ch = "#";
 					if(c.staticValue > 1)
 					{
 						if(c.staticValue > 20)
