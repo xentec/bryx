@@ -588,7 +588,7 @@ Quality AI::evalState(Game &state) const
 		if(c.isPlayer())
 			scores[type2ply(c.type)]++;
 		if(c.type == color)
-			h += c.staticValue;
+			h += 1 + c.staticValue;
 	}
 
 	u32 me = 0, enemies = 0;

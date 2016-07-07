@@ -217,7 +217,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool print_s
 						ch = "#";
 					if(c.staticValue > 1)
 					{
-						if(c.staticValue > 20)
+						if(c.staticValue > 10)
 							color = color::CYAN;
 						else
 							color = color::GREEN;
@@ -228,7 +228,7 @@ void Map::print(std::unordered_map<vec, console::Format> highlight, bool print_s
 					}
 					else
 					{
-						if(c.staticValue < -20)
+						if(c.staticValue < -10)
 							color = color::MAGENTA;
 						else
 							color = color::RED;
@@ -370,136 +370,6 @@ Map Map::load(std::istream& file)
 		catch(std::exception& e)
 		{
 			fmt::print("error in transistion [{} <-> {}]: {}\n", from.asString(), to.asString(), e.what());
-		}
-	}
-
-	// Evaluate cells
-	//#################
-	for(Cell& c: map)
-	{
-		if(c.type == Cell::Type::VOID)
-			continue;
-
-		u32 totalCounter = 0, maxCounter = 0, counter = 0;
-		for(usz j = 0; j < (2 * Direction::_LAST); j++)       //checks for walls twice, to get the length of the wall
-		{
-			if(c.trans[j % Direction::_LAST].to == nullptr)   //which is contained in maxCount
-			{
-				counter++;
-
-			}else
-			{
-				if(counter > maxCounter)
-					maxCounter = counter;
-
-				totalCounter += counter;
-				counter = 0;
-			}
-		}
-		totalCounter /= 2;
-		//maxCounter decides the maximum length of the wall
-		//totalCounter decides the total amount of walls
-		switch(maxCounter)
-		{
-			case 1:                             //at least 1 wall with no neighbour-walls
-				switch(totalCounter){
-					case 2:                     //-||- with a total of 2 attached walls
-						c.staticValue += 3;
-						break;
-					case 3:                     //-||- with a total of 3 attached walls
-						c.staticValue += 4;
-						break;
-					case 4:                     //-||- with a total of 4 attached walls
-						c.staticValue += 3;
-						break;
-					default:                    //exact 1 wall or unexpected amount of attached walls
-						c.staticValue += 2;
-						break;
-				}
-				break;
-			case 2:                             //at least 2 neighbour-walls
-				switch(totalCounter){
-					case 3:                     //...
-						c.staticValue += 4;
-						break;
-					case 4:
-						c.staticValue += 5;
-						break;
-					default:
-						c.staticValue += 3;
-						break;
-				}
-				break;
-			case 3:
-				switch(totalCounter){
-					case 4:
-						c.staticValue += 6;
-						break;
-					case 5:
-						c.staticValue += 4;
-						break;
-					case 6:
-						c.staticValue += 3;
-						break;
-					default:
-						c.staticValue += 5;
-						break;
-				}
-				break;
-			case 4:
-				switch(totalCounter){
-					case 5:
-						c.staticValue += 8;
-						break;
-					case 6:
-						c.staticValue += 6;
-						break;
-					case 7:
-						c.staticValue += 4;
-						break;
-					default:
-						c.staticValue += 10;
-						break;
-				}
-				break;
-			case 5:
-				switch(totalCounter){
-					case 6:
-						c.staticValue += 6;
-						break;
-					default:
-						c.staticValue += 7;
-						break;
-				}
-				break;
-			case 6:
-				c.staticValue += 4;
-				break;
-			case 7:
-				c.staticValue += 2;
-				break;
-			default:
-				c.staticValue += 1;
-				break;
-		}
-
-		if(c.type == Cell::Type::BONUS)
-		{
-			c.staticValue += BONUS_VALUE;
-			for(Cell::Transition& tr: c)
-			{
-				if(tr.to)
-					tr.to->staticValue -= BONUS_VALUE;
-			}
-		}
-		else if(c.type == Cell::Type::CHOICE)
-		{
-			c.staticValue += CHOICE_VALUE;
-			for(Cell::Transition& tr: c)
-			{
-				if(tr.to)
-					tr.to->staticValue -= CHOICE_VALUE;
-			}
 		}
 	}
 
