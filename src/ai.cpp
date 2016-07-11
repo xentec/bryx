@@ -557,7 +557,7 @@ Move AI::bomb(u32 time)
 			empty += !p;
 		}
 
-		u32 score = enemy*2 - empty - me*3;
+		i32 score = enemy*2 - empty - me*3;
 
 		if(score >= bestScore)
 		{
