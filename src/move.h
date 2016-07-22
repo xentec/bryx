@@ -28,6 +28,11 @@ struct Move
 		NONE = 0, BOMB = 20, OVERRIDE = 21
 	};
 
+	static struct Opts
+	{
+		bool printMap;
+	} opts;
+
 	Move(Player& player, Cell* target);
 	Move(const Move& other);
 	Move& operator =(const Move& other);

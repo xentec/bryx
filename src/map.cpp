@@ -17,6 +17,8 @@ bool Map::printAnsi = false;
 bool Map::printAnsi = true;
 #endif
 
+bool Map::printStatic = false;
+
 
 Map::Map():
 	Map(1,1)

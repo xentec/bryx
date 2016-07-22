@@ -4,6 +4,8 @@
 #include "map.h"
 #include "util/console.h"
 
+Move::Opts Move::opts = { false };
+
 Move::Move(Player& player, Cell* target):
 	player(&player),
 	target(target), override(false),
@@ -84,6 +86,11 @@ void Move::print() const
 	if(!target)
 		return;
 
+	println("{}", asString());
+
+	if(!opts.printMap)
+		return;
+
 	Format cf;
 	std::unordered_map<vec, Format> hl;
 
@@ -97,7 +104,6 @@ void Move::print() const
 	cf.setBG(Format::WHITE);
 	hl.emplace(target->pos, cf);
 
-	println("{}", asString());
 	target->getMap().print(hl);
 }
 

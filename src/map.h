@@ -17,6 +17,10 @@
 
 struct Map
 {
+	static bool printAnsi;
+	static bool printStatic;
+
+
 	Map();
 	Map(u32 width, u32 height);
 	Map(const Map& other);
@@ -31,8 +35,8 @@ struct Map
 
 	string asString(bool transistions = true) const;
 
-	void print(bool print_statics = true) const;
-	void print(std::unordered_map<vec, console::Format> highlight, bool print_statics = true) const;
+	void print(bool print_statics = printStatic) const;
+	void print(std::unordered_map<vec, console::Format> highlight, bool print_statics = printStatic) const;
 
 	void check() const;
 
@@ -46,8 +50,6 @@ private:
 	std::vector<Cell> data;
 
 public:
-	static bool printAnsi;
-
 	template<class T, class M>
 	struct iterator : std::iterator<std::random_access_iterator_tag, T>
 	{

@@ -79,6 +79,8 @@ void parseArgs(Options& opts, usz argc, char* argv[])
 		{"-q", [](Options&, const string&, usz&, const string*){ console::quiet = true; }},
 		{"-nc", [](Options&, const string&, usz&, const string*){ console::colorfull = false; }},
 		{"-na", [](Options&, const string&, usz&, const string*){ Map::printAnsi = false; }},
+		{"-st", [](Options&, const string&, usz&, const string*){ Map::printStatic = true; }},
+		{"-mm", [](Options&, const string&, usz&, const string*){ Move::opts.printMap = true; }},
 	};
 
 	static std::unordered_map<string, Mode> modes =
